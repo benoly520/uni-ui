@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "description": "面向产品的跨框架 PC Web 组件库（React 18 + Vue 3），macOS 毛玻璃设计语言，零运行时、tree-shaking。",
   "type": "module",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "benoly520",
   "sideEffects": [
     "**/*.css"
   ],

@@ -1,0 +1,12 @@
+# 依赖
+node_modules/
+
+# 构建产物（由源码构建生成，非库源码事实来源）
+dist/
+
+# WorkBuddy 运行时数据（项目内部数据，非库源码）
+.codebuddy/
+
+# 编辑器 / 系统
+.DS_Store
+*.log

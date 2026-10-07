@@ -1,0 +1,2310 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>uni-ui · 设计系统预览 — 面向产品的组件系统</title>
+<link rel="icon" href="data:," />
+
+<!-- 字体：展示字 Cabinet Grotesk（有性格的几何无衬线）+ 正文字 Satoshi（内敛现代）+ 等宽 JetBrains Mono（token 展示）。均为免费授权，避开 Inter/system-ui 默认味 -->
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&f[]=cabinet-grotesk@700,800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+/* ============================================================
+   1. 设计令牌（token）— 全部 CSS 变量，组件零硬编码
+   亮/暗通过 data-theme 覆盖语义令牌；换肤通过覆盖 --ui-color-brand
+   ============================================================ */
+/* 根字号基准：1rem = 16px；宿主覆盖 html font-size 即可整体放大缩小（产品缩放/大屏/无障碍） */
+html { font-size: 16px; }
+
+:root {
+  /* — 品牌色（可覆盖，多品牌换肤的唯一入口）— */
+  --ui-color-brand: #0a84ff;        /* 默认：Mac OS 系统蓝（systemBlue），有辨识度 */
+  --ui-color-brand-hover: #0a6cf0;
+  --ui-color-brand-soft: rgba(10, 132, 255, 0.12);
+  --ui-color-danger: #e5484d;
+  --ui-color-success: #2fa66b;
+  --ui-color-warning: #ff9f0a;          /* 警告（橙色，独立于 danger 的红色语义） */
+  --ui-color-info: var(--ui-color-brand); /* 信息（复用品牌蓝，换肤自动跟随） */
+  /* — 涨跌色（市场域，与 danger/success 刻意分开：中国「红=涨」不是 danger）— */
+  --ui-color-up: #ff453a;        /* 涨（默认 cn：红涨） */
+  --ui-color-down: #00c896;      /* 跌（默认 cn：绿跌） */
+
+  /* — 语义色（亮色，苹果风暖近白/近黑）— */
+  --ui-bg: #f5f5f7;
+  --ui-bg-elevated: #ffffff;
+  --ui-text: #1d1d1f;
+  --ui-text-muted: #6e6e73;
+  --ui-border: rgba(0, 0, 0, 0.08);
+  /* — 毛玻璃材质参数：透明度(%) + 模糊半径(px) 可调 — */
+  --ui-glass-tint: 255 255 255;            /* 毛玻璃底色 RGB（亮色浅） */
+  --ui-glass-blur: 20px;                   /* 模糊半径 px */
+  --ui-glass-saturate: 180%;               /* 饱和度 */
+  --ui-glass-opacity: 55%;                 /* 透明度（常规面） */
+  --ui-glass-opacity-strong: 72%;          /* 透明度（强面：顶栏/卡片/输入） */
+  /* 全局默认值“别名”：组件级在自身作用域重定义 --ui-glass-opacity 时，回退到此而非自身，
+     否则 var(--ui-glass-opacity, var(--ui-glass-opacity)) 自引用会触发循环依赖 → 背景整片 transparent。 */
+  --ui-glass-opacity-default: var(--ui-glass-opacity);
+  --ui-glass-blur-default: var(--ui-glass-blur);
+  --ui-shadow-color: rgba(0, 0, 0, 0.18);
+
+  /* — 紧凑利落：小圆角、4px 网格间距 — */
+  --ui-radius-sm: 4px;
+  --ui-radius-md: 7px;
+  --ui-radius-lg: 12px;
+  --ui-radius-pill: 999px;
+  --ui-space-1: 0.25rem;  --ui-space-2: 0.5rem;  --ui-space-3: 0.75rem;
+  --ui-space-4: 1rem; --ui-space-5: 1.5rem; --ui-space-6: 2.5rem; --ui-space-7: 4rem;
+
+  /* — 三级阴影，带环境色而非纯黑 — */
+  --ui-shadow-1: 0 1px 2px var(--ui-shadow-color);
+  --ui-shadow-2: 0 8px 24px rgba(0, 0, 0, 0.10);
+  --ui-shadow-3: 0 24px 64px rgba(0, 0, 0, 0.16);
+
+  /* — 动效时长与缓动 — */
+  --ui-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ui-dur-fast: 160ms;
+  --ui-dur-base: 320ms;
+
+  /* — 字体 — */
+  --ui-font-display: "Cabinet Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+  --ui-font-body: "Satoshi", -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+  --ui-font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* — 字阶（模块化）— */
+  --ui-fs-xs: 0.6875rem; --ui-fs-sm: 0.8125rem; --ui-fs-md: 0.875rem;
+  --ui-fs-lg: 1.0625rem; --ui-fs-xl: 1.5rem; --ui-fs-2xl: 2.5rem; --ui-fs-3xl: 4rem;
+
+  /* — 尺寸 Scale（4 档：大/中/微/小 = lg/md/xs/sm；md 为默认）—
+     组件内部只读下方“当前档”变量（--ui-control-h / --ui-fs-control / --ui-pad-x / --ui-icon-size），
+     尺寸类（.ui-size-*）重定义它们，组件不感知 size 本身，避免每组件硬编码尺寸。 */
+  --ui-control-h-xs: 1.5rem;     --ui-control-h-sm: 1.75rem;   --ui-control-h-md: 2rem;     --ui-control-h-lg: 2.5rem;
+  --ui-fs-control-xs: 0.6875rem; --ui-fs-control-sm: 0.75rem; --ui-fs-control-md: 0.8125rem; --ui-fs-control-lg: 0.9375rem;
+  --ui-pad-x-xs: 0.5rem;         --ui-pad-x-sm: 0.75rem;      --ui-pad-x-md: 1rem;         --ui-pad-x-lg: 1.25rem;
+  --ui-icon-size-xs: 0.75rem;    --ui-icon-size-sm: 0.875rem; --ui-icon-size-md: 1rem;     --ui-icon-size-lg: 1.25rem;
+  /* 当前档默认值（= md）；尺寸类把下列变量重定义为对应档 */
+  --ui-control-h: var(--ui-control-h-md);
+  --ui-fs-control: var(--ui-fs-control-md);
+  --ui-pad-x: var(--ui-pad-x-md);
+  --ui-icon-size: var(--ui-icon-size-md);
+  --ui-btn-min-w: 32px;   /* PC 控件最小宽（原 44px 为移动端触控尺寸，PC 工具条偏宽，下调受控） */
+
+  /* — 外部图标：组件不内置图标，任何 SVG / 图标库节点均可传入，尺寸受 token 控制 — */
+
+  /* — Segmented：浅色灰底白块（macOS 风）— */
+  --ui-seg-track: #e7e7ea;
+  --ui-seg-thumb: #ffffff;
+}
+
+/* 涨跌色约定切换：<html data-mkt="intl"> → 国际绿涨红跌（默认 cn：红涨绿跌）。
+   市场域语义，独立于 danger/success；暗色提亮在 [data-theme=dark] 内重定义。 */
+[data-mkt="intl"] { --ui-color-up: #00c896; --ui-color-down: #ff453a; }
+
+/* ============================================================
+   0. 尺寸类（ui-size-*）— 任意组件根加此类切换 4 档：大/中/微/小（lg/md/xs/sm）。
+   仅重定义“当前档”变量，回退到不同名 token，无自引用循环（见 §17.20 纪律）。
+   md 为默认，故只需 xs/sm/lg 三档类；组件内部统一读 --ui-control-h / --ui-fs-control /
+   --ui-pad-x / --ui-icon-size，不感知 size 本身。
+   ============================================================ */
+.ui-size-xs { --ui-control-h: var(--ui-control-h-xs); --ui-fs-control: var(--ui-fs-control-xs); --ui-pad-x: var(--ui-pad-x-xs); --ui-icon-size: var(--ui-icon-size-xs); }
+.ui-size-sm { --ui-control-h: var(--ui-control-h-sm); --ui-fs-control: var(--ui-fs-control-sm); --ui-pad-x: var(--ui-pad-x-sm); --ui-icon-size: var(--ui-icon-size-sm); }
+.ui-size-lg { --ui-control-h: var(--ui-control-h-lg); --ui-fs-control: var(--ui-fs-control-lg); --ui-pad-x: var(--ui-pad-x-lg); --ui-icon-size: var(--ui-icon-size-lg); }
+
+/* 暗色：仅覆盖语义令牌，组件代码不变 */
+[data-theme="dark"] {
+  --ui-bg: #0a0a0c;
+  --ui-bg-elevated: #1c1c1e;
+  --ui-text: #f5f5f7;
+  --ui-text-muted: #98989d;
+  --ui-border: rgba(255, 255, 255, 0.10);
+  --ui-glass-tint: 28 28 30;               /* 暗色深底 */
+  --ui-glass-opacity: 50%;
+  --ui-glass-opacity-strong: 72%;
+  --ui-shadow-color: rgba(0, 0, 0, 0.55);
+  --ui-shadow-2: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --ui-shadow-3: 0 24px 64px rgba(0, 0, 0, 0.6);
+  --ui-color-brand-soft: rgba(10, 132, 255, 0.20);
+  /* Segmented 暗色：轨道更深、选中块提亮（对应浅色灰底白块） */
+  --ui-seg-track: #2b2b2d;
+  --ui-seg-thumb: #5a5a5e;
+  /* 涨跌色暗色提亮（保证玻璃面对比度）：systemRed/systemGreen 提亮值 */
+  --ui-color-up: #ff6961;
+  --ui-color-down: #30d158;
+}
+[data-theme="dark"][data-mkt="intl"] { --ui-color-up: #30d158; --ui-color-down: #ff6961; }
+
+/* ============================================================
+   2. 基础重置 + 排版 + 焦点
+   ============================================================ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--ui-font-body);
+  font-size: var(--ui-fs-md);
+  line-height: 1.6;
+  color: var(--ui-text);
+  background: var(--ui-bg);
+  -webkit-font-smoothing: antialiased;
+  transition: background var(--ui-dur-base) var(--ui-ease), color var(--ui-dur-base) var(--ui-ease);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+/* 氛围层：渐变网格 + 噪点（反 AI 味清单 #8 不命中） */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background:
+    radial-gradient(48rem 36rem at 8% -8%, rgba(82, 70, 229, 0.20), transparent 60%),
+    radial-gradient(40rem 30rem at 100% 0%, rgba(0, 184, 212, 0.14), transparent 55%),
+    radial-gradient(36rem 28rem at 60% 110%, rgba(229, 72, 77, 0.10), transparent 55%);
+  filter: blur(0.5px);
+}
+body::after {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* 焦点圈：2px brand + 2px 偏移，键盘可达性 */
+:focus-visible { outline: 2px solid var(--ui-color-brand); outline-offset: 2px; border-radius: var(--ui-radius-sm); }
+h1, h2, h3 { font-family: var(--ui-font-display); font-weight: 800; letter-spacing: -0.03em; line-height: 1.02; }
+a { color: var(--ui-color-brand); text-decoration: none; }
+
+/* ============================================================
+   3. 布局容器（非对称、留白或密度可控）
+   ============================================================ */
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 var(--ui-space-5); }
+.section { padding: var(--ui-space-7) 0; }
+.eyebrow {
+  font-family: var(--ui-font-mono); font-size: var(--ui-fs-xs); letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--ui-color-brand); margin-bottom: var(--ui-space-3);
+}
+.section-title { font-size: var(--ui-fs-2xl); margin-bottom: var(--ui-space-2); }
+.section-sub { color: var(--ui-text-muted); font-size: var(--ui-fs-lg); max-width: 56ch; }
+
+/* 顶栏：毛玻璃 */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--ui-space-3) var(--ui-space-5);
+  /* 顶栏玻璃：默认走“强面”不透明度；可被 --ui-nav-glass-opacity / --ui-nav-glass-blur 独立覆盖 */
+  background: rgb(var(--ui-glass-tint) / var(--ui-nav-glass-opacity, var(--ui-glass-opacity-strong)));
+  backdrop-filter: blur(var(--ui-nav-glass-blur, var(--ui-glass-blur))) saturate(var(--ui-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--ui-nav-glass-blur, var(--ui-glass-blur))) saturate(var(--ui-glass-saturate));
+  border-bottom: 1px solid var(--ui-border);
+}
+.brand { font-family: var(--ui-font-display); font-weight: 800; font-size: var(--ui-fs-lg); letter-spacing: -0.03em; }
+.brand .dot { color: var(--ui-color-brand); }
+.nav-controls { display: flex; gap: var(--ui-space-2); align-items: center; }
+
+/* ============================================================
+   4. 毛玻璃面（ui-glass）— macOS 材质核心
+   ============================================================ */
+.ui-glass {
+  /* 卡片旋钮：未设 --ui-card-glass-* 时回退全局默认；对话框 / Toast 在下方用自身旋钮覆盖 */
+  --ui-glass-opacity: var(--ui-card-glass-opacity, var(--ui-glass-opacity-default));
+  --ui-glass-blur: var(--ui-card-glass-blur, var(--ui-glass-blur-default));
+  background: rgb(var(--ui-glass-tint) / var(--ui-glass-opacity));
+  backdrop-filter: blur(var(--ui-glass-blur)) saturate(var(--ui-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--ui-glass-blur)) saturate(var(--ui-glass-saturate));
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
+  box-shadow: var(--ui-shadow-2);
+}
+/* 逐组件独立玻璃旋钮：组件在自身作用域把 --ui-glass-opacity/blur 重定义为
+   “组件旋钮 → 全局默认”的回退链。Dialog / Toast 既能跟随全局，又能被
+   --ui-dialog-glass-opacity 之类独立覆盖，且互不干扰。 */
+.ui-dialog { --ui-glass-opacity: var(--ui-dialog-glass-opacity, var(--ui-glass-opacity-default));
+             --ui-glass-blur: var(--ui-dialog-glass-blur, var(--ui-glass-blur-default)); }
+.ui-toast   { --ui-glass-opacity: var(--ui-toast-glass-opacity, var(--ui-glass-opacity-default));
+             --ui-glass-blur: var(--ui-toast-glass-blur, var(--ui-glass-blur-default)); }
+
+/* ============================================================
+   5. 组件：Button（ui-btn）
+   变体 primary/default/ghost/outline/danger；形状 pill（修饰类）；尺寸 大/中/微/小（ui-size-*）；状态全
+   ============================================================ */
+.ui-btn {
+  font-family: var(--ui-font-body); font-weight: 700; font-size: var(--ui-fs-control);
+  height: var(--ui-control-h); padding: 0 var(--ui-pad-x);
+  border-radius: var(--ui-radius-md); border: 1px solid transparent;
+  display: inline-flex; align-items: center; gap: var(--ui-space-2);
+  cursor: pointer; min-width: var(--ui-btn-min-w);
+  transition: background var(--ui-dur-fast) ease, transform var(--ui-dur-fast) var(--ui-ease),
+              box-shadow var(--ui-dur-fast) ease, border-color var(--ui-dur-fast) ease;
+  user-select: none;
+}
+.ui-btn--primary { background: var(--ui-color-brand); color: #fff; box-shadow: var(--ui-shadow-1); }
+.ui-btn--primary:hover { background: var(--ui-color-brand-hover); transform: translateY(-1px); }
+.ui-btn--default { background: rgb(var(--ui-glass-tint) / var(--ui-btn-glass-opacity, var(--ui-glass-opacity-strong))); color: var(--ui-text); border-color: var(--ui-border); }
+.ui-btn--default:hover { background: var(--ui-bg-elevated); transform: translateY(-1px); }
+.ui-btn--ghost { background: transparent; color: var(--ui-text); }
+.ui-btn--ghost:hover { background: var(--ui-color-brand-soft); }
+.ui-btn--outline { background: transparent; color: var(--ui-text); border-color: var(--ui-border); }
+.ui-btn--outline:hover { border-color: var(--ui-color-brand); color: var(--ui-color-brand); background: var(--ui-color-brand-soft); }
+.ui-btn--danger { background: var(--ui-color-danger); color: #fff; }
+.ui-btn--danger:hover { transform: translateY(-1px); filter: brightness(0.95); }
+.ui-btn:active { transform: translateY(0) scale(0.98); }
+.ui-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+.ui-btn--loading { color: transparent; position: relative; pointer-events: none; }
+.ui-btn--loading::after {
+  content: ""; position: absolute; width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff;
+  animation: ui-spin 0.6s linear infinite;
+}
+@keyframes ui-spin { to { transform: rotate(360deg); } }
+/* 胶囊形状：作为修饰类，可与任意语义变体（primary/default/ghost/danger/outline）叠加，形状与语义正交 */
+.ui-btn--pill { border-radius: var(--ui-radius-pill); }
+
+/* Icon — 外部图标插槽：组件不内置图标，任意 SVG / 图标库节点均可传入；尺寸受 --ui-icon-size 控制，颜色继承 currentColor */
+.ui-icon { width: var(--ui-icon-size); height: var(--ui-icon-size); display: inline-flex; flex: none; align-items: center; justify-content: center; }
+.ui-icon svg { width: 100%; height: 100%; display: block; }
+.ui-icon--sm { width: 14px; height: 14px; }
+.ui-icon--lg { width: 20px; height: 20px; }
+
+/* ============================================================
+   6. Input / Switch / Segmented / Card / Tabs / Tooltip / Badge
+   ============================================================ */
+.ui-field { display: flex; flex-direction: column; gap: var(--ui-space-2); }
+.ui-label { font-size: var(--ui-fs-sm); font-weight: 500; color: var(--ui-text-muted); }
+.ui-input {
+  font-family: var(--ui-font-body); font-size: var(--ui-fs-control); color: var(--ui-text);
+  height: var(--ui-control-h); padding: 0 var(--ui-pad-x);
+  background: rgb(var(--ui-glass-tint) / var(--ui-input-glass-opacity, var(--ui-glass-opacity-strong))); border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md); min-width: 240px;
+  transition: border-color var(--ui-dur-fast) ease, box-shadow var(--ui-dur-fast) ease;
+}
+.ui-input:focus { outline: none; border-color: var(--ui-color-brand); box-shadow: 0 0 0 3px var(--ui-color-brand-soft); }
+.ui-input::placeholder { color: var(--ui-text-muted); }
+.ui-input--error { border-color: var(--ui-color-danger); box-shadow: 0 0 0 3px rgba(229,72,77,0.14); }
+
+/* Switch — macOS 毛玻璃 toggle（尺寸跟随 scale：track 高=控件高，宽=1.7×高，thumb=高−6，位移=0.7×高） */
+.ui-switch { position: relative; width: calc(var(--ui-control-h) * 1.7); height: var(--ui-control-h); border-radius: var(--ui-radius-pill);
+  background: var(--ui-border); border: none; cursor: pointer; transition: background var(--ui-dur-fast) var(--ui-ease); }
+.ui-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: calc(var(--ui-control-h) - 6px); height: calc(var(--ui-control-h) - 6px);
+  border-radius: 50%; background: #fff; box-shadow: var(--ui-shadow-1);
+  transition: transform var(--ui-dur-fast) var(--ui-ease); }
+.ui-switch[aria-checked="true"] { background: var(--ui-color-brand); }
+.ui-switch[aria-checked="true"]::after { transform: translateX(calc(var(--ui-control-h) * 0.7)); }
+
+/* Segmented control — 苹果分段控件：灰底白块、选中滑块 */
+.ui-segmented { display: inline-flex; padding: 3px; border-radius: var(--ui-radius-md);
+  background: var(--ui-seg-track); border: 1px solid var(--ui-border); position: relative; }
+.ui-segmented button { font-family: var(--ui-font-body); font-weight: 500; font-size: var(--ui-fs-control);
+  color: var(--ui-text-muted); background: transparent; border: none; border-radius: var(--ui-radius-sm);
+  padding: 0 var(--ui-pad-x); cursor: pointer; min-height: var(--ui-control-h); position: relative; z-index: 1; transition: color var(--ui-dur-fast) ease; }
+.ui-segmented button[aria-pressed="true"] { color: var(--ui-text); font-weight: 700; }
+.ui-segmented .thumb { position: absolute; top: 3px; bottom: 3px; border-radius: var(--ui-radius-sm);
+  background: var(--ui-seg-thumb); box-shadow: var(--ui-shadow-1); transition: left var(--ui-dur-fast) var(--ui-ease), width var(--ui-dur-fast) var(--ui-ease); z-index: 0; }
+
+/* Card */
+.ui-card { padding: var(--ui-space-5); }
+.ui-card h3 { font-size: var(--ui-fs-lg); margin-bottom: var(--ui-space-2); }
+.ui-card p { color: var(--ui-text-muted); font-size: var(--ui-fs-sm); }
+
+/* Tabs */
+.ui-tabs { display: flex; gap: var(--ui-space-4); }
+.ui-tabs-wrap { position: relative; }
+.ui-tabs-scroll { overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; -ms-overflow-style: none;
+  border-bottom: 1px solid var(--ui-border); }
+.ui-tabs-scroll::-webkit-scrollbar { display: none; }
+.ui-tabs-arrow { position: absolute; top: 0; bottom: 0; width: 34px; display: none; align-items: center;
+  border: none; cursor: pointer; z-index: 2; color: var(--ui-text); padding: 0;
+  background: rgb(var(--ui-glass-tint) / 0.82);
+  backdrop-filter: blur(10px) saturate(var(--ui-glass-saturate));
+  -webkit-backdrop-filter: blur(10px) saturate(var(--ui-glass-saturate)); }
+.ui-tabs-arrow.is-visible { display: flex; }
+.ui-tabs-arrow:hover { color: var(--ui-color-brand); }
+.ui-tabs-arrow::before { content: ""; width: 9px; height: 9px; border-right: 2px solid currentColor; border-top: 2px solid currentColor; }
+.ui-tabs-arrow--left  { left: 0; justify-content: flex-end; padding-right: 7px; }
+.ui-tabs-arrow--left::before  { transform: rotate(-135deg); }
+.ui-tabs-arrow--right { right: 0; justify-content: flex-start; padding-left: 7px; }
+.ui-tabs-arrow--right::before { transform: rotate(45deg); }
+.ui-tabs button { font-family: var(--ui-font-body); font-weight: 500; font-size: var(--ui-fs-md);
+  background: none; border: none; color: var(--ui-text-muted); padding: var(--ui-space-3) 0;
+  cursor: pointer; position: relative; min-height: var(--ui-control-h); flex: none; white-space: nowrap; }
+.ui-tabs button[aria-selected="true"] { color: var(--ui-text); }
+.ui-tabs button[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--ui-color-brand); border-radius: 2px; }
+.ui-tabpanel { margin-top: var(--ui-space-3); padding: var(--ui-space-4); border: 1px solid var(--ui-border); border-radius: var(--ui-radius-md); color: var(--ui-text-muted); font-size: var(--ui-fs-sm); }
+.ui-tabpanel[hidden] { display: none; }
+
+/* Tooltip — 默认反转色（invert，macOS 惯例）；加 .ui-tip--surface 关闭反转、切换为「跟随主题表面 + 毛玻璃」 */
+.ui-tip { position: relative; display: inline-flex; }
+.ui-tip .bubble { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(4px);
+  /* invert=true（默认）：用「文字色 / 背景色」对调实现反转色 —— 浅色黑底白字、暗色白底黑字 */
+  background: var(--ui-text); color: var(--ui-bg); font-size: var(--ui-fs-xs); padding: var(--ui-space-2) var(--ui-space-3);
+  border-radius: var(--ui-radius-sm); white-space: nowrap; opacity: 0; pointer-events: none;
+  transition: opacity var(--ui-dur-fast) ease, transform var(--ui-dur-fast) var(--ui-ease); }
+.ui-tip:hover .bubble { opacity: 1; transform: translateX(-50%) translateY(0); }
+/* invert=false（跟随表面 + 毛玻璃）：纳入逐组件玻璃旋钮 --ui-tooltip-glass-opacity / --ui-tooltip-glass-blur；
+   回退到全局默认 --ui-glass-opacity / --ui-glass-blur（不同名，无自引用循环）。 */
+.ui-tip.ui-tip--surface .bubble {
+  background: rgb(var(--ui-glass-tint) / var(--ui-tooltip-glass-opacity, var(--ui-glass-opacity)));
+  color: var(--ui-text); border: 1px solid var(--ui-border);
+  backdrop-filter: blur(var(--ui-tooltip-glass-blur, var(--ui-glass-blur))) saturate(var(--ui-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--ui-tooltip-glass-blur, var(--ui-glass-blur))) saturate(var(--ui-glass-saturate)); }
+/* 演示用：强制气泡常显，便于实时观察透明度 / 模糊旋钮（不影响真实 hover 行为） */
+.ui-tip.ui-tip--demo .bubble { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ============================================================
+   6b. 金融域组件：Stat（指标卡）+ Number（数字着色）+ Data Table
+   ============================================================ */
+/* Number：等宽数字 + 涨跌着色工具类 */
+.ui-num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+.ui-num--up { color: var(--ui-color-up); }
+.ui-num--down { color: var(--ui-color-down); }
+.ui-num--muted { color: var(--ui-text-muted); }
+.ui-num[ data-num] { text-align: right; }
+
+/* Stat：标签 + 主值 + 涨跌 delta（箭头 + 色） */
+.ui-stat { display: flex; flex-direction: column; gap: 4px; }
+.ui-stat .label { font-size: var(--ui-fs-sm); color: var(--ui-text-muted); }
+.ui-stat .value { font-size: var(--ui-fs-2xl); font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; letter-spacing: -0.02em; }
+.ui-stat .delta { font-size: var(--ui-fs-sm); font-weight: 600; font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 4px; }
+.ui-stat .delta::before { content: ""; width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; }
+.ui-stat .delta.ui-num--up::before { border-bottom: 6px solid var(--ui-color-up); }
+.ui-stat .delta.ui-num--down::before { border-top: 6px solid var(--ui-color-down); }
+
+/* Data Table — 毛玻璃容器 + 横向滚动；紧凑密度（金融默认） */
+.ui-table { overflow-x: auto; border: 1px solid var(--ui-border); border-radius: var(--ui-radius-md);
+  background: rgb(var(--ui-glass-tint) / var(--ui-glass-opacity-strong)); }
+.ui-table table { width: 100%; border-collapse: collapse; font-size: var(--ui-fs-sm); }
+.ui-table th, .ui-table td { padding: var(--ui-space-3); text-align: left; border-bottom: 1px solid var(--ui-border); white-space: nowrap; }
+.ui-table thead th { position: sticky; top: 0;
+  background: rgb(var(--ui-glass-tint) / 0.92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  color: var(--ui-text-muted); font-weight: 600; cursor: pointer; user-select: none; }
+.ui-table thead th:hover { color: var(--ui-text); }
+.ui-table thead th .arrow { opacity: 0; margin-left: 4px; font-size: 0.7em; }
+.ui-table thead th.is-sorted .arrow { opacity: 1; color: var(--ui-color-brand); }
+.ui-table tbody tr:last-child td { border-bottom: none; }
+.ui-table tbody tr:hover { background: rgb(var(--ui-glass-tint) / 0.40); }
+.ui-table th[data-num], .ui-table td[data-num] { text-align: right; font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+.ui-table--compact th, .ui-table--compact td { padding: 5px 12px; }   /* 紧凑密度：投研信息密度 */
+.ui-table--comfortable th, .ui-table--comfortable td { padding: var(--ui-space-4); }
+
+
+.ui-badge { display: inline-flex; align-items: center; gap: 4px; font-size: var(--ui-fs-xs); font-weight: 700;
+  padding: 2px 8px; border-radius: var(--ui-radius-pill); background: var(--ui-color-brand-soft); color: var(--ui-color-brand); }
+.ui-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--ui-color-brand);
+  color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: var(--ui-fs-sm); }
+
+/* Toast / Dialog */
+.ui-toast { position: fixed; right: var(--ui-space-5); bottom: var(--ui-space-5); z-index: 100;
+  padding: var(--ui-space-3) var(--ui-space-4); display: flex; gap: var(--ui-space-3); align-items: center;
+  font-size: var(--ui-fs-sm); transform: translateY(120%); opacity: 0;
+  transition: transform var(--ui-dur-base) var(--ui-ease), opacity var(--ui-dur-base) var(--ui-ease); }
+.ui-toast.show { transform: translateY(0); opacity: 1; }
+.ui-overlay { position: fixed; inset: 0; z-index: 90; background: rgba(0,0,0,0.30);
+  backdrop-filter: blur(6px); display: grid; place-items: center; padding: var(--ui-space-5);
+  opacity: 0; pointer-events: none; transition: opacity var(--ui-dur-base) var(--ui-ease); }
+.ui-overlay.show { opacity: 1; pointer-events: auto; }
+.ui-dialog { width: min(420px, 100%); padding: var(--ui-space-5);
+  transform: scale(0.94); transition: transform var(--ui-dur-base) var(--ui-ease); }
+.ui-overlay.show .ui-dialog { transform: scale(1); }
+.ui-dialog h3 { font-size: var(--ui-fs-xl); margin-bottom: var(--ui-space-3); }
+.ui-dialog-actions { display: flex; justify-content: flex-end; gap: var(--ui-space-3); margin-top: var(--ui-space-5); }
+
+/* ============================================================
+   6c. 投研业务组件（P1/P2 缺口，本轮补进预览页）
+   Drawer / Select / Search / Form / Pagination / Tag / Message / Progress / Skeleton / Empty
+   ============================================================ */
+/* Drawer — 侧滑抽屉：投研点股票右侧滑出详情，不打断主视图（P1） */
+.ui-drawer-overlay { position: fixed; inset: 0; z-index: 95; background: rgba(0,0,0,0.32);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); opacity: 0; pointer-events: none; transition: opacity var(--ui-dur-base) var(--ui-ease); }
+.ui-drawer-overlay.show { opacity: 1; pointer-events: auto; }
+.ui-drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(420px, 92vw); z-index: 96;
+  background: rgb(var(--ui-glass-tint) / var(--ui-glass-opacity-strong));
+  backdrop-filter: blur(var(--ui-glass-blur)) saturate(var(--ui-glass-saturate)); -webkit-backdrop-filter: blur(var(--ui-glass-blur)) saturate(var(--ui-glass-saturate));
+  border-left: 1px solid var(--ui-border); box-shadow: var(--ui-shadow-3);
+  transform: translateX(100%); transition: transform var(--ui-dur-base) var(--ui-ease); display: flex; flex-direction: column; }
+.ui-drawer-overlay.show .ui-drawer { transform: translateX(0); }
+.ui-drawer header { display: flex; justify-content: space-between; align-items: center; gap: var(--ui-space-3); padding: var(--ui-space-5); border-bottom: 1px solid var(--ui-border); }
+.ui-drawer .body { padding: var(--ui-space-5); overflow-y: auto; display: flex; flex-direction: column; gap: var(--ui-space-4); }
+
+/* Select — 自定义下拉（单/多选/可搜索），选股/选行业/选财报期（P1） */
+.ui-select { position: relative; min-width: 200px; }
+.ui-select-trigger { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--ui-space-2);
+  height: var(--ui-control-h); padding: 0 var(--ui-pad-x); font-family: var(--ui-font-body); font-size: var(--ui-fs-control); color: var(--ui-text);
+  background: rgb(var(--ui-glass-tint) / var(--ui-input-glass-opacity, var(--ui-glass-opacity-strong))); border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md); cursor: pointer; text-align: left; }
+.ui-select-trigger[aria-expanded="true"] { border-color: var(--ui-color-brand); box-shadow: 0 0 0 3px var(--ui-color-brand-soft); }
+.ui-select-trigger .caret { transition: transform var(--ui-dur-fast) var(--ui-ease); color: var(--ui-text-muted); }
+.ui-select.open .ui-select-trigger .caret { transform: rotate(180deg); }
+.ui-select-menu { position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 20; display: none; max-height: 260px; overflow-y: auto;
+  padding: var(--ui-space-2); background: rgb(var(--ui-glass-tint) / 0.96); border: 1px solid var(--ui-border); border-radius: var(--ui-radius-md);
+  box-shadow: var(--ui-shadow-3); backdrop-filter: blur(18px) saturate(var(--ui-glass-saturate)); -webkit-backdrop-filter: blur(18px) saturate(var(--ui-glass-saturate)); }
+.ui-select.open .ui-select-menu { display: block; }
+.ui-select-search { width: 100%; height: var(--ui-control-h-sm); margin-bottom: var(--ui-space-2); padding: 0 var(--ui-space-3); font-size: var(--ui-fs-control);
+  color: var(--ui-text); background: transparent; border: 1px solid var(--ui-border); border-radius: var(--ui-radius-sm); }
+.ui-select-search:focus { outline: none; border-color: var(--ui-color-brand); }
+.ui-select-option { display: flex; align-items: center; justify-content: space-between; gap: var(--ui-space-2); padding: 6px var(--ui-space-3);
+  border-radius: var(--ui-radius-sm); cursor: pointer; font-size: var(--ui-fs-control); }
+.ui-select-option[aria-selected="true"] { color: var(--ui-color-brand); font-weight: 700; }
+.ui-select-option .check { opacity: 0; flex: none; }
+.ui-select-option[aria-selected="true"] .check { opacity: 1; }
+.ui-select-option[aria-selected="true"].multi { color: var(--ui-color-brand); }
+
+/* Search — 全局搜（带联想下拉），搜股票/基金/研报（P1） */
+.ui-search { position: relative; min-width: 240px; }
+.ui-search-input { width: 100%; height: var(--ui-control-h); padding: 0 var(--ui-pad-x) 0 calc(var(--ui-pad-x) + 22px); font-size: var(--ui-fs-control); color: var(--ui-text);
+  background: rgb(var(--ui-glass-tint) / var(--ui-input-glass-opacity, var(--ui-glass-opacity-strong))); border: 1px solid var(--ui-border); border-radius: var(--ui-radius-pill); }
+.ui-search-input:focus { outline: none; border-color: var(--ui-color-brand); box-shadow: 0 0 0 3px var(--ui-color-brand-soft); }
+.ui-search .ico { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--ui-text-muted); pointer-events: none; }
+.ui-search-suggest { position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 20; display: none; padding: var(--ui-space-2);
+  background: rgb(var(--ui-glass-tint) / 0.96); border: 1px solid var(--ui-border); border-radius: var(--ui-radius-md); box-shadow: var(--ui-shadow-3);
+  backdrop-filter: blur(18px) saturate(var(--ui-glass-saturate)); -webkit-backdrop-filter: blur(18px) saturate(var(--ui-glass-saturate)); }
+.ui-search.open .ui-search-suggest { display: block; }
+.ui-search-suggest .opt { display: flex; justify-content: space-between; gap: var(--ui-space-2); padding: 6px var(--ui-space-3); border-radius: var(--ui-radius-sm); cursor: pointer; font-size: var(--ui-fs-control); }
+.ui-search-suggest .opt:hover, .ui-search-suggest .opt.active { background: var(--ui-color-brand-soft); }
+.ui-search-suggest .opt .code { font-family: var(--ui-font-mono); color: var(--ui-text-muted); }
+
+/* Form — 字段栅格 + 校验提示（回测参数/筛选表单）（P1，修复「只有单个 Input」） */
+.ui-form { display: flex; flex-direction: column; gap: var(--ui-space-4); }
+.ui-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: var(--ui-space-4); }
+.ui-form-row { display: flex; flex-direction: column; gap: var(--ui-space-2); }
+.ui-form-error { color: var(--ui-color-danger); font-size: var(--ui-fs-xs); min-height: 1em; margin-top: 2px; }
+
+/* Pagination — 翻页（P1） */
+.ui-pagination { display: inline-flex; align-items: center; gap: 4px; }
+.ui-pagination button { min-width: 32px; height: var(--ui-control-h-sm); padding: 0 var(--ui-space-2); border-radius: var(--ui-radius-sm); font-size: var(--ui-fs-control);
+  border: 1px solid var(--ui-border); background: rgb(var(--ui-glass-tint) / var(--ui-glass-opacity-strong)); color: var(--ui-text); cursor: pointer; }
+.ui-pagination button.is-active { background: var(--ui-color-brand); color: #fff; border-color: var(--ui-color-brand); }
+.ui-pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Tag — 分类标签（区别于计数型 Badge：沪深300 / 增持 / 行业）（P2） */
+.ui-tag { display: inline-flex; align-items: center; gap: 4px; font-size: var(--ui-fs-xs); font-weight: 600; padding: 2px 8px;
+  border-radius: var(--ui-radius-sm); border: 1px solid var(--ui-border); background: transparent; color: var(--ui-text-muted); }
+.ui-tag--brand { color: var(--ui-color-brand); border-color: var(--ui-color-brand); }
+.ui-tag--up { color: var(--ui-color-up); border-color: var(--ui-color-up); }
+.ui-tag--down { color: var(--ui-color-down); border-color: var(--ui-color-down); }
+
+/* Message — 顶部全局通知（区别于角落 Toast：流程级结果/成功）（P2，修复 aria-live 缺失） */
+.ui-message { position: fixed; top: var(--ui-space-4); left: 50%; transform: translate(-50%, -140%); z-index: 110; opacity: 0;
+  display: flex; gap: var(--ui-space-3); align-items: center; min-width: 240px; max-width: 90vw; padding: var(--ui-space-3) var(--ui-space-4); font-size: var(--ui-fs-sm);
+  border-radius: var(--ui-radius-md); border: 1px solid var(--ui-border); box-shadow: var(--ui-shadow-3);
+  background: rgb(var(--ui-glass-tint) / var(--ui-glass-opacity-strong)); backdrop-filter: blur(var(--ui-glass-blur)) saturate(var(--ui-glass-saturate)); -webkit-backdrop-filter: blur(var(--ui-glass-blur)) saturate(var(--ui-glass-saturate));
+  transition: transform var(--ui-dur-base) var(--ui-ease), opacity var(--ui-dur-base) var(--ui-ease); }
+.ui-message.show { transform: translate(-50%, 0); opacity: 1; }
+.ui-message .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--ui-color-brand); }
+.ui-message--success .dot { background: var(--ui-color-success); }
+.ui-message--warning .dot { background: var(--ui-color-warning); }
+.ui-message--danger .dot { background: var(--ui-color-danger); }
+.ui-message--info .dot { background: var(--ui-color-info); }
+
+/* Progress — 回测/导入进度（P2） */
+.ui-progress { height: 8px; border-radius: var(--ui-radius-pill); background: var(--ui-border); overflow: hidden; }
+.ui-progress > span { display: block; height: 100%; background: var(--ui-color-brand); border-radius: var(--ui-radius-pill); transition: width var(--ui-dur-base) var(--ui-ease); }
+
+/* Skeleton — 加载占位（P2，修复大数据加载态缺失） */
+.ui-skeleton { border-radius: var(--ui-radius-sm); background: linear-gradient(90deg, var(--ui-border) 25%, rgba(128,128,128,0.18) 37%, var(--ui-border) 63%); background-size: 400% 100%; animation: ui-shimmer 1.4s ease infinite; }
+@keyframes ui-shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+/* Empty — 空状态（P2） */
+.ui-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--ui-space-3); padding: var(--ui-space-6); color: var(--ui-text-muted); text-align: center; }
+.ui-empty .ico { width: 40px; height: 40px; opacity: 0.5; }
+
+/* 信息密度（问题修复）：紧凑/宽松可切换，投研默认紧凑（P1 density） */
+:root { --ui-cell-pad-y: var(--ui-space-5); }
+html.density-cozy { --ui-cell-pad-y: var(--ui-space-6); }
+
+
+/* 全局盒模型：padding/border 计入 width，避免窄屏 cell 被 padding 撑出溢出 */
+*, *::before, *::after { box-sizing: border-box; }
+/* 消除移动端点击可聚焦元素时浏览器默认的灰蓝高亮背景（tap highlight）；键盘焦点蓝环(:focus-visible)保留 */
+html { -webkit-tap-highlight-color: transparent; }
+/* range 滑块作为 flex 子项需可收缩，否则窄屏因固有宽度撑破布局 */
+input[type="range"] { width: 100%; min-width: 0; }
+
+/* ============================================================
+   7. 画廊网格（错落、非对称，反一模一样居中三卡）
+   ============================================================ */
+.gallery { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--ui-space-4); margin-top: var(--ui-space-5); }
+.cell { padding: var(--ui-cell-pad-y) var(--ui-space-5); display: flex; flex-direction: column; gap: var(--ui-space-3); min-width: 0; }
+.cell h3 { font-size: var(--ui-fs-md); font-family: var(--ui-font-body); font-weight: 700; letter-spacing: -0.01em; color: var(--ui-text-muted); margin-bottom: var(--ui-space-1); }
+.cell-4 { grid-column: span 4; } .cell-6 { grid-column: span 6; } .cell-8 { grid-column: span 8; } .cell-12 { grid-column: span 12; }
+.row { display: flex; flex-wrap: wrap; gap: var(--ui-space-3); align-items: center; }
+
+/* token 色块 */
+.swatch { width: 100%; height: 56px; border-radius: var(--ui-radius-md); border: 1px solid var(--ui-border); }
+.token-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--ui-space-3); }
+.token-label { font-family: var(--ui-font-mono); font-size: var(--ui-fs-xs); color: var(--ui-text-muted); margin-top: 6px; }
+
+/* 换肤色板 */
+.skin { width: 40px; height: 40px; border-radius: var(--ui-radius-pill); border: 2px solid transparent; cursor: pointer; }
+.skin[aria-pressed="true"] { border-color: var(--ui-text); }
+
+/* 入场序列 */
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity var(--ui-dur-base) var(--ui-ease), transform var(--ui-dur-base) var(--ui-ease); }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .reveal:nth-child(2) { transition-delay: 70ms; }
+  .reveal:nth-child(3) { transition-delay: 140ms; }
+  .reveal:nth-child(4) { transition-delay: 210ms; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .ui-btn, .ui-switch, .ui-segmented .thumb, .ui-dialog, .ui-toast, .ui-overlay, .ui-tip .bubble { transition: none !important; }
+}
+
+/* 响应式意图：手机端（≤768px）画廊单列上下展示，避免多列挤在一起 */
+/* ——— 虚拟滚动表格（金融规模件：千只标的级，固定行高 + 仅渲染可视窗口）——— */
+.ui-vtable { max-height: 320px; overflow: auto; border: 1px solid var(--ui-border); border-radius: var(--ui-radius-md); background: var(--ui-bg-elevated); position: relative; }
+.ui-vtable-head { position: sticky; top: 0; z-index: 3; display: grid; grid-template-columns: 1.6fr 0.9fr 0.9fr 0.8fr 0.9fr 1fr; background: var(--ui-bg-elevated); box-shadow: inset 0 -1px 0 var(--ui-border); font-weight: 700; }
+.ui-vtable-row { position: absolute; left: 0; right: 0; display: grid; grid-template-columns: 1.6fr 0.9fr 0.9fr 0.8fr 0.9fr 1fr; height: 33px; box-sizing: border-box; will-change: transform; }
+.ui-vtable-head > span, .ui-vtable-row > span { padding: 0 12px; line-height: 33px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid var(--ui-border); }
+.ui-vtable-row:hover { background: rgb(var(--ui-glass-tint) / 0.40); }
+.ui-vtable-row .sticky-col, .ui-vtable-head .sticky-col { position: sticky; left: 0; background: var(--ui-bg-elevated); z-index: 1; }
+.ui-vtable-head .sticky-col { z-index: 4; }
+.ui-vtable-row [data-num] { text-align: right; font-variant-numeric: tabular-nums; }
+.ui-vtable-meta { font-size: var(--ui-fs-xs); color: var(--ui-text-muted); margin-top: 6px; }
+
+@media (max-width: 768px) {
+  .gallery { grid-template-columns: 1fr; }
+  .cell-4, .cell-6, .cell-8, .cell-12 { grid-column: span 1; }
+  .nav { flex-wrap: wrap; gap: var(--ui-space-3); padding: var(--ui-space-3) var(--ui-space-4); }
+  :root { --ui-fs-3xl: 44px; --ui-fs-2xl: 32px; }
+}
+
+/* ============================================================
+   17.28 金融增强组件：DatePicker / NumberInput / Popover / 图表桥接 / Table 增强
+   全部 token 驱动，组件零内置逻辑耦合，纯 DOM 便于 React/Vue 复用
+   ============================================================ */
+
+/* — DatePicker · 单日 / 日期范围 — */
+.ui-datepicker { position: relative; display: inline-block; width: 100%; }
+.ui-datepicker-trigger { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; cursor: pointer; background: transparent; }
+.ui-datepicker-trigger .dp-text { flex: 1; }
+.ui-datepicker-pop { position: absolute; top: calc(100% + 6px); left: 0; z-index: 50; width: 280px; padding: 12px; background: var(--ui-bg-elevated); border: 1px solid var(--ui-border); border-radius: var(--ui-radius-lg); box-shadow: 0 12px 40px rgba(0,0,0,.28); }
+[dir="rtl"] .ui-datepicker-pop { left: auto; right: 0; }
+.ui-datepicker-pop[hidden] { display: none; }
+.dp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.dp-title { font-weight: 700; font-size: var(--ui-fs-control); }
+.dp-nav { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--ui-radius-md); color: var(--ui-text-muted); cursor: pointer; }
+.dp-nav:hover { background: var(--ui-color-brand-soft); color: var(--ui-color-brand); }
+.dp-week, .dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+.dp-week span { text-align: center; font-size: 12px; color: var(--ui-text-muted); padding: 4px 0; }
+.dp-cell { aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; border-radius: var(--ui-radius-md); cursor: pointer; font-size: 13px; color: var(--ui-text); }
+.dp-cell:hover { background: var(--ui-color-brand-soft); }
+.dp-cell.is-out { color: var(--ui-text-muted); opacity: .45; }
+.dp-cell.is-today { box-shadow: inset 0 0 0 1px var(--ui-color-brand); }
+.dp-cell.in-range { background: var(--ui-color-brand-soft); border-radius: 0; }
+.dp-cell.is-selected { background: var(--ui-color-brand); color: #fff; }
+.dp-cell.is-selected.is-start { border-top-left-radius: var(--ui-radius-md); border-bottom-left-radius: var(--ui-radius-md); }
+.dp-cell.is-selected.is-end { border-top-right-radius: var(--ui-radius-md); border-bottom-right-radius: var(--ui-radius-md); }
+.dp-foot { display: flex; justify-content: space-between; margin-top: 10px; }
+
+/* — NumberInput · 格式化数值录入 — */
+.ui-number { display: inline-flex; align-items: stretch; width: 100%; border: 1px solid var(--ui-border); border-radius: var(--ui-radius-md); background: var(--ui-bg-elevated); overflow: hidden; }
+.ui-number:focus-within { border-color: var(--ui-color-brand); box-shadow: 0 0 0 3px var(--ui-color-brand-soft); }
+.ui-number-prefix, .ui-number-suffix { display: inline-flex; align-items: center; padding: 0 8px; color: var(--ui-text-muted); font-size: 13px; background: rgba(127,127,127,.06); }
+.ui-number-input { flex: 1; min-width: 0; border: none; background: transparent; padding: 8px 10px; color: var(--ui-text); font: inherit; text-align: right; }
+.ui-number-input:focus { outline: none; }
+.ui-number-step { width: 32px; border: none; border-left: 1px solid var(--ui-border); background: transparent; color: var(--ui-text-muted); cursor: pointer; font-size: 15px; line-height: 1; }
+.ui-number-step:hover { background: var(--ui-color-brand-soft); color: var(--ui-color-brand); }
+.ui-number-step[data-step="down"] { border-left: none; border-right: 1px solid var(--ui-border); }
+
+/* — Popover · 可交互悬浮资料卡（区别于 Tooltip 纯标签）— */
+.ui-popover { position: relative; display: inline-block; }
+.ui-popover-panel { position: absolute; top: calc(100% + 8px); left: 0; z-index: 60; min-width: 220px; padding: 12px; background: var(--ui-bg-elevated); border: 1px solid var(--ui-border); border-radius: var(--ui-radius-lg); box-shadow: 0 12px 40px rgba(0,0,0,.3); }
+.ui-popover-panel[hidden] { display: none; }
+.pop-head { display: flex; justify-content: space-between; align-items: baseline; font-weight: 800; margin-bottom: 8px; }
+.pop-head .code { font-family: var(--ui-font-mono); font-size: 12px; color: var(--ui-text-muted); font-weight: 400; }
+.pop-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 13px; }
+.pop-actions { display: flex; gap: 8px; margin-top: 10px; }
+
+/* — 图表主题桥接 · 图表吃 uni-ui token — */
+.ui-chart { width: 100%; }
+.ui-chart-svg { width: 100%; height: 200px; display: block; }
+.ui-chart-legend { display: flex; gap: 16px; margin-top: 8px; font-size: 12px; color: var(--ui-text-muted); }
+.ui-chart-legend .lg::before { content: ''; display: inline-block; width: 12px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+.lg-brand::before { background: var(--ui-color-brand); }
+.lg-up::before { background: var(--ui-color-up); }
+.lg-down::before { background: var(--ui-color-down); }
+
+/* — Data Table 增强 · 吸顶表头 / 冻结首列 / 行多选 — */
+.ui-table-wrap { max-height: 260px; overflow: auto; border: 1px solid var(--ui-border); border-radius: var(--ui-radius-md); }
+.ui-table--sticky thead th { position: sticky; top: 0; z-index: 3; background: var(--ui-bg-elevated); box-shadow: inset 0 -1px 0 var(--ui-border); }
+.ui-table--freeze .sticky-col, .ui-table--freeze .col-check { position: sticky; left: 0; z-index: 2; background: var(--ui-bg-elevated); }
+.ui-table--freeze thead .sticky-col, .ui-table--freeze thead .col-check { z-index: 4; }
+.ui-table--selectable tbody tr { cursor: pointer; }
+.ui-table--selectable tbody tr.is-selected { background: var(--ui-color-brand-soft); }
+.ui-table--selectable tbody tr.is-selected .sticky-col, .ui-table--selectable tbody tr.is-selected .col-check { background: var(--ui-color-brand-soft); }
+.col-check { width: 36px; text-align: center; }
+
+/* ============================================================
+   17.30 金融辅助组件：Tree / Slider / Accordion / Steps / Breadcrumb / ContextMenu
+   全部 token 驱动，纯 DOM 便于 React/Vue 复用
+   ============================================================ */
+
+/* — Tree · 行业/板块树（多选筛选）— */
+.ui-tree { font-size: var(--ui-fs-control); user-select: none; }
+.ui-tree-children { list-style: none; margin: 0; padding: 0; }
+.ui-tree-node > .ui-tree-children { padding-left: 18px; }
+.ui-tree-row { display: flex; align-items: center; gap: 4px; padding: 4px 6px; border-radius: var(--ui-radius-md); cursor: pointer; color: var(--ui-text); }
+.ui-tree-row:hover { background: var(--ui-color-brand-soft); }
+.ui-tree-caret { width: 18px; height: 18px; flex: none; display: inline-flex; align-items: center; justify-content: center; color: var(--ui-text-muted); transition: transform var(--ui-dur-base) var(--ui-ease); }
+.ui-tree-leaf > .ui-tree-row .ui-tree-caret { visibility: hidden; }
+.ui-tree-node.is-collapsed > .ui-tree-children { display: none; }
+.ui-tree-node.is-collapsed > .ui-tree-row .ui-tree-caret { transform: rotate(-90deg); }
+.ui-tree-check { width: 15px; height: 15px; flex: none; accent-color: var(--ui-color-brand); cursor: pointer; }
+.ui-tree-label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ui-tree-count { font-size: 11px; color: var(--ui-text-muted); font-family: var(--ui-font-mono); }
+
+/* — Slider · 估值/涨跌幅区间筛选（双滑块）— */
+.ui-slider { position: relative; height: 34px; display: flex; align-items: center; padding: 0 8px; }
+.ui-slider-track { position: relative; width: 100%; height: 4px; background: var(--ui-border); border-radius: 999px; }
+.ui-slider-fill { position: absolute; height: 100%; background: var(--ui-color-brand); border-radius: 999px; }
+.ui-slider-thumb { position: absolute; top: 50%; width: 16px; height: 16px; border-radius: 50%; background: var(--ui-bg-elevated); border: 2px solid var(--ui-color-brand); transform: translate(-50%, -50%); cursor: grab; box-shadow: 0 1px 5px rgba(0,0,0,.35); touch-action: none; }
+.ui-slider-thumb:active { cursor: grabbing; }
+.ui-slider-thumb:focus-visible { outline: 2px solid var(--ui-color-brand); outline-offset: 3px; }
+.ui-slider-vals { display: flex; justify-content: space-between; margin-top: 6px; font-family: var(--ui-font-mono); font-size: 12px; color: var(--ui-text-muted); }
+
+/* — Accordion · 筛选条件分组折叠 — */
+.ui-accordion { border: 1px solid var(--ui-border); border-radius: var(--ui-radius-lg); overflow: hidden; background: var(--ui-bg-elevated); }
+.ui-accordion-item + .ui-accordion-item { border-top: 1px solid var(--ui-border); }
+.ui-accordion-header { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 11px var(--ui-space-4); background: transparent; cursor: pointer; color: var(--ui-text); font-weight: 700; font-size: var(--ui-fs-control); border: none; text-align: left; }
+.ui-accordion-header:hover { background: var(--ui-color-brand-soft); }
+.ui-accordion-caret { flex: none; color: var(--ui-text-muted); transition: transform var(--ui-dur-base) var(--ui-ease); }
+.ui-accordion-item.is-open > .ui-accordion-header .ui-accordion-caret { transform: rotate(180deg); }
+.ui-accordion-panel { overflow: hidden; max-height: 0; transition: max-height var(--ui-dur-base) var(--ui-ease); }
+.ui-accordion-panel-inner { padding: 0 var(--ui-space-4) var(--ui-space-4); display: flex; flex-direction: column; gap: var(--ui-space-2); }
+.ui-accordion-badge { font-family: var(--ui-font-mono); font-size: 11px; color: var(--ui-color-brand); background: var(--ui-color-brand-soft); padding: 1px 7px; border-radius: 999px; }
+
+/* — Steps · 流程向导 — */
+.ui-steps { display: flex; align-items: flex-start; }
+.ui-step { display: flex; align-items: center; flex: 1; }
+.ui-step-dot { width: 28px; height: 28px; flex: none; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; border: 2px solid var(--ui-border); color: var(--ui-text-muted); background: var(--ui-bg-elevated); transition: all var(--ui-dur-base) var(--ui-ease); }
+.ui-step-icon { width: 1em; height: 1em; display: inline-block; }
+.ui-step-text { margin-left: 8px; display: flex; flex-direction: column; line-height: 1.2; }
+.ui-step-title { font-size: 13px; font-weight: 600; color: var(--ui-text-muted); }
+.ui-step-desc { font-size: 11px; color: var(--ui-text-muted); opacity: .8; }
+.ui-step-line { flex: 1; height: 2px; background: var(--ui-border); margin: 0 10px; align-self: center; transition: background var(--ui-dur-base) var(--ui-ease); }
+.ui-step.is-done .ui-step-dot { background: var(--ui-color-brand); border-color: var(--ui-color-brand); color: #fff; }
+.ui-step.is-done .ui-step-line { background: var(--ui-color-brand); }
+.ui-step.is-current .ui-step-dot { border-color: var(--ui-color-brand); color: var(--ui-color-brand); box-shadow: 0 0 0 3px var(--ui-color-brand-soft); }
+.ui-step.is-done .ui-step-title, .ui-step.is-current .ui-step-title { color: var(--ui-text); }
+.ui-step.is-clickable .ui-step-dot { cursor: pointer; }
+
+/* — Breadcrumb · 路径导航 — */
+.ui-breadcrumb { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 13px; }
+.ui-breadcrumb a { color: var(--ui-text-muted); text-decoration: none; cursor: pointer; padding: 2px 4px; border-radius: var(--ui-radius-sm, 6px); }
+.ui-breadcrumb a:hover { color: var(--ui-color-brand); background: var(--ui-color-brand-soft); }
+.ui-breadcrumb .sep { color: var(--ui-text-muted); opacity: .5; }
+.ui-breadcrumb .current { color: var(--ui-text); font-weight: 600; padding: 2px 4px; }
+
+/* — ContextMenu · 右键菜单 — */
+.ui-contextmenu { position: fixed; z-index: 100; min-width: 188px; padding: 6px; background: var(--ui-bg-elevated); border: 1px solid var(--ui-border); border-radius: var(--ui-radius-lg); box-shadow: 0 14px 44px rgba(0,0,0,.4); display: none; }
+.ui-contextmenu.is-open { display: block; }
+.ui-contextmenu-item { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 7px 10px; border-radius: var(--ui-radius-md); cursor: pointer; font-size: 13px; color: var(--ui-text); }
+.ui-contextmenu-item:hover { background: var(--ui-color-brand-soft); color: var(--ui-color-brand); }
+.ui-contextmenu-item.is-danger:hover { background: rgba(229,72,77,.14); color: var(--ui-color-danger); }
+.ui-contextmenu-sep { height: 1px; background: var(--ui-border); margin: 4px 2px; }
+.ui-contextmenu-shortcut { font-family: var(--ui-font-mono); font-size: 11px; color: var(--ui-text-muted); }
+.ui-contextmenu-target { border: 1px dashed var(--ui-border); border-radius: var(--ui-radius-md); padding: var(--ui-space-4); color: var(--ui-text-muted); font-size: 13px; text-align: center; }
+</style>
+</head>
+<body>
+
+<!-- 顶栏 -->
+<nav class="nav">
+  <div class="brand">uni<span class="dot">·</span>ui</div>
+  <div class="nav-controls">
+    <button class="ui-btn ui-btn--ghost ui-size-sm" id="themeBtn" aria-label="切换明暗主题">◐ 主题</button>
+    <button class="ui-btn ui-btn--ghost ui-size-sm" id="mktBtn" aria-label="切换涨跌色约定">涨跌色：中国</button>
+    <button class="ui-btn ui-btn--ghost ui-size-sm" id="densityBtn" aria-label="切换信息密度">密度：紧凑</button>
+    <button class="ui-btn ui-btn--primary ui-size-sm" id="skinReset">默认品牌色</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- Hero：非对称、左对齐、大气 -->
+  <section class="section" style="padding-top: var(--ui-space-7);">
+    <div class="reveal">
+      <p class="eyebrow">面向产品的组件系统</p>
+      <h1 style="font-size: var(--ui-fs-3xl); max-width: 14ch;">为产品而生的<br />克制与毛玻璃。</h1>
+      <p class="section-sub" style="margin-top: var(--ui-space-4);">
+        uni-ui 不是后台管理工具箱。它是一套有自身品牌声音、紧凑利落、原生支持暗色与多品牌换肤的组件系统——
+        视觉由 token 驱动，DOM 结构跨框架统一。
+      </p>
+      <div class="row" style="margin-top: var(--ui-space-5);">
+        <button class="ui-btn ui-btn--primary">开始使用</button>
+        <button class="ui-btn ui-btn--default">查看组件</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 设计定调说明 -->
+  <section class="section">
+    <div class="ui-glass ui-card reveal" style="grid-column: span 12;">
+      <h2 class="section-title" style="font-size: var(--ui-fs-xl);">设计定调（Design Direction）</h2>
+      <div class="row" style="flex-wrap: wrap; gap: var(--ui-space-5); margin-top: var(--ui-space-4); align-items: flex-start;">
+        <div style="flex: 1 1 200px;"><span class="ui-label">受众</span><p style="margin-top:6px;">面向 C 端 / B 端产品界面，非数据密集后台。</p></div>
+        <div style="flex: 1 1 200px;"><span class="ui-label">调性</span><p style="margin-top:6px;">苹果 macOS 大气简约 + 毛玻璃半透明 + 紧凑利落。</p></div>
+        <div style="flex: 1 1 200px;"><span class="ui-label">展示字 / 正文</span><p style="margin-top:6px;">Cabinet Grotesk / Satoshi，等宽 JetBrains Mono 用于 token。</p></div>
+        <div style="flex: 1 1 200px;"><span class="ui-label">记忆点</span><p style="margin-top:6px;">毛玻璃材质 + 电光靛品牌色，换肤只动一个变量。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tokens -->
+  <section class="section">
+    <p class="eyebrow reveal">Design Tokens</p>
+    <h2 class="section-title reveal">一套变量，驱动全部视觉</h2>
+    <p class="section-sub reveal">颜色、字阶、间距、圆角、阴影全部语义化。暗色与换肤仅覆盖语义令牌，组件零改动。</p>
+
+    <div class="gallery">
+      <div class="cell cell-4 ui-glass reveal">
+        <h3>品牌与语义色</h3>
+        <div class="token-grid">
+          <div><div class="swatch" style="background: var(--ui-color-brand);"></div><div class="token-label">--ui-color-brand</div></div>
+          <div><div class="swatch" style="background: var(--ui-color-danger);"></div><div class="token-label">--ui-color-danger</div></div>
+          <div><div class="swatch" style="background: var(--ui-text);"></div><div class="token-label">--ui-text</div></div>
+          <div><div class="swatch" style="background: var(--ui-text-muted);"></div><div class="token-label">--ui-text-muted</div></div>
+          <div><div class="swatch" style="background: var(--ui-bg);"></div><div class="token-label">--ui-bg</div></div>
+          <div><div class="swatch" style="background: var(--ui-border);"></div><div class="token-label">--ui-border</div></div>
+        </div>
+      </div>
+
+      <div class="cell cell-4 ui-glass reveal">
+        <h3>字阶（模块化）</h3>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="font-family:var(--ui-font-display); font-size:var(--ui-fs-3xl);">Aa 64</div>
+          <div style="font-family:var(--ui-font-display); font-size:var(--ui-fs-xl);">Aa 24</div>
+          <div style="font-family:var(--ui-font-body); font-size:var(--ui-fs-lg);">产品界面 17</div>
+          <div style="font-family:var(--ui-font-body); font-size:var(--ui-fs-md);">正文 14（紧凑）</div>
+          <div style="font-family:var(--ui-font-mono); font-size:var(--ui-fs-sm);">token 13</div>
+        </div>
+      </div>
+
+      <div class="cell cell-4 ui-glass reveal">
+        <h3>圆角与间距（紧凑）</h3>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div style="display:flex; gap:10px; align-items:center;"><div style="width:28px;height:28px;background:var(--ui-color-brand);border-radius:var(--ui-radius-sm);"></div><span class="ui-label">sm 4px</span></div>
+          <div style="display:flex; gap:10px; align-items:center;"><div style="width:28px;height:28px;background:var(--ui-color-brand);border-radius:var(--ui-radius-md);"></div><span class="ui-label">md 7px</span></div>
+          <div style="display:flex; gap:10px; align-items:center;"><div style="width:28px;height:28px;background:var(--ui-color-brand);border-radius:var(--ui-radius-lg);"></div><span class="ui-label">lg 12px</span></div>
+          <div style="display:flex; gap:10px; align-items:center;"><div style="width:28px;height:28px;background:var(--ui-color-brand);border-radius:var(--ui-radius-pill);"></div><span class="ui-label">pill</span></div>
+        </div>
+      </div>
+
+      <!-- 换肤演示 -->
+      <div class="cell cell-12 ui-glass reveal">
+        <h3>多品牌换肤 — 只覆盖 <code style="font-family:var(--ui-font-mono);">--ui-color-brand</code></h3>
+        <div class="row">
+          <button class="skin" style="background:#ff453a;" data-skin="#ff453a" aria-pressed="false" title="绯红" aria-label="绯红（红）"></button>
+          <button class="skin" style="background:#ff6a00;" data-skin="#ff6a00" aria-pressed="false" title="丹橙" aria-label="丹橙（橙）"></button>
+          <button class="skin" style="background:#ffd60a;" data-skin="#ffd60a" aria-pressed="false" title="流金" aria-label="流金（黄）"></button>
+          <button class="skin" style="background:#00c896;" data-skin="#00c896" aria-pressed="false" title="翡翠" aria-label="翡翠（绿）"></button>
+          <button class="skin" style="background:#0a84ff;" data-skin="#0a84ff" aria-pressed="true" title="晴空（默认）" aria-label="晴空（蓝·默认）"></button>
+          <button class="skin" style="background:#5246e5;" data-skin="#5246e5" aria-pressed="false" title="绀青" aria-label="绀青（靛）"></button>
+          <button class="skin" style="background:#a855f7;" data-skin="#a855f7" aria-pressed="false" title="紫菀" aria-label="紫菀（紫）"></button>
+          <span class="ui-label" style="margin-left:var(--ui-space-3);">七色光谱 · 绯红 / 丹橙 / 流金 / 翡翠 / 晴空（默认）/ 绀青 / 紫菀；点击切换品牌色，全站按钮 / 焦点环 / 开关 / 分段选中实时跟随。</span>
+        </div>
+      </div>
+      <div class="cell cell-12 ui-glass reveal">
+        <h3>毛玻璃材质 — 透明度(%) 与 模糊半径(px) 实时可调</h3>
+        <div class="row" style="align-items:center; gap:var(--ui-space-5); flex-wrap:wrap;">
+          <label class="ui-label" style="display:flex; align-items:center; gap:var(--ui-space-2);">
+            透明度 <output id="glassOpVal" style="font-family:var(--ui-font-mono); min-width:3ch;">45%</output>
+            <input type="range" id="glassOp" min="0" max="100" value="45" style="accent-color:var(--ui-color-brand);" />
+          </label>
+          <label class="ui-label" style="display:flex; align-items:center; gap:var(--ui-space-2);">
+            模糊半径 <output id="glassBlurVal" style="font-family:var(--ui-font-mono); min-width:4ch;">20px</output>
+            <input type="range" id="glassBlur" min="0" max="40" value="20" style="accent-color:var(--ui-color-brand);" />
+          </label>
+          <span class="ui-label">上方滑块改“全局默认”（常规面：卡片 / 对话框 / Toast）。顶栏 / 按钮 / 输入框属“强面”，走各自独立旋钮——见下方「逐组件独立控制」。</span>
+        </div>
+        <div class="row" style="gap:var(--ui-space-4); flex-wrap:wrap; margin-top:var(--ui-space-4);">
+          <div class="ui-glass" style="flex:1; min-width:150px; padding:var(--ui-space-4); text-align:center;">
+            <div class="ui-label">全局默认</div>
+            <div style="font-size:var(--ui-fs-sm); margin-top:var(--ui-space-2); opacity:.8;">跟随上方全局滑块</div>
+          </div>
+          <div class="ui-glass" style="--ui-glass-opacity:85%; --ui-glass-blur:4px; flex:1; min-width:150px; padding:var(--ui-space-4); text-align:center;">
+            <div class="ui-label">实例覆盖 A</div>
+            <div style="font-size:var(--ui-fs-sm); margin-top:var(--ui-space-2); opacity:.8;">透明度 15% · blur 4px（不随全局变）</div>
+          </div>
+          <div class="ui-glass" style="--ui-glass-opacity:30%; --ui-glass-blur:32px; flex:1; min-width:150px; padding:var(--ui-space-4); text-align:center;">
+            <div class="ui-label">实例覆盖 B</div>
+            <div style="font-size:var(--ui-fs-sm); margin-top:var(--ui-space-2); opacity:.8;">透明度 70% · blur 32px（不随全局变）</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 逐组件独立玻璃控制：每个组件有自己的旋钮，互不干扰 -->
+      <div class="cell cell-12 ui-glass reveal">
+        <h3>逐组件独立玻璃控制 — 透明度 / 模糊各自可调，互不干扰</h3>
+        <p class="ui-label">每个玻璃组件都有独立旋钮（<code style="font-family:var(--ui-font-mono);">--ui-{comp}-glass-opacity</code> / <code style="font-family:var(--ui-font-mono);">--ui-{comp}-glass-blur</code>），未设时回退全局默认。透明度与模糊是两条独立通道；改任一组件不影响其它。</p>
+        <div class="row" style="gap:var(--ui-space-4); flex-wrap:wrap; margin-top:var(--ui-space-4); align-items:stretch;">
+          <!-- 实时场景 -->
+          <div style="flex:1; min-width:280px; position:relative; height:240px; border-radius:var(--ui-radius-lg); overflow:hidden; border:1px solid var(--ui-border); background:linear-gradient(135deg, rgba(82,70,229,.25), rgba(0,184,212,.18) 50%, rgba(229,72,77,.15));">
+            <div style="position:absolute; top:0; left:0; right:0; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;
+                        background: rgb(var(--ui-glass-tint) / var(--ui-nav-glass-opacity, var(--ui-glass-opacity-strong)));
+                        backdrop-filter: blur(var(--ui-nav-glass-blur, var(--ui-glass-blur))) saturate(var(--ui-glass-saturate));
+                        -webkit-backdrop-filter: blur(var(--ui-nav-glass-blur, var(--ui-glass-blur))) saturate(var(--ui-glass-saturate));
+                        border-bottom:1px solid var(--ui-border);">
+              <span class="ui-label">顶栏 Nav</span>
+              <button class="ui-btn ui-btn--primary ui-size-sm">按钮</button>
+            </div>
+            <div class="ui-glass" style="position:absolute; top:56px; left:14px; right:14px; padding:var(--ui-space-4);">
+              <div class="ui-label">卡片 Card</div>
+              <input class="ui-input" style="margin-top:8px; min-width:0; width:100%;" placeholder="输入框 Input" />
+            </div>
+            <div class="ui-toast ui-glass" style="position:absolute; right:14px; bottom:14px; transform:none; opacity:1;">
+              <span class="ui-avatar" style="width:24px;height:24px;font-size:11px;">✓</span><span>Toast</span>
+            </div>
+            <span class="ui-tip ui-tip--surface ui-tip--demo" style="position:absolute; left:14px; bottom:52px;">
+              <button class="ui-btn ui-btn--ghost ui-size-sm">Tooltip</button>
+              <span class="bubble">跟随表面 · 可独立调透明度 / 模糊</span>
+            </span>
+          </div>
+          <!-- 控制面板 -->
+          <div style="flex:1; min-width:280px; display:flex; flex-direction:column; gap:var(--ui-space-3);">
+            <div class="ui-label" style="font-weight:700;">独立旋钮（拖动只改对应组件）</div>
+            <label class="ui-label" style="display:flex; align-items:center; gap:var(--ui-space-2);">
+              <span style="min-width:3ch;">顶栏</span>
+              透 <input type="range" data-comp="nav" data-prop="opacity" data-tier="strong" min="0" max="100" value="28" style="flex:1; accent-color:var(--ui-color-brand);" />
+              糊 <input type="range" data-comp="nav" data-prop="blur" min="0" max="40" value="20" style="flex:1; accent-color:var(--ui-color-brand);" />
+            </label>
+            <label class="ui-label" style="display:flex; align-items:center; gap:var(--ui-space-2);">
+              <span style="min-width:3ch;">卡片</span>
+              透 <input type="range" data-comp="card" data-prop="opacity" data-tier="base" min="0" max="100" value="45" style="flex:1; accent-color:var(--ui-color-brand);" />
+              糊 <input type="range" data-comp="card" data-prop="blur" min="0" max="40" value="20" style="flex:1; accent-color:var(--ui-color-brand);" />
+            </label>
+            <label class="ui-label" style="display:flex; align-items:center; gap:var(--ui-space-2);">
+              <span style="min-width:3ch;">输入</span>
+              透 <input type="range" data-comp="input" data-prop="opacity" data-tier="strong" min="0" max="100" value="28" style="flex:1; accent-color:var(--ui-color-brand);" />
+              糊 <input type="range" data-comp="input" data-prop="blur" min="0" max="40" value="20" style="flex:1; accent-color:var(--ui-color-brand);" />
+            </label>
+            <label class="ui-label" style="display:flex; align-items:center; gap:var(--ui-space-2);">
+              <span style="min-width:3ch;">Toast</span>
+              透 <input type="range" data-comp="toast" data-prop="opacity" data-tier="base" min="0" max="100" value="45" style="flex:1; accent-color:var(--ui-color-brand);" />
+              糊 <input type="range" data-comp="toast" data-prop="blur" min="0" max="40" value="20" style="flex:1; accent-color:var(--ui-color-brand);" />
+            </label>
+            <label class="ui-label" style="display:flex; align-items:center; gap:var(--ui-space-2);">
+              <span style="min-width:3ch;">提示</span>
+              透 <input type="range" data-comp="tooltip" data-prop="opacity" data-tier="base" min="0" max="100" value="45" style="flex:1; accent-color:var(--ui-color-brand);" />
+              糊 <input type="range" data-comp="tooltip" data-prop="blur" min="0" max="40" value="20" style="flex:1; accent-color:var(--ui-color-brand);" />
+            </label>
+            <p class="ui-label" style="margin-top:var(--ui-space-2);">旋钮写在 <code style="font-family:var(--ui-font-mono);">:root</code> 即改该类型全部实例；写在单个元素 style 上只改那一个实例。两条通道（透明度 / 模糊）互不影响。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 组件画廊 -->
+  <section class="section">
+    <p class="eyebrow reveal">Components</p>
+    <h2 class="section-title reveal">核心组件（紧凑利落 macOS 风）</h2>
+
+    <div class="gallery">
+      <div class="cell cell-6 ui-glass reveal">
+        <h3>Button · 变体 × 尺寸 × 状态 × 外部图标</h3>
+        <div class="row">
+          <button class="ui-btn ui-btn--primary">Primary</button>
+          <button class="ui-btn ui-btn--default">Default</button>
+          <button class="ui-btn ui-btn--ghost">Ghost</button>
+          <button class="ui-btn ui-btn--danger">Danger</button>
+        </div>
+        <div class="row">
+          <button class="ui-btn ui-btn--primary ui-size-sm">小</button>
+          <button class="ui-btn ui-btn--primary" disabled>禁用</button>
+          <button class="ui-btn ui-btn--primary ui-btn--loading">加载</button>
+        </div>
+        <div class="row">
+          <button class="ui-btn ui-btn--outline">Outline</button>
+          <button class="ui-btn ui-btn--primary ui-btn--pill">胶囊 Primary</button>
+          <button class="ui-btn ui-btn--outline ui-btn--pill">胶囊 Outline</button>
+          <button class="ui-btn ui-btn--ghost ui-btn--pill">胶囊 Ghost</button>
+        </div>
+        <div class="row">
+          <button class="ui-btn ui-btn--primary"><span class="ui-icon"><i data-lucide="plus"></i></span>新建</button>
+          <button class="ui-btn ui-btn--default"><span class="ui-icon"><i data-lucide="download"></i></span>导出</button>
+        </div>
+        <p class="ui-label" style="margin-top:var(--ui-space-2);">本预览默认接入 <strong>lucide</strong> 图标体系：<code style="font-family:var(--ui-font-mono);">icon</code> 插槽内写 <code style="font-family:var(--ui-font-mono);">&lt;i data-lucide="plus"&gt;&lt;/i&gt;</code>，由 <code style="font-family:var(--ui-font-mono);">createIcons()</code> 替换为真实 SVG。组件不内置图标，尺寸由 <code style="font-family:var(--ui-font-mono);">--ui-icon-size</code> 控制，颜色继承文字，可随时换 heroicons 等任意库。</p>
+      </div>
+
+      <div class="cell cell-12 ui-glass reveal">
+        <h3>尺寸矩阵 — 4 档（大 / 中 / 微 / 小），统一 <code style="font-family:var(--ui-font-mono);">ui-size-*</code> 驱动</h3>
+        <p class="ui-label">所有控件只读“当前档”变量（--ui-control-h / --ui-fs-control / --ui-pad-x / --ui-icon-size），尺寸类（.ui-size-xs / sm / lg）重定义它们，组件不感知 size。md 为默认，故仅三档类。</p>
+        <div class="ui-field"><label class="ui-label">Button</label>
+          <div class="row">
+            <button class="ui-btn ui-btn--primary ui-size-xs">微</button>
+            <button class="ui-btn ui-btn--primary ui-size-sm">小</button>
+            <button class="ui-btn ui-btn--primary">中</button>
+            <button class="ui-btn ui-btn--primary ui-size-lg">大</button>
+          </div>
+        </div>
+        <div class="ui-field"><label class="ui-label">Input</label>
+          <div class="row">
+            <input class="ui-input ui-size-xs" placeholder="微" />
+            <input class="ui-input ui-size-sm" placeholder="小" />
+            <input class="ui-input" placeholder="中" />
+            <input class="ui-input ui-size-lg" placeholder="大" />
+          </div>
+        </div>
+        <div class="ui-field"><label class="ui-label">Switch</label>
+          <div class="row">
+            <button class="ui-switch ui-size-xs" aria-checked="true" aria-label="开"></button>
+            <button class="ui-switch ui-size-sm" aria-checked="true" aria-label="开"></button>
+            <button class="ui-switch" aria-checked="true" aria-label="开"></button>
+            <button class="ui-switch ui-size-lg" aria-checked="true" aria-label="开"></button>
+          </div>
+        </div>
+        <div class="ui-field"><label class="ui-label">Segmented</label>
+          <div class="row">
+            <div class="ui-segmented ui-size-xs"><span class="thumb" style="left:3px;width:38px;"></span><button aria-pressed="true">微</button><button aria-pressed="false">小</button></div>
+            <div class="ui-segmented ui-size-sm"><span class="thumb" style="left:3px;width:40px;"></span><button aria-pressed="true">小</button><button aria-pressed="false">中</button></div>
+            <div class="ui-segmented"><span class="thumb" style="left:3px;width:40px;"></span><button aria-pressed="true">中</button><button aria-pressed="false">大</button></div>
+            <div class="ui-segmented ui-size-lg"><span class="thumb" style="left:3px;width:44px;"></span><button aria-pressed="true">大</button><button aria-pressed="false">巨</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cell cell-6 ui-glass reveal">
+        <h3>Input · 聚焦环 / 错误态</h3>
+        <div class="ui-field"><label class="ui-label" for="i1">邮箱</label><input class="ui-input" id="i1" placeholder="you@product.com" /></div>
+        <div class="ui-field"><label class="ui-label" for="i2" style="color:var(--ui-color-danger);">邮箱（错误）</label><input class="ui-input ui-input--error" id="i2" value="invalid" /></div>
+      </div>
+
+      <div class="cell cell-4 ui-glass reveal">
+        <h3>Switch</h3>
+        <div class="row"><button class="ui-switch" aria-checked="true" aria-label="开"></button><span class="ui-label">开启</span></div>
+        <div class="row"><button class="ui-switch" aria-checked="false" aria-label="关"></button><span class="ui-label">关闭</span></div>
+      </div>
+
+      <div class="cell cell-4 ui-glass reveal">
+        <h3>Segmented</h3>
+        <div class="ui-segmented" id="seg">
+          <span class="thumb" style="left:3px; width:62px;"></span>
+          <button aria-pressed="true">日</button>
+          <button aria-pressed="false">周</button>
+          <button aria-pressed="false">月</button>
+        </div>
+      </div>
+
+      <div class="cell cell-4 ui-glass reveal">
+        <h3>Badge / Avatar / Tooltip</h3>
+        <div class="row">
+          <span class="ui-badge">● 在线</span>
+          <span class="ui-avatar">U</span>
+          <span class="ui-tip"><button class="ui-btn ui-btn--default ui-size-sm">悬停我（反转·默认）</button><span class="bubble">反转色 tooltip</span></span>
+          <span class="ui-tip ui-tip--surface"><button class="ui-btn ui-btn--default ui-size-sm">悬停我（跟随表面）</button><span class="bubble">跟随主题表面 + 毛玻璃</span></span>
+        </div>
+      </div>
+
+      <div class="cell cell-6 ui-glass reveal">
+        <h3>Tabs</h3>
+        <div class="ui-tabs-wrap">
+          <button class="ui-tabs-arrow ui-tabs-arrow--left" aria-label="向左滚动标签" type="button"></button>
+          <div class="ui-tabs-scroll">
+            <div class="ui-tabs" role="tablist">
+              <button role="tab" id="tab-overview" aria-selected="true" aria-controls="panel-overview">概览</button>
+              <button role="tab" id="tab-activity" aria-selected="false" aria-controls="panel-activity">活动</button>
+              <button role="tab" id="tab-settings" aria-selected="false" aria-controls="panel-settings">设置</button>
+            </div>
+          </div>
+          <button class="ui-tabs-arrow ui-tabs-arrow--right" aria-label="向右滚动标签" type="button"></button>
+        </div>
+        <div class="ui-tabpanel" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">当前面板：概览内容区（↑↓ 方向键可在 tab 间移动，Home/End 跳首尾）</div>
+        <div class="ui-tabpanel" id="panel-activity" role="tabpanel" aria-labelledby="tab-activity" hidden>活动面板内容</div>
+        <div class="ui-tabpanel" id="panel-settings" role="tabpanel" aria-labelledby="tab-settings" hidden>设置面板内容</div>
+        <div style="margin-top:var(--ui-space-4); max-width:380px;">
+          <div class="ui-tabs-wrap">
+            <button class="ui-tabs-arrow ui-tabs-arrow--left" aria-label="向左滚动标签" type="button"></button>
+            <div class="ui-tabs-scroll">
+              <div class="ui-tabs" role="tablist">
+                <button role="tab" aria-selected="true">概览</button>
+                <button role="tab">市场</button>
+                <button role="tab">活动</button>
+                <button role="tab">消息</button>
+                <button role="tab">团队</button>
+                <button role="tab">项目</button>
+                <button role="tab">设置</button>
+                <button role="tab">账单</button>
+                <button role="tab">成员</button>
+                <button role="tab">权限</button>
+                <button role="tab">集成</button>
+                <button role="tab">日志</button>
+                <button role="tab">帮助</button>
+                <button role="tab">关于</button>
+              </div>
+            </div>
+            <button class="ui-tabs-arrow ui-tabs-arrow--right" aria-label="向右滚动标签" type="button"></button>
+          </div>
+          <p class="ui-label" style="margin-top:var(--ui-space-3);">标签过多时自动出现左右箭头，点击横向滚动；容器足以容纳全部时不显示箭头。</p>
+        </div>
+      </div>
+
+      <div class="cell cell-6 ui-glass reveal">
+        <h3>Dialog / Toast（交互演示）</h3>
+        <div class="row">
+          <button class="ui-btn ui-btn--primary" id="openDialog">打开对话框</button>
+          <button class="ui-btn ui-btn--default" id="showToast">触发 Toast</button>
+        </div>
+      </div>
+
+      <div class="cell cell-12 ui-glass reveal">
+        <h3>行情指标 · Stat（标签 + 主值 + 涨跌 delta，tabular-nums）</h3>
+        <div class="row" style="gap:var(--ui-space-6); align-items:flex-start;">
+          <div class="ui-stat">
+            <span class="label">上证指数</span>
+            <span class="value ui-num">3,218.76</span>
+            <span class="delta ui-num--up">+1.24%</span>
+          </div>
+          <div class="ui-stat">
+            <span class="label">深证成指</span>
+            <span class="value ui-num">10,142.33</span>
+            <span class="delta ui-num--down">-0.86%</span>
+          </div>
+          <div class="ui-stat">
+            <span class="label">两市成交额</span>
+            <span class="value ui-num">8,642.5亿</span>
+            <span class="delta ui-num--muted">较昨日 —</span>
+          </div>
+        </div>
+        <p class="ui-label" style="margin-top:var(--ui-space-4);">红涨绿跌为默认「中国」约定，点顶栏「涨跌色」可切「国际」绿涨红跌；暗色下自动提亮保证对比度。</p>
+      </div>
+
+      <div class="cell cell-12 ui-glass reveal">
+        <h3>Data Table · 行情（紧凑密度 / 数值右对齐 / 涨跌着色 / 表头点击排序）</h3>
+        <div class="ui-table ui-table--compact">
+          <table>
+            <thead>
+              <tr>
+                <th data-key="code">代码<span class="arrow">▾</span></th>
+                <th data-key="name">名称<span class="arrow">▾</span></th>
+                <th data-key="price" data-num>最新价<span class="arrow">▾</span></th>
+                <th data-key="chg" data-num>涨跌幅%<span class="arrow">▾</span></th>
+                <th data-key="vol" data-num>成交量(万手)<span class="arrow">▾</span></th>
+                <th data-key="turn" data-num>换手率%<span class="arrow">▾</span></th>
+                <th data-key="cap" data-num>总市值(亿)<span class="arrow">▾</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>600519</td><td>贵州茅台</td><td data-num class="ui-num">1,682.00</td><td data-num class="ui-num ui-num--down">-0.42</td><td data-num class="ui-num">32.6</td><td data-num class="ui-num">0.26</td><td data-num class="ui-num">21,140</td></tr>
+              <tr><td>300750</td><td>宁德时代</td><td data-num class="ui-num">198.35</td><td data-num class="ui-num ui-num--up">+2.18</td><td data-num class="ui-num">128.4</td><td data-num class="ui-num">0.71</td><td data-num class="ui-num">8,720</td></tr>
+              <tr><td>000858</td><td>五粮液</td><td data-num class="ui-num">142.80</td><td data-num class="ui-num ui-num--down">-1.05</td><td data-num class="ui-num">54.2</td><td data-num class="ui-num">0.39</td><td data-num class="ui-num">5,540</td></tr>
+              <tr><td>601318</td><td>中国平安</td><td data-num class="ui-num">48.62</td><td data-num class="ui-num ui-num--up">+0.93</td><td data-num class="ui-num">96.8</td><td data-num class="ui-num">0.53</td><td data-num class="ui-num">8,860</td></tr>
+              <tr><td>002594</td><td>比亚迪</td><td data-num class="ui-num">241.10</td><td data-num class="ui-num ui-num--up">+3.47</td><td data-num class="ui-num">71.5</td><td data-num class="ui-num">0.62</td><td data-num class="ui-num">7,010</td></tr>
+              <tr><td>600036</td><td>招商银行</td><td data-num class="ui-num">35.74</td><td data-num class="ui-num ui-num--down">-0.28</td><td data-num class="ui-num">110.2</td><td data-num class="ui-num">0.43</td><td data-num class="ui-num">9,020</td></tr>
+              <tr><td>000001</td><td>平安银行</td><td data-num class="ui-num">11.28</td><td data-num class="ui-num ui-num--up">+0.15</td><td data-num class="ui-num">142.9</td><td data-num class="ui-num">0.74</td><td data-num class="ui-num">2,190</td></tr>
+              <tr><td>601012</td><td>隆基绿能</td><td data-num class="ui-num">18.46</td><td data-num class="ui-num ui-num--down">-2.31</td><td data-num class="ui-num">203.7</td><td data-num class="ui-num">1.08</td><td data-num class="ui-num">1,400</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="ui-label" style="margin-top:var(--ui-space-4);">紧凑密度（投研信息密度）；数值列等宽对齐不跳动；表头点击切换升/降序，箭头指示当前排序列。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 投研业务组件：P1/P2 缺口 + 问题改进，本轮补进预览 -->
+  <section class="section">
+    <p class="eyebrow reveal">Business Components</p>
+    <h2 class="section-title reveal">投研业务组件（数据录入 / 容器 / 加载态）</h2>
+    <p class="section-sub reveal">金融投研工具真正吃重的筛选、抽屉、联想搜、校验表单、翻页、分类标签与加载态——此前为文档路线图，现全部实现进预览页。</p>
+
+    <div class="gallery">
+      <!-- Select -->
+      <div class="cell cell-6 ui-glass reveal">
+        <h3>Select · 单/多选 + 可搜索</h3>
+        <div class="ui-field"><label class="ui-label">板块（单选）</label>
+          <div class="ui-select" id="selSingle">
+            <button class="ui-select-trigger" aria-haspopup="listbox" aria-expanded="false">白酒<span class="caret ui-icon"><i data-lucide="chevron-down"></i></span></button>
+            <div class="ui-select-menu" role="listbox">
+              <div class="ui-select-option" role="option" data-val="白酒" aria-selected="true">白酒</div>
+              <div class="ui-select-option" role="option" data-val="新能源" aria-selected="false">新能源</div>
+              <div class="ui-select-option" role="option" data-val="金融" aria-selected="false">金融</div>
+              <div class="ui-select-option" role="option" data-val="医药" aria-selected="false">医药</div>
+              <div class="ui-select-option" role="option" data-val="半导体" aria-selected="false">半导体</div>
+            </div>
+          </div>
+        </div>
+        <div class="ui-field"><label class="ui-label">标的（多选 + 搜索）</label>
+          <div class="ui-select" id="selMulti" data-multi>
+            <button class="ui-select-trigger" aria-haspopup="listbox" aria-expanded="false">贵州茅台、宁德时代<span class="caret ui-icon"><i data-lucide="chevron-down"></i></span></button>
+            <div class="ui-select-menu" role="listbox">
+              <input class="ui-select-search" placeholder="搜索标的…" />
+              <div class="ui-select-option multi" role="option" data-val="贵州茅台" aria-selected="true">贵州茅台<span class="check ui-icon"><i data-lucide="check"></i></span></div>
+              <div class="ui-select-option multi" role="option" data-val="宁德时代" aria-selected="true">宁德时代<span class="check ui-icon"><i data-lucide="check"></i></span></div>
+              <div class="ui-select-option multi" role="option" data-val="比亚迪" aria-selected="false">比亚迪<span class="check ui-icon"><i data-lucide="check"></i></span></div>
+              <div class="ui-select-option multi" role="option" data-val="招商银行" aria-selected="false">招商银行<span class="check ui-icon"><i data-lucide="check"></i></span></div>
+              <div class="ui-select-option multi" role="option" data-val="隆基绿能" aria-selected="false">隆基绿能<span class="check ui-icon"><i data-lucide="check"></i></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="cell cell-6 ui-glass reveal">
+        <h3>Search · 全局搜（带联想下拉）</h3>
+        <div class="ui-search" id="globalSearch">
+          <span class="ico ui-icon"><i data-lucide="search"></i></span>
+          <input class="ui-search-input" placeholder="搜股票 / 基金 / 研报…" aria-label="全局搜索" />
+          <div class="ui-search-suggest" role="listbox">
+            <div class="opt" role="option"><span>贵州茅台 <span class="ui-tag ui-tag--up">白酒</span></span><span class="code">600519</span></div>
+            <div class="opt" role="option"><span>宁德时代 <span class="ui-tag ui-tag--down">新能源</span></span><span class="code">300750</span></div>
+            <div class="opt" role="option"><span>招商银行 <span class="ui-tag">银行</span></span><span class="code">600036</span></div>
+            <div class="opt" role="option"><span>比亚迪 <span class="ui-tag ui-tag--up">新能源</span></span><span class="code">002594</span></div>
+          </div>
+        </div>
+        <p class="ui-label" style="margin-top:var(--ui-space-3);">输入即联想，支持键盘 ↑↓ 选择 / Enter 确认 / Esc 关闭。</p>
+      </div>
+
+      <!-- Form + 校验 -->
+      <div class="cell cell-12 ui-glass reveal">
+        <h3>Form · 筛选 / 回测参数（字段栅格 + 校验）</h3>
+        <form class="ui-form" id="demoForm" novalidate>
+          <div class="ui-form-grid">
+            <div class="ui-form-row">
+              <label class="ui-label" for="fStock">标的代码</label>
+              <input class="ui-input" id="fStock" placeholder="如 600519" />
+              <div class="ui-form-error" data-for="fStock"></div>
+            </div>
+            <div class="ui-form-row">
+              <label class="ui-label" for="fStart">开始日期</label>
+              <input class="ui-input" id="fStart" placeholder="2024-01-01" />
+              <div class="ui-form-error" data-for="fStart"></div>
+            </div>
+            <div class="ui-form-row">
+              <label class="ui-label" for="fEnd">结束日期</label>
+              <input class="ui-input" id="fEnd" placeholder="2024-12-31" />
+              <div class="ui-form-error" data-for="fEnd"></div>
+            </div>
+            <div class="ui-form-row">
+              <label class="ui-label" for="fWin">回测窗口(天)</label>
+              <input class="ui-input" id="fWin" placeholder="20" value="20" />
+              <div class="ui-form-error" data-for="fWin"></div>
+            </div>
+          </div>
+          <div class="row">
+            <button class="ui-btn ui-btn--primary" type="submit">运行回测</button>
+            <button class="ui-btn ui-btn--ghost" type="reset">重置</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Pagination + Tag + Message -->
+      <div class="cell cell-6 ui-glass reveal">
+        <h3>Pagination · 翻页</h3>
+        <div class="ui-pagination" id="demoPager" role="navigation" aria-label="分页">
+          <button aria-label="上一页" data-prev>‹</button>
+          <button class="is-active" aria-current="page">1</button>
+          <button>2</button><button>3</button><button>4</button>
+          <button>…</button><button>20</button>
+          <button aria-label="下一页" data-next>›</button>
+        </div>
+        <p class="ui-label" style="margin-top:var(--ui-space-3);">大数据集翻页控件（结合表格虚拟滚动，P1）。</p>
+      </div>
+
+      <div class="cell cell-6 ui-glass reveal">
+        <h3>Tag · 分类标签 / Message · 全局通知</h3>
+        <div class="row">
+          <span class="ui-tag ui-tag--brand">沪深300</span>
+          <span class="ui-tag ui-tag--up">增持</span>
+          <span class="ui-tag ui-tag--down">减持</span>
+          <span class="ui-tag">ESG</span>
+        </div>
+        <div class="row" style="margin-top:var(--ui-space-3);">
+          <button class="ui-btn ui-btn--default ui-size-sm" id="showMsgSuccess">成功通知</button>
+          <button class="ui-btn ui-btn--default ui-size-sm" id="showMsgWarning">警告通知</button>
+          <button class="ui-btn ui-btn--default ui-size-sm" id="showMsgInfo">信息通知</button>
+          <button class="ui-btn ui-btn--default ui-size-sm" id="showMsgDanger">错误通知</button>
+        </div>
+        <p class="ui-label" style="margin-top:var(--ui-space-3);">Tag 区别于计数型 Badge（分类语义）；Message 为顶部居中流程通知，区别于角落 Toast。</p>
+      </div>
+
+      <!-- 加载态 -->
+      <div class="cell cell-12 ui-glass reveal">
+        <h3>加载态 · Progress / Skeleton / Empty</h3>
+        <div class="ui-field"><label class="ui-label">回测进度</label>
+          <div class="ui-progress" id="demoProgress"><span style="width:0%"></span></div>
+          <button class="ui-btn ui-btn--primary ui-size-sm" id="runProgress" style="align-self:flex-start; margin-top:var(--ui-space-2);">模拟运行</button>
+        </div>
+        <div class="ui-field" style="margin-top:var(--ui-space-3);"><label class="ui-label">列表骨架屏</label>
+          <div class="row" style="gap:var(--ui-space-4); align-items:stretch;">
+            <div style="flex:1; min-width:160px; display:flex; flex-direction:column; gap:8px;">
+              <div class="ui-skeleton" style="height:14px; width:60%;"></div>
+              <div class="ui-skeleton" style="height:14px; width:90%;"></div>
+              <div class="ui-skeleton" style="height:14px; width:75%;"></div>
+            </div>
+            <div class="ui-empty" style="flex:1; min-width:160px; border:1px solid var(--ui-border); border-radius:var(--ui-radius-md);">
+              <span class="ico ui-icon"><i data-lucide="table"></i></span>
+              <span class="ui-label">暂无自选标的</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Drawer + 密度说明 -->
+      <div class="cell cell-6 ui-glass reveal">
+        <h3>Drawer · 侧滑详情（含焦点陷阱）</h3>
+        <button class="ui-btn ui-btn--primary" id="openDrawer">打开个股详情</button>
+        <p class="ui-label" style="margin-top:var(--ui-space-3);">点股票右侧滑出详情，不打断主视图；打开时焦点锁在抽屉内、Esc 关闭（a11y）。</p>
+      </div>
+
+      <div class="cell cell-6 ui-glass reveal">
+        <h3>信息密度（density）</h3>
+        <p class="ui-label">投研工具需 Bloomberg/Wind 级紧凑。点顶栏「密度：紧凑/宽松」切换全局密度——表格、卡片间距即时跟随。当前默认紧凑。</p>
+        <p class="ui-label" style="margin-top:var(--ui-space-2);">同时 Button 最小宽由 44px（移动触控）下调为受控 32px（PC 工具条更紧凑），见 token <code style="font-family:var(--ui-font-mono);">--ui-btn-min-w</code>。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 金融增强组件：P0+ 本轮补进预览（DatePicker / NumberInput / Popover / 图表桥接 / Table 增强） -->
+  <section class="section">
+    <p class="eyebrow reveal">Financial Enhancements</p>
+    <h2 class="section-title reveal">金融增强组件（时间 / 数值 / 图表 / 表格）</h2>
+    <p class="section-sub reveal">金融投研工具吃重而通用组件库此前缺的三块——时间区间、格式化数值、图表换肤，加可交互悬浮卡与大数据表格能力，本轮一并落地预览页。</p>
+
+    <div class="gallery">
+      <!-- DatePicker -->
+      <div class="cell cell-6 ui-glass reveal">
+        <h3>DatePicker · 单日 / 日期范围</h3>
+        <div class="ui-field"><label class="ui-label">回测区间（范围）</label>
+          <div class="ui-datepicker" id="dpRange" data-range>
+            <button class="ui-datepicker-trigger ui-input" aria-haspopup="dialog" aria-expanded="false">
+              <span class="ui-icon"><i data-lucide="calendar"></i></span>
+              <span class="dp-text">选择日期区间</span>
+            </button>
+            <div class="ui-datepicker-pop" role="dialog" aria-label="选择日期区间" hidden>
+              <div class="dp-head">
+                <button class="dp-nav" data-nav="prev" aria-label="上个月"><span class="ui-icon"><i data-lucide="chevron-left"></i></span></button>
+                <span class="dp-title">—</span>
+                <button class="dp-nav" data-nav="next" aria-label="下个月"><span class="ui-icon"><i data-lucide="chevron-right"></i></span></button>
+              </div>
+              <div class="dp-week"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+              <div class="dp-grid"></div>
+              <div class="dp-foot">
+                <button class="ui-btn ui-btn--ghost ui-size-sm" data-act="today">今天</button>
+                <button class="ui-btn ui-btn--primary ui-size-sm" data-act="clear">清除</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ui-field" style="margin-top:var(--ui-space-3);"><label class="ui-label">财报披露日（单日）</label>
+          <div class="ui-datepicker" id="dpSingle">
+            <button class="ui-datepicker-trigger ui-input" aria-haspopup="dialog" aria-expanded="false">
+              <span class="ui-icon"><i data-lucide="calendar"></i></span>
+              <span class="dp-text">选择日期</span>
+            </button>
+            <div class="ui-datepicker-pop" role="dialog" aria-label="选择日期" hidden>
+              <div class="dp-head">
+                <button class="dp-nav" data-nav="prev" aria-label="上个月"><span class="ui-icon"><i data-lucide="chevron-left"></i></span></button>
+                <span class="dp-title">—</span>
+                <button class="dp-nav" data-nav="next" aria-label="下个月"><span class="ui-icon"><i data-lucide="chevron-right"></i></span></button>
+              </div>
+              <div class="dp-week"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+              <div class="dp-grid"></div>
+              <div class="dp-foot">
+                <button class="ui-btn ui-btn--ghost ui-size-sm" data-act="today">今天</button>
+                <button class="ui-btn ui-btn--primary ui-size-sm" data-act="clear">清除</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NumberInput -->
+      <div class="cell cell-6 ui-glass reveal">
+        <h3>NumberInput · 格式化数值录入</h3>
+        <div class="ui-field"><label class="ui-label">买入价（¥，2 位小数，步进 0.01）</label>
+          <div class="ui-number" data-min="0" data-max="9999" data-step="0.01" data-precision="2" data-prefix="¥">
+            <button class="ui-number-step" data-step="down" aria-label="减少">−</button>
+            <input class="ui-number-input" inputmode="decimal" value="1682.00" aria-label="买入价" />
+            <button class="ui-number-step" data-step="up" aria-label="增加">+</button>
+          </div>
+        </div>
+        <div class="ui-field" style="margin-top:var(--ui-space-3);"><label class="ui-label">仓位（%，1 位小数，上限 100）</label>
+          <div class="ui-number" data-min="0" data-max="100" data-step="1" data-precision="1" data-suffix="%">
+            <button class="ui-number-step" data-step="down" aria-label="减少">−</button>
+            <input class="ui-number-input" inputmode="decimal" value="65.0" aria-label="仓位" />
+            <button class="ui-number-step" data-step="up" aria-label="增加">+</button>
+          </div>
+        </div>
+        <div class="ui-field" style="margin-top:var(--ui-space-3);"><label class="ui-label">成交额（¥ 千分位，0 位小数）</label>
+          <div class="ui-number" data-min="0" data-step="1000000" data-precision="0" data-prefix="¥">
+            <button class="ui-number-step" data-step="down" aria-label="减少">−</button>
+            <input class="ui-number-input" inputmode="decimal" value="21400000000" aria-label="成交额" />
+            <button class="ui-number-step" data-step="up" aria-label="增加">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Popover -->
+      <div class="cell cell-6 ui-glass reveal">
+        <h3>Popover · 可交互悬浮资料卡</h3>
+        <div class="ui-popover" id="popStock">
+          <button class="ui-btn ui-btn--default ui-size-sm" aria-expanded="false" aria-controls="popBody">贵州茅台 ▸</button>
+          <div class="ui-popover-panel" id="popBody" role="dialog" aria-label="个股快览" hidden>
+            <div class="pop-head">贵州茅台 <span class="code">600519</span></div>
+            <div class="pop-row"><span>最新价</span><b class="ui-num">1,682.00</b></div>
+            <div class="pop-row"><span>涨跌幅</span><b class="ui-num ui-num--down">-0.42%</b></div>
+            <div class="pop-row"><span>市盈率 TTM</span><b class="ui-num">28.40</b></div>
+            <div class="pop-row"><span>换手率</span><b class="ui-num">0.31%</b></div>
+            <div class="pop-actions">
+              <button class="ui-btn ui-btn--primary ui-size-sm">加自选</button>
+              <button class="ui-btn ui-btn--ghost ui-size-sm">看研报</button>
+            </div>
+          </div>
+        </div>
+        <p class="ui-label" style="margin-top:var(--ui-space-3);">Hover / Focus 弹出，面板内按钮可点（区别于 Tooltip 纯标签）；点击外部或 Esc 关闭。也可以接图表桥接做迷你走势。</p>
+      </div>
+
+      <!-- 图表主题桥接 -->
+      <div class="cell cell-12 ui-glass reveal">
+        <h3>图表主题桥接 · 让图表吃 uni-ui token</h3>
+        <div class="ui-chart" id="demoChart">
+          <svg class="ui-chart-svg" viewBox="0 0 600 200" preserveAspectRatio="none" role="img" aria-label="净值曲线示意"></svg>
+          <div class="ui-chart-legend">
+            <span class="lg lg-brand">策略净值</span>
+            <span class="lg lg-up">超额(涨)</span>
+            <span class="lg lg-down">回撤(跌)</span>
+          </div>
+        </div>
+        <p class="ui-label" style="margin-top:var(--ui-space-2);">切换顶栏「主题 / 品牌色 / 涨跌色约定」，曲线、网格、涨跌标记即时跟随——证明 ECharts / visx 只需 read 同一套 CSS 变量即可整体换肤，无需各自维护主题。</p>
+      </div>
+
+      <!-- Data Table 增强 -->
+      <div class="cell cell-12 ui-glass reveal">
+        <h3>Data Table 增强 · 吸顶表头 / 冻结首列 / 行多选</h3>
+        <div class="ui-table-wrap">
+          <table class="ui-table ui-table--sticky ui-table--freeze ui-table--selectable">
+            <thead><tr>
+              <th class="col-check"><input type="checkbox" class="row-check-all" aria-label="全选" /></th>
+              <th class="sticky-col">标的</th><th data-num>最新价</th><th data-num>涨跌幅</th><th data-num>市盈率</th><th data-num>换手率</th><th>板块</th>
+            </tr></thead>
+            <tbody>
+              <tr><td class="col-check"><input type="checkbox" class="row-check" aria-label="选择" /></td><td class="sticky-col">贵州茅台</td><td class="ui-num">1,682.00</td><td class="ui-num ui-num--down">-0.42%</td><td class="ui-num">28.4</td><td class="ui-num">0.31%</td><td>白酒</td></tr>
+              <tr><td class="col-check"><input type="checkbox" class="row-check" aria-label="选择" /></td><td class="sticky-col">宁德时代</td><td class="ui-num">198.50</td><td class="ui-num ui-num--up">+1.86%</td><td class="ui-num">19.2</td><td class="ui-num">1.12%</td><td>新能源</td></tr>
+              <tr><td class="col-check"><input type="checkbox" class="row-check" aria-label="选择" /></td><td class="sticky-col">招商银行</td><td class="ui-num">38.20</td><td class="ui-num ui-num--down">-0.08%</td><td class="ui-num">6.1</td><td class="ui-num">0.22%</td><td>银行</td></tr>
+              <tr><td class="col-check"><input type="checkbox" class="row-check" aria-label="选择" /></td><td class="sticky-col">比亚迪</td><td class="ui-num">245.00</td><td class="ui-num ui-num--up">+2.10%</td><td class="ui-num">22.0</td><td class="ui-num">0.95%</td><td>新能源</td></tr>
+              <tr><td class="col-check"><input type="checkbox" class="row-check" aria-label="选择" /></td><td class="sticky-col">隆基绿能</td><td class="ui-num">18.40</td><td class="ui-num ui-num--down">-1.55%</td><td class="ui-num">14.7</td><td class="ui-num">0.88%</td><td>光伏</td></tr>
+              <tr><td class="col-check"><input type="checkbox" class="row-check" aria-label="选择" /></td><td class="sticky-col">中国平安</td><td class="ui-num">52.30</td><td class="ui-num ui-num--up">+0.77%</td><td class="ui-num">9.4</td><td class="ui-num">0.41%</td><td>保险</td></tr>
+              <tr><td class="col-check"><input type="checkbox" class="row-check" aria-label="选择" /></td><td class="sticky-col">美的集团</td><td class="ui-num">72.10</td><td class="ui-num ui-num--up">+0.34%</td><td class="ui-num">13.1</td><td class="ui-num">0.36%</td><td>家电</td></tr>
+              <tr><td class="col-check"><input type="checkbox" class="row-check" aria-label="选择" /></td><td class="sticky-col">东方财富</td><td class="ui-num">14.05</td><td class="ui-num ui-num--down">-2.01%</td><td class="ui-num">17.9</td><td class="ui-num">1.45%</td><td>券商</td></tr>
+              <tr><td class="col-check"><input type="checkbox" class="row-check" aria-label="选择" /></td><td class="sticky-col">药明康德</td><td class="ui-num">61.80</td><td class="ui-num ui-num--up">+1.20%</td><td class="ui-num">21.3</td><td class="ui-num">0.67%</td><td>医药</td></tr>
+              <tr><td class="col-check"><input type="checkbox" class="row-check" aria-label="选择" /></td><td class="sticky-col">京东方A</td><td class="ui-num">4.12</td><td class="ui-num ui-num--down">-0.48%</td><td class="ui-num">25.6</td><td class="ui-num">0.94%</td><td>半导体</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="ui-label" style="margin-top:var(--ui-space-2);">表头吸顶（纵向滚动不丢列名）、首列冻结（横向滚动锚定标的）、行多选 + 表头全选。千只标的级虚拟滚动见下。</p>
+      </div>
+
+      <!-- Data Table 虚拟滚动 -->
+      <div class="cell cell-12 ui-glass reveal">
+        <h3>Data Table 虚拟滚动 · 5000 行仅渲染可视窗口</h3>
+        <div class="ui-vtable" id="vtable" aria-label="自选标的列表（虚拟滚动）">
+          <div class="ui-vtable-head"><span class="sticky-col">标的</span><span data-num>最新价</span><span data-num>涨跌幅</span><span data-num>市盈率</span><span data-num>换手率</span><span>板块</span></div>
+          <div class="ui-vtable-viewport"></div>
+        </div>
+        <div class="ui-vtable-meta v-count">渲染 0 行 / 共 0 行</div>
+        <p class="ui-label" style="margin-top:var(--ui-space-2);">固定行高 + 仅渲染可视窗口（上下各缓冲若干行），5000 行数据 DOM 中始终只有几十个节点；纵向滚动即时重算窗口，横向滚动首列冻结。大规模标的列表不再卡顿。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 金融辅助组件：Tree / Slider / Accordion / Steps / Breadcrumb / ContextMenu -->
+  <section class="section">
+    <p class="eyebrow reveal">Helpers</p>
+    <h2 class="section-title reveal">金融辅助组件（导航 / 筛选 / 流程）</h2>
+    <p class="section-sub reveal">投研工具的非核心但高频件——行业板块树、区间筛选滑块、筛选分组折叠、回测流程向导、研究路径面包屑、标的一行右键菜单，本轮一并补齐，金融 PC 组件矩阵收口。</p>
+
+    <div class="gallery">
+      <!-- Tree -->
+      <div class="cell cell-6 ui-glass reveal">
+        <h3>Tree · 行业 / 板块树（多选筛选）</h3>
+        <div class="ui-tree" id="sectorTree" role="tree" aria-label="申万行业树">
+          <ul class="ui-tree-children">
+            <li class="ui-tree-node" role="treeitem" aria-expanded="true">
+              <div class="ui-tree-row">
+                <span class="ui-tree-caret ui-icon"><i data-lucide="chevron-down"></i></span>
+                <input type="checkbox" class="ui-tree-check" aria-label="选择 食品饮料" />
+                <span class="ui-tree-label">食品饮料</span><span class="ui-tree-count">30</span>
+              </div>
+              <ul class="ui-tree-children">
+                <li class="ui-tree-node ui-tree-leaf" role="treeitem">
+                  <div class="ui-tree-row">
+                    <span class="ui-tree-caret ui-icon"><i data-lucide="chevron-down"></i></span>
+                    <input type="checkbox" class="ui-tree-check" aria-label="选择 白酒" />
+                    <span class="ui-tree-label">白酒</span><span class="ui-tree-count">18</span>
+                  </div>
+                </li>
+                <li class="ui-tree-node ui-tree-leaf" role="treeitem">
+                  <div class="ui-tree-row">
+                    <span class="ui-tree-caret ui-icon"><i data-lucide="chevron-down"></i></span>
+                    <input type="checkbox" class="ui-tree-check" aria-label="选择 调味品" />
+                    <span class="ui-tree-label">调味品</span><span class="ui-tree-count">12</span>
+                  </div>
+                </li>
+              </ul>
+            </li>
+            <li class="ui-tree-node" role="treeitem" aria-expanded="true">
+              <div class="ui-tree-row">
+                <span class="ui-tree-caret ui-icon"><i data-lucide="chevron-down"></i></span>
+                <input type="checkbox" class="ui-tree-check" aria-label="选择 新能源" />
+                <span class="ui-tree-label">新能源</span><span class="ui-tree-count">54</span>
+              </div>
+              <ul class="ui-tree-children">
+                <li class="ui-tree-node ui-tree-leaf" role="treeitem">
+                  <div class="ui-tree-row">
+                    <span class="ui-tree-caret ui-icon"><i data-lucide="chevron-down"></i></span>
+                    <input type="checkbox" class="ui-tree-check" aria-label="选择 电池" />
+                    <span class="ui-tree-label">电池</span><span class="ui-tree-count">26</span>
+                  </div>
+                </li>
+                <li class="ui-tree-node ui-tree-leaf" role="treeitem">
+                  <div class="ui-tree-row">
+                    <span class="ui-tree-caret ui-icon"><i data-lucide="chevron-down"></i></span>
+                    <input type="checkbox" class="ui-tree-check" aria-label="选择 光伏" />
+                    <span class="ui-tree-label">光伏</span><span class="ui-tree-count">28</span>
+                  </div>
+                </li>
+              </ul>
+            </li>
+            <li class="ui-tree-node ui-tree-leaf" role="treeitem">
+              <div class="ui-tree-row">
+                <span class="ui-tree-caret ui-icon"><i data-lucide="chevron-down"></i></span>
+                <input type="checkbox" class="ui-tree-check" aria-label="选择 银行" />
+                <span class="ui-tree-label">银行</span><span class="ui-tree-count">42</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <p class="ui-label" style="margin-top:var(--ui-space-2);">点击箭头或行折叠 / 展开；勾选叶子节点即筛入该板块。与 Select 多选互补，适合层级行业维度。</p>
+      </div>
+
+      <!-- Slider -->
+      <div class="cell cell-6 ui-glass reveal">
+        <h3>Slider · 涨跌幅区间筛选（双滑块）</h3>
+        <div class="ui-field"><label class="ui-label">当日涨跌幅区间</label>
+          <div class="ui-slider" id="chgSlider" data-min="-6" data-max="6" data-step="0.5" data-start="-2" data-end="3" data-format="pct">
+            <div class="ui-slider-track">
+              <div class="ui-slider-fill"></div>
+              <div class="ui-slider-thumb" data-handle="0" tabindex="0" role="slider" aria-valuemin="-6" aria-valuemax="6" aria-valuenow="-2" aria-label="最小涨跌幅"></div>
+              <div class="ui-slider-thumb" data-handle="1" tabindex="0" role="slider" aria-valuemin="-6" aria-valuemax="6" aria-valuenow="3" aria-label="最大涨跌幅"></div>
+            </div>
+          </div>
+          <div class="ui-slider-vals"><span class="s-min">-2.0%</span><span class="s-max">+3.0%</span></div>
+        </div>
+        <div class="ui-field" style="margin-top:var(--ui-space-4);"><label class="ui-label">市盈率 PE 区间</label>
+          <div class="ui-slider" id="peSlider" data-min="0" data-max="60" data-step="1" data-start="8" data-end="35" data-format="num">
+            <div class="ui-slider-track">
+              <div class="ui-slider-fill"></div>
+              <div class="ui-slider-thumb" data-handle="0" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="60" aria-valuenow="8" aria-label="最小市盈率"></div>
+              <div class="ui-slider-thumb" data-handle="1" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="60" aria-valuenow="35" aria-label="最大市盈率"></div>
+            </div>
+          </div>
+          <div class="ui-slider-vals"><span class="s-min">8</span><span class="s-max">35</span></div>
+        </div>
+        <p class="ui-label" style="margin-top:var(--ui-space-2);">双滑块拖拽 + 键盘（聚焦后 ←/→ 步进），自动约束 min≤max；填充条跟随品牌色。证券筛选高频件。</p>
+      </div>
+
+      <!-- Accordion -->
+      <div class="cell cell-6 ui-glass reveal">
+        <h3>Accordion · 筛选条件分组折叠</h3>
+        <div class="ui-accordion" id="filterAcc">
+          <div class="ui-accordion-item is-open">
+            <button class="ui-accordion-header" aria-expanded="true">
+              <span>行情面</span><span class="ui-accordion-badge">3</span>
+              <span class="ui-accordion-caret ui-icon"><i data-lucide="chevron-down"></i></span>
+            </button>
+            <div class="ui-accordion-panel">
+              <div class="ui-accordion-panel-inner">
+                <label class="row" style="justify-content:space-between;"><span>涨停</span><span class="ui-switch" role="switch" aria-checked="false"></span></label>
+                <label class="row" style="justify-content:space-between;"><span>创新高</span><span class="ui-switch" role="switch" aria-checked="false"></span></label>
+                <label class="row" style="justify-content:space-between;"><span>放量</span><span class="ui-switch" role="switch" aria-checked="true"></span></label>
+              </div>
+            </div>
+          </div>
+          <div class="ui-accordion-item">
+            <button class="ui-accordion-header" aria-expanded="false">
+              <span>基本面</span><span class="ui-accordion-badge">2</span>
+              <span class="ui-accordion-caret ui-icon"><i data-lucide="chevron-down"></i></span>
+            </button>
+            <div class="ui-accordion-panel">
+              <div class="ui-accordion-panel-inner">
+                <label class="row" style="gap:8px;"><input type="checkbox" checked /> 高分红（股息率 &gt; 3%）</label>
+                <label class="row" style="gap:8px;"><input type="checkbox" /> 低估值（PE &lt; 行业均值）</label>
+              </div>
+            </div>
+          </div>
+          <div class="ui-accordion-item">
+            <button class="ui-accordion-header" aria-expanded="false">
+              <span>资金面</span><span class="ui-accordion-badge">1</span>
+              <span class="ui-accordion-caret ui-icon"><i data-lucide="chevron-down"></i></span>
+            </button>
+            <div class="ui-accordion-panel">
+              <div class="ui-accordion-panel-inner">
+                <label class="row" style="justify-content:space-between;"><span>北向资金净买入</span><span class="ui-switch" role="switch" aria-checked="true"></span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="ui-label" style="margin-top:var(--ui-space-2);">分组折叠降低长表单认知负荷；支持同时展开多组，折叠过渡用 max-height 动画。</p>
+      </div>
+
+      <!-- Steps -->
+      <div class="cell cell-6 ui-glass reveal">
+        <h3>Steps · 回测流程向导</h3>
+        <div class="ui-steps" id="backtestSteps">
+          <div class="ui-step is-done is-clickable" data-step="0">
+            <span class="ui-step-dot"><i data-lucide="check"></i></span>
+            <span class="ui-step-text"><span class="ui-step-title">配置参数</span><span class="ui-step-desc">选股 + 区间</span></span>
+          </div>
+          <span class="ui-step-line"></span>
+          <div class="ui-step is-current is-clickable" data-step="1">
+            <span class="ui-step-dot">2</span>
+            <span class="ui-step-text"><span class="ui-step-title">运行回测</span><span class="ui-step-desc">计算中</span></span>
+          </div>
+          <span class="ui-step-line"></span>
+          <div class="ui-step is-clickable" data-step="2">
+            <span class="ui-step-dot">3</span>
+            <span class="ui-step-text"><span class="ui-step-title">查看结果</span><span class="ui-step-desc">绩效报告</span></span>
+          </div>
+        </div>
+        <p class="ui-label" style="margin-top:var(--ui-space-2);">已完成步骤实心品牌色 + 勾选，当前步高亮描边；点击步骤可回跳 / 跳进。</p>
+      </div>
+
+      <!-- Breadcrumb -->
+      <div class="cell cell-6 ui-glass reveal">
+        <h3>Breadcrumb · 研究路径</h3>
+        <nav class="ui-breadcrumb" aria-label="研究路径">
+          <a>首页</a><span class="sep">/</span>
+          <a>行业研究</a><span class="sep">/</span>
+          <a>A股</a><span class="sep">/</span>
+          <span class="current" aria-current="page">白酒</span>
+        </nav>
+        <p class="ui-label" style="margin-top:var(--ui-space-2);">末项为当前页（不链接）；链接 hover 跟随品牌色与柔光。研报 / 标的详情页定位常用。</p>
+      </div>
+
+      <!-- ContextMenu -->
+      <div class="cell cell-12 ui-glass reveal">
+        <h3>ContextMenu · 标的一行右键菜单</h3>
+        <div class="ui-contextmenu-target" id="cmTarget">在此区域点击鼠标右键（或长按触屏）——模拟自选列表里「一行标的」的右键操作</div>
+        <div class="ui-contextmenu" id="cmMenu" role="menu" aria-label="标的操作">
+          <div class="ui-contextmenu-item" role="menuitem" data-act="watch">加自选 <span class="ui-contextmenu-shortcut">⌘D</span></div>
+          <div class="ui-contextmenu-item" role="menuitem" data-act="report">看研报</div>
+          <div class="ui-contextmenu-item" role="menuitem" data-act="portfolio">加入组合</div>
+          <div class="ui-contextmenu-sep"></div>
+          <div class="ui-contextmenu-item is-danger" role="menuitem" data-act="del">删除标的</div>
+        </div>
+        <p class="ui-label" style="margin-top:var(--ui-space-2);">右键定位到光标处弹出；点击项执行（演示为顶部通知）；点击外部 / Esc 关闭；危险项红色 hover。</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="section" style="padding-bottom: var(--ui-space-7);">
+    <p class="ui-label">uni-ui · 设计系统预览 · 单包 uni-ui / import 'uni-ui/react' · token 驱动 · DOM 跨框架统一</p>
+  </footer>
+</main>
+
+<!-- Dialog -->
+<div class="ui-overlay" id="overlay">
+  <div class="ui-dialog ui-glass" role="dialog" aria-modal="true" aria-label="示例对话框">
+    <h3>确认操作</h3>
+    <p class="ui-label">这是 macOS 风毛玻璃对话框。遮罩层模糊背景，面板缩放入场。焦点圈使用品牌色，键盘可达。</p>
+    <div class="ui-dialog-actions">
+      <button class="ui-btn ui-btn--ghost" id="closeDialog">取消</button>
+      <button class="ui-btn ui-btn--primary" id="confirmDialog">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="ui-toast ui-glass" id="toast" role="status" aria-live="polite"><span class="ui-avatar" style="width:24px;height:24px;font-size:11px;">✓</span><span>操作已保存</span></div>
+
+<!-- Message：顶部全局通知（区别于角落 Toast） -->
+<div class="ui-message" id="message" role="status" aria-live="polite"><span class="dot"></span><span class="msg-text">已保存</span></div>
+
+<!-- Drawer：侧滑抽屉 -->
+<div class="ui-drawer-overlay" id="drawerOverlay">
+  <aside class="ui-drawer ui-glass" role="dialog" aria-modal="true" aria-label="个股详情">
+    <header>
+      <div>
+        <div style="font-family:var(--ui-font-display); font-weight:800; font-size:var(--ui-fs-lg);">贵州茅台</div>
+        <div class="ui-label">600519 · 白酒</div>
+      </div>
+      <button class="ui-btn ui-btn--ghost ui-size-sm" id="closeDrawer" aria-label="关闭">✕</button>
+    </header>
+    <div class="body">
+      <div class="row" style="gap:var(--ui-space-5); align-items:flex-start;">
+        <div class="ui-stat"><span class="label">最新价</span><span class="value ui-num">1,682.00</span><span class="delta ui-num--down">-0.42%</span></div>
+        <div class="ui-stat"><span class="label">总市值</span><span class="value ui-num">21,140亿</span><span class="delta ui-num--muted">—</span></div>
+      </div>
+      <div class="row">
+        <span class="ui-tag ui-tag--brand">沪深300</span>
+        <span class="ui-tag ui-tag--up">增持</span>
+        <span class="ui-tag">白酒</span>
+      </div>
+      <p class="ui-label">侧滑抽屉不打断主视图，适合承载个股详情、研报、财务摘要。本预览为交互骨架，真实组件将接数据 + 图表主题桥接。</p>
+    </div>
+  </aside>
+</div>
+
+<!-- lucide 图标体系（本地 vendor，预览不依赖外网）：data-lucide 占位 + createIcons 替换为真实 SVG -->
+<script src="./vendor/lucide.min.js"></script>
+<script>
+/* 主题切换：覆盖 data-theme，仅语义令牌变，组件不变 */
+const html = document.documentElement;
+document.getElementById('themeBtn').addEventListener('click', () => {
+  html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+});
+
+/* 多品牌换肤：只覆盖 --ui-color-brand，全站跟随 */
+document.querySelectorAll('.skin').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.documentElement.style.setProperty('--ui-color-brand', btn.dataset.skin);
+    document.querySelectorAll('.skin').forEach(b => b.setAttribute('aria-pressed', 'false'));
+    btn.setAttribute('aria-pressed', 'true');
+  });
+});
+document.getElementById('skinReset').addEventListener('click', () => {
+  document.documentElement.style.setProperty('--ui-color-brand', '#0a84ff');
+  document.querySelectorAll('.skin').forEach(b => b.setAttribute('aria-pressed', b.dataset.skin === '#0a84ff' ? 'true' : 'false'));
+});
+
+/* 涨跌色约定切换：data-mkt=cn(红涨绿跌) / intl(绿涨红跌) */
+const mktBtn = document.getElementById('mktBtn');
+mktBtn.addEventListener('click', () => {
+  const toIntl = html.dataset.mkt !== 'intl';
+  html.dataset.mkt = toIntl ? 'intl' : 'cn';
+  mktBtn.textContent = '涨跌色：' + (toIntl ? '国际' : '中国');
+});
+
+/* Data Table 排序：纯 DOM 逻辑，React/Vue 侧直接复用。numeric/string 自适应，asc/desc 切换，箭头指示。 */
+function initTableSort() {
+  document.querySelectorAll('.ui-table').forEach(tbl => {
+    const ths = Array.from(tbl.querySelectorAll('thead th'));
+    const tbody = tbl.querySelector('tbody');
+    ths.forEach(th => th.addEventListener('click', () => {
+      if (th.classList.contains('col-check')) return;   // 复选框列不参与排序
+      const idx = ths.indexOf(th);
+      const isNum = th.hasAttribute('data-num');
+      const asc = !th.classList.contains('is-sorted') || th.dataset.dir === 'desc';
+      ths.forEach(o => { o.classList.remove('is-sorted'); delete o.dataset.dir; });
+      th.classList.add('is-sorted'); th.dataset.dir = asc ? 'asc' : 'desc';
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      rows.sort((a, b) => {
+        const ta = a.children[idx].textContent.trim(), tb = b.children[idx].textContent.trim();
+        let va, vb;
+        if (isNum) { va = parseFloat(ta.replace(/[+,%\s]/g, '')); vb = parseFloat(tb.replace(/[+,%\s]/g, '')); }
+        else { va = ta; vb = tb; }
+        if (va < vb) return asc ? -1 : 1;
+        if (va > vb) return asc ? 1 : -1;
+        return 0;
+      });
+      rows.forEach(r => tbody.appendChild(r));
+    }));
+  });
+}
+initTableSort();
+
+/* 毛玻璃参数：透明度(%) + 模糊半径(px) 实时可调。
+   公开旋钮“透明度”与 CSS token“不透明度”是同一 alpha 的反向：透明度 = 100 − 不透明度。
+   滑块显示透明度（0% 实底 → 100% 全透），写入时反转为 --ui-glass-opacity（不透明度）。 */
+const glassOp = document.getElementById('glassOp');
+const glassBlur = document.getElementById('glassBlur');
+glassOp.addEventListener('input', () => {
+  const transparency = Number(glassOp.value);                 // 透明度 0–100，与标签一致
+  document.documentElement.style.setProperty('--ui-glass-opacity', (100 - transparency) + '%'); // 写入不透明度
+  document.getElementById('glassOpVal').textContent = transparency + '%';
+});
+glassBlur.addEventListener('input', () => {
+  document.documentElement.style.setProperty('--ui-glass-blur', glassBlur.value + 'px');
+  document.getElementById('glassBlurVal').textContent = glassBlur.value + 'px';
+});
+
+/* 逐组件独立玻璃控制：每个组件有 --ui-{comp}-glass-opacity / --ui-{comp}-glass-blur 旋钮，互不干扰。
+   透明度滑块显示“透明度”，写入时反转为不透明度（与全局旋钮同约定）。初始仅对齐滑块位置，不写 knob，
+   保留“未设即回退全局默认”的语义——只有真正拖动才落 knob。 */
+function setCompGlass(comp, prop, val) {
+  const root = document.documentElement;
+  if (prop === 'opacity') root.style.setProperty('--ui-' + comp + '-glass-opacity', (100 - val) + '%');
+  else root.style.setProperty('--ui-' + comp + '-glass-blur', val + 'px');
+}
+document.querySelectorAll('[data-comp]').forEach(slider => {
+  const comp = slider.dataset.comp, prop = slider.dataset.prop, tier = slider.dataset.tier;
+  let init;
+  if (prop === 'opacity') {
+    const op = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(tier === 'strong' ? '--ui-glass-opacity-strong' : '--ui-glass-opacity'));
+    init = Math.round(100 - op);
+  } else {
+    init = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-glass-blur'));
+  }
+  slider.value = init;
+  slider.addEventListener('input', () => setCompGlass(comp, prop, Number(slider.value)));
+});
+
+/* Switch */
+document.querySelectorAll('.ui-switch').forEach(s => s.addEventListener('click', () => {
+  s.setAttribute('aria-checked', s.getAttribute('aria-checked') === 'true' ? 'false' : 'true');
+}));
+
+/* Segmented：滑动 thumb */
+const seg = document.getElementById('seg');
+const segButtons = seg.querySelectorAll('button');
+const thumb = seg.querySelector('.thumb');
+function moveThumb(btn) { thumb.style.left = btn.offsetLeft + 'px'; thumb.style.width = btn.offsetWidth + 'px'; }
+segButtons.forEach(b => b.addEventListener('click', () => {
+  segButtons.forEach(x => x.setAttribute('aria-pressed', 'false'));
+  b.setAttribute('aria-pressed', 'true'); moveThumb(b);
+}));
+moveThumb(segButtons[0]);
+
+/* Tabs：标签过多时显示左右箭头，点击横向滚动 */
+function initTabsScroll(wrap){
+  const scroller = wrap.querySelector('.ui-tabs-scroll');
+  const left = wrap.querySelector('.ui-tabs-arrow--left');
+  const right = wrap.querySelector('.ui-tabs-arrow--right');
+  if(!scroller || !left || !right) return;
+  const update = () => {
+    const max = scroller.scrollWidth - scroller.clientWidth;
+    const x = scroller.scrollLeft;
+    left.classList.toggle('is-visible', x > 1);
+    right.classList.toggle('is-visible', x < max - 1);
+  };
+  const step = () => Math.max(80, scroller.clientWidth * 0.8);
+  left.addEventListener('click', () => scroller.scrollBy({ left: -step(), behavior: 'smooth' }));
+  right.addEventListener('click', () => scroller.scrollBy({ left: step(), behavior: 'smooth' }));
+  scroller.addEventListener('scroll', update, { passive: true });
+  if (window.ResizeObserver) new ResizeObserver(update).observe(scroller);
+  window.addEventListener('resize', update);
+  update();
+}
+document.querySelectorAll('.ui-tabs button').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.ui-tabs button').forEach(x => x.setAttribute('aria-selected', 'false'));
+  t.setAttribute('aria-selected', 'true');
+  if (t.scrollIntoView) t.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' });
+}));
+document.querySelectorAll('.ui-tabs-wrap').forEach(initTabsScroll);
+
+/* Dialog + 焦点陷阱（a11y：与 Drawer 同标准 — 键盘 Tab 循环 / Esc 关闭 / 打开聚焦首项 / 关闭恢复焦点） */
+const overlay = document.getElementById('overlay');
+let dialogLastFocus;
+function dialogFocusables() { return overlay.querySelectorAll('.ui-dialog button, .ui-dialog [href], .ui-dialog input, .ui-dialog [tabindex]:not([tabindex="-1"])'); }
+function trapDialog(e) {
+  if (e.key !== 'Tab') return;
+  const f = dialogFocusables(); if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+}
+function openDialog() { dialogLastFocus = document.activeElement; overlay.classList.add('show'); const f = dialogFocusables(); if (f.length) f[0].focus(); }
+function closeDialog() { overlay.classList.remove('show'); if (dialogLastFocus) dialogLastFocus.focus(); }
+document.getElementById('openDialog').addEventListener('click', openDialog);
+document.getElementById('closeDialog').addEventListener('click', closeDialog);
+document.getElementById('confirmDialog').addEventListener('click', closeDialog);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeDialog(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('show')) closeDialog(); });
+overlay.addEventListener('keydown', trapDialog);
+
+/* Toast */
+const toast = document.getElementById('toast');
+document.getElementById('showToast').addEventListener('click', () => {
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2400);
+});
+
+/* ============================================================
+   投研业务组件交互（P1/P2 缺口 + 问题改进，本轮补进预览）
+   ============================================================ */
+
+/* 信息密度切换（问题修复：投研默认紧凑，可切宽松） */
+const densityBtn = document.getElementById('densityBtn');
+densityBtn.addEventListener('click', () => {
+  const cozy = html.classList.toggle('density-cozy');
+  densityBtn.textContent = '密度：' + (cozy ? '宽松' : '紧凑');
+  document.querySelectorAll('.ui-table').forEach(t => t.classList.toggle('ui-table--comfortable', cozy));
+});
+
+/* Select（单/多选 + 可搜索） */
+function initSelect(sel) {
+  const trigger = sel.querySelector('.ui-select-trigger');
+  const search = sel.querySelector('.ui-select-search');
+  const multi = sel.hasAttribute('data-multi');
+  const opts = () => Array.from(sel.querySelectorAll('.ui-select-option'));
+  const close = () => { sel.classList.remove('open'); trigger.setAttribute('aria-expanded', 'false'); };
+  const open = () => { sel.classList.add('open'); trigger.setAttribute('aria-expanded', 'true'); if (search) search.focus(); };
+  const label = () => { const s = opts().filter(o => o.getAttribute('aria-selected') === 'true').map(o => o.dataset.val); trigger.firstChild.textContent = s.length ? s.join('、') : '请选择'; };
+  trigger.addEventListener('click', e => { e.stopPropagation(); sel.classList.contains('open') ? close() : open(); });
+  opts().forEach(o => o.addEventListener('click', e => {
+    e.stopPropagation();
+    if (multi) { o.setAttribute('aria-selected', o.getAttribute('aria-selected') === 'true' ? 'false' : 'true'); label(); }
+    else { opts().forEach(x => x.setAttribute('aria-selected', 'false')); o.setAttribute('aria-selected', 'true'); trigger.firstChild.textContent = o.dataset.val; close(); }
+  }));
+  if (search) {
+    search.addEventListener('input', () => { const q = search.value.trim().toLowerCase(); opts().forEach(o => { o.style.display = !q || o.dataset.val.toLowerCase().includes(q) ? '' : 'none'; }); });
+    search.addEventListener('click', e => e.stopPropagation());
+  }
+  document.addEventListener('click', e => { if (!sel.contains(e.target)) close(); });
+}
+document.querySelectorAll('.ui-select').forEach(initSelect);
+
+/* Search 联想（键盘 ↑↓ / Enter / Esc） */
+function initSearch(box) {
+  const input = box.querySelector('.ui-search-input');
+  const optsList = () => Array.from(box.querySelectorAll('.opt'));
+  let active = -1;
+  const close = () => { box.classList.remove('open'); active = -1; };
+  input.addEventListener('focus', () => box.classList.add('open'));
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase(); box.classList.add('open');
+    optsList().forEach(o => { o.style.display = !q || o.textContent.toLowerCase().includes(q) ? '' : 'none'; });
+  });
+  input.addEventListener('keydown', e => {
+    const vis = optsList().filter(o => o.style.display !== 'none');
+    if (e.key === 'ArrowDown') active = Math.min(active + 1, vis.length - 1);
+    else if (e.key === 'ArrowUp') active = Math.max(active - 1, 0);
+    else if (e.key === 'Enter') { if (vis[active]) { input.value = vis[active].querySelector('span').firstChild.textContent.trim(); close(); } return; }
+    else if (e.key === 'Escape') { close(); return; }
+    else return;
+    e.preventDefault(); vis.forEach((o, i) => o.classList.toggle('active', i === active));
+  });
+  optsList().forEach(o => o.addEventListener('mousedown', e => { e.preventDefault(); input.value = o.querySelector('span').firstChild.textContent.trim(); close(); }));
+  document.addEventListener('click', e => { if (!box.contains(e.target)) close(); });
+}
+document.querySelectorAll('.ui-search').forEach(initSearch);
+
+/* Form 校验（回测参数） */
+const demoForm = document.getElementById('demoForm');
+demoForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const setErr = (id, msg) => { document.querySelector(`.ui-form-error[data-for="${id}"]`).textContent = msg || ''; document.getElementById(id).classList.toggle('ui-input--error', !!msg); };
+  let ok = true;
+  const stock = demoForm.fStock.value.trim();
+  if (!stock) { setErr('fStock', '必填'); ok = false; } else if (!/^\d{6}$/.test(stock)) { setErr('fStock', '需为 6 位代码'); ok = false; } else setErr('fStock');
+  const sd = demoForm.fStart.value.trim();
+  if (!sd) { setErr('fStart', '必填'); ok = false; } else if (!/^\d{4}-\d{2}-\d{2}$/.test(sd)) { setErr('fStart', '格式 YYYY-MM-DD'); ok = false; } else setErr('fStart');
+  const ed = demoForm.fEnd.value.trim();
+  if (!ed) { setErr('fEnd', '必填'); ok = false; } else if (!/^\d{4}-\d{2}-\d{2}$/.test(ed)) { setErr('fEnd', '格式 YYYY-MM-DD'); ok = false; } else setErr('fEnd');
+  const win = demoForm.fWin.value.trim();
+  if (!win) { setErr('fWin', '必填'); ok = false; } else if (!(+win > 0)) { setErr('fWin', '需为正整数'); ok = false; } else setErr('fWin');
+  if (ok) showMessage('回测任务已提交', 'success');
+});
+demoForm.addEventListener('reset', () => { demoForm.querySelectorAll('.ui-form-error').forEach(e => e.textContent = ''); demoForm.querySelectorAll('.ui-input--error').forEach(e => e.classList.remove('ui-input--error')); });
+
+/* Message 顶部全局通知（区别于角落 Toast） */
+let msgTimer;
+function showMessage(text, type) {
+  const m = document.getElementById('message');
+  m.className = 'ui-message ui-message--' + (type || 'info');
+  m.querySelector('.msg-text').textContent = text;
+  requestAnimationFrame(() => m.classList.add('show'));
+  clearTimeout(msgTimer); msgTimer = setTimeout(() => m.classList.remove('show'), 2600);
+}
+document.getElementById('showMsgSuccess').addEventListener('click', () => showMessage('持仓已同步', 'success'));
+document.getElementById('showMsgWarning').addEventListener('click', () => showMessage('部分数据延迟更新', 'warning'));
+document.getElementById('showMsgInfo').addEventListener('click', () => showMessage('已切换基准指数为沪深300', 'info'));
+document.getElementById('showMsgDanger').addEventListener('click', () => showMessage('下单失败：资金不足', 'danger'));
+
+/* Pagination */
+const pager = document.getElementById('demoPager');
+pager.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || b.dataset.prev || b.dataset.next) return;
+  pager.querySelectorAll('button').forEach(x => { x.classList.remove('is-active'); x.removeAttribute('aria-current'); });
+  b.classList.add('is-active'); b.setAttribute('aria-current', 'page');
+});
+
+/* Progress 模拟运行 */
+document.getElementById('runProgress').addEventListener('click', () => {
+  const bar = document.querySelector('#demoProgress > span'); let p = 0; bar.style.width = '0%';
+  const t = setInterval(() => { p = Math.min(100, p + 8 + Math.random() * 10); bar.style.width = p + '%'; if (p >= 100) clearInterval(t); }, 220);
+});
+
+/* Drawer + 焦点陷阱（a11y 修复） */
+const drawerOverlay = document.getElementById('drawerOverlay');
+let lastFocus;
+function trapFocus(e) {
+  if (e.key !== 'Tab') return;
+  const f = drawerOverlay.querySelectorAll('button, [href], input, [tabindex]:not([tabindex="-1"])'); if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+}
+function openDrawer() { lastFocus = document.activeElement; drawerOverlay.classList.add('show'); drawerOverlay.querySelector('.ui-drawer').querySelector('button,input,[tabindex]').focus(); }
+function closeDrawer() { drawerOverlay.classList.remove('show'); if (lastFocus) lastFocus.focus(); }
+document.getElementById('openDrawer').addEventListener('click', openDrawer);
+document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
+drawerOverlay.addEventListener('click', e => { if (e.target === drawerOverlay) closeDrawer(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && drawerOverlay.classList.contains('show')) closeDrawer(); });
+drawerOverlay.addEventListener('keydown', trapFocus);
+
+/* Tabs 键盘导航 + 面板关联（修复「Tabs 不完整」） */
+document.querySelectorAll('.ui-tabs[role="tablist"]').forEach(list => {
+  const tabs = Array.from(list.querySelectorAll('[role="tab"]'));
+  list.addEventListener('keydown', e => {
+    const i = tabs.indexOf(document.activeElement); if (i < 0) return;
+    let n = -1;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') n = (i + 1) % tabs.length;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') n = (i - 1 + tabs.length) % tabs.length;
+    else if (e.key === 'Home') n = 0;
+    else if (e.key === 'End') n = tabs.length - 1;
+    if (n < 0) return; e.preventDefault(); tabs[n].focus(); tabs[n].click();
+  });
+  tabs.forEach(t => t.addEventListener('click', () => {
+    tabs.forEach(x => x.setAttribute('aria-selected', 'false'));
+    t.setAttribute('aria-selected', 'true');
+    const tid = t.getAttribute('aria-controls');
+    document.querySelectorAll('.ui-tabpanel').forEach(p => { p.hidden = p.id !== tid; });
+  }));
+});
+
+/* ============================================================
+   17.28 金融增强组件交互（DatePicker / NumberInput / Popover / 图表桥接 / Table 增强）
+   纯 DOM 逻辑，React/Vue 侧直接复用
+   ============================================================ */
+
+/* — DatePicker · 单日 / 日期范围 — */
+function initDatePicker(dp) {
+  const trigger = dp.querySelector('.ui-datepicker-trigger');
+  const pop = dp.querySelector('.ui-datepicker-pop');
+  const grid = dp.querySelector('.dp-grid');
+  const title = dp.querySelector('.dp-title');
+  const range = dp.hasAttribute('data-range');
+  const today = new Date(); today.setHours(0,0,0,0);
+  let view = new Date(today.getFullYear(), today.getMonth(), 1);
+  let start = null, end = null;            // 选中（范围模式下 start/end）
+  const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const same = (a,b) => a && b && a.getTime() === b.getTime();
+
+  function render() {
+    title.textContent = `${view.getFullYear()}年${view.getMonth()+1}月`;
+    const first = new Date(view.getFullYear(), view.getMonth(), 1);
+    const lead = (first.getDay() + 6) % 7;       // 周一为一周起点
+    const days = new Date(view.getFullYear(), view.getMonth()+1, 0).getDate();
+    const prevDays = new Date(view.getFullYear(), view.getMonth(), 0).getDate();
+    grid.innerHTML = '';
+    for (let i = 0; i < lead; i++) {
+      const d = prevDays - lead + 1 + i;
+      const cell = document.createElement('div'); cell.className = 'dp-cell is-out'; cell.textContent = d; cell.dataset.disabled = '1';
+      grid.appendChild(cell);
+    }
+    for (let d = 1; d <= days; d++) {
+      const date = new Date(view.getFullYear(), view.getMonth(), d);
+      const cell = document.createElement('div'); cell.className = 'dp-cell'; cell.textContent = d; cell.dataset.date = fmt(date);
+      if (same(date, today)) cell.classList.add('is-today');
+      if (range) {
+        if (same(date, start)) { cell.classList.add('is-selected','is-start'); }
+        if (same(date, end)) { cell.classList.add('is-selected','is-end'); }
+        if (start && end && date > start && date < end) cell.classList.add('in-range');
+      } else if (same(date, start)) cell.classList.add('is-selected');
+      cell.addEventListener('click', () => pick(date));
+      grid.appendChild(cell);
+    }
+  }
+  function pick(date) {
+    if (range) {
+      if (!start || (start && end)) { start = date; end = null; }
+      else if (date < start) { end = start; start = date; }
+      else end = date;
+      if (start && end) { syncTrigger(); close(); }
+    } else { start = date; syncTrigger(); close(); }
+    render();
+  }
+  function syncTrigger() {
+    const t = dp.querySelector('.dp-text');
+    if (range) t.textContent = (start && end) ? `${fmt(start)} ~ ${fmt(end)}` : (start ? fmt(start) : '选择日期区间');
+    else t.textContent = start ? fmt(start) : '选择日期';
+  }
+  function open() { pop.hidden = false; trigger.setAttribute('aria-expanded','true'); render(); }
+  function close() { pop.hidden = true; trigger.setAttribute('aria-expanded','false'); }
+
+  trigger.addEventListener('click', e => { e.stopPropagation(); pop.hidden ? open() : close(); });
+  pop.querySelector('[data-nav="prev"]').addEventListener('click', () => { view = new Date(view.getFullYear(), view.getMonth()-1, 1); render(); });
+  pop.querySelector('[data-nav="next"]').addEventListener('click', () => { view = new Date(view.getFullYear(), view.getMonth()+1, 1); render(); });
+  pop.querySelector('[data-act="today"]').addEventListener('click', () => {
+    if (range) { start = new Date(today); end = new Date(today); syncTrigger(); close(); } else { start = new Date(today); syncTrigger(); close(); }
+  });
+  pop.querySelector('[data-act="clear"]').addEventListener('click', () => { start = end = null; syncTrigger(); });
+  document.addEventListener('click', e => { if (!dp.contains(e.target)) close(); });
+}
+document.querySelectorAll('.ui-datepicker').forEach(initDatePicker);
+
+/* — NumberInput · 格式化数值录入 — */
+function initNumber(n) {
+  const input = n.querySelector('.ui-number-input');
+  const step = Number(n.dataset.step || '1');
+  const prec = Number(n.dataset.precision != null ? n.dataset.precision : '0');
+  const min = n.dataset.min !== undefined ? Number(n.dataset.min) : -Infinity;
+  const max = n.dataset.max !== undefined ? Number(n.dataset.max) : Infinity;
+  const prefix = n.dataset.prefix || '', suffix = n.dataset.suffix || '';
+  if (prefix) { const s = document.createElement('span'); s.className = 'ui-number-prefix'; s.textContent = prefix; n.insertBefore(s, n.firstChild); }
+  if (suffix) { const s = document.createElement('span'); s.className = 'ui-number-suffix'; s.textContent = suffix; n.appendChild(s); }
+  const clamp = v => Math.min(max, Math.max(min, v));
+  const group = v => v.toLocaleString('en-US', { minimumFractionDigits: prec, maximumFractionDigits: prec });
+  const show = v => { input.value = (prefix ? prefix : '') + group(v) + (suffix ? suffix : ''); };
+  function parse() {
+    const raw = input.value.replace(new RegExp((prefix||'') + '\\s*'), '').replace(new RegExp('\\s*' + (suffix||'')), '').replace(/[, ]/g, '');
+    const v = parseFloat(raw); return isNaN(v) ? 0 : v;
+  }
+  input.addEventListener('blur', () => show(clamp(parse())));
+  input.addEventListener('change', () => show(clamp(parse())));
+  n.querySelectorAll('.ui-number-step').forEach(b => b.addEventListener('click', () => {
+    const dir = b.dataset.step === 'up' ? 1 : -1;
+    show(clamp(parse() + dir * step));
+    input.focus();
+  }));
+  show(parse());
+}
+document.querySelectorAll('.ui-number').forEach(initNumber);
+
+/* — Popover · 可交互悬浮资料卡 — */
+function initPopover(p) {
+  const trigger = p.querySelector('button');
+  const panel = p.querySelector('.ui-popover-panel');
+  let timer;
+  const show = () => { clearTimeout(timer); panel.hidden = false; trigger.setAttribute('aria-expanded','true'); };
+  const hide = () => { timer = setTimeout(() => { panel.hidden = true; trigger.setAttribute('aria-expanded','false'); }, 120); };
+  p.addEventListener('mouseenter', show);
+  p.addEventListener('mouseleave', hide);
+  trigger.addEventListener('focus', show);
+  panel.addEventListener('focusin', () => clearTimeout(timer));
+  panel.addEventListener('focusout', hide);
+  trigger.addEventListener('keydown', e => { if (e.key === 'Escape') { hide(); trigger.focus(); } });
+  p.addEventListener('click', e => { if (!panel.contains(e.target)) {/* 面板内按钮不拦截 */} });
+  document.addEventListener('click', e => { if (!p.contains(e.target)) { panel.hidden = true; trigger.setAttribute('aria-expanded','false'); } });
+}
+document.querySelectorAll('.ui-popover').forEach(initPopover);
+
+/* — 图表主题桥接：read uni-ui CSS 变量 → 喂给图表 — */
+function uniChartTheme() {
+  const cs = getComputedStyle(document.documentElement);
+  const g = n => cs.getPropertyValue(n).trim();
+  return {
+    brand: g('--ui-color-brand'), up: g('--ui-color-up'), down: g('--ui-color-down'),
+    text: g('--ui-text-muted'), grid: g('--ui-border'), bg: g('--ui-bg-elevated'),
+  };
+}
+function renderChart() {
+  const svg = document.querySelector('#demoChart .ui-chart-svg');
+  if (!svg) return;
+  const t = uniChartTheme();
+  const W = 600, H = 200, pad = 12;
+  // 确定性伪随机序列（策略净值 vs 基准）
+  let seed = 42; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  const N = 40; const net = [], bench = [];
+  let a = 100, b = 100;
+  for (let i = 0; i < N; i++) { a += (rnd() - 0.45) * 6; b += (rnd() - 0.48) * 5; net.push(a); bench.push(b); }
+  const min = Math.min(...net, ...bench), max = Math.max(...net, ...bench);
+  const x = i => pad + i * (W - 2*pad) / (N - 1);
+  const y = v => pad + (1 - (v - min) / (max - min)) * (H - 2*pad);
+  const path = arr => arr.map((v,i) => `${i?'L':'M'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
+  // 网格线
+  let grid = '';
+  for (let g = 0; g <= 4; g++) { const gy = pad + g*(H-2*pad)/4; grid += `<line x1="${pad}" y1="${gy}" x2="${W-pad}" y2="${gy}" stroke="${t.grid}" stroke-width="1"/>`; }
+  // 涨跌区间填充（净值高于基准=超额，用 up；低于=回撤，用 down）
+  let areaUp = '', areaDown = '';
+  for (let i = 0; i < N; i++) { const top = y(Math.max(net[i], bench[i])), bot = y(Math.min(net[i], bench[i])); const col = net[i] >= bench[i] ? t.up : t.down; areaUp += `<rect x="${(x(i)-2).toFixed(1)}" y="${top.toFixed(1)}" width="4" height="${Math.max(0,bot-top).toFixed(1)}" fill="${col}" opacity="0.18"/>`; }
+  const netPath = path(net), benchPath = path(bench);
+  svg.innerHTML = `
+    <defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${t.brand}" stop-opacity="0.25"/><stop offset="100%" stop-color="${t.brand}" stop-opacity="0"/>
+    </linearGradient></defs>
+    ${grid}
+    <path d="${netPath} L${x(N-1).toFixed(1)} ${H-pad} L${x(0).toFixed(1)} ${H-pad} Z" fill="url(#cg)" stroke="none"/>
+    ${areaUp}
+    <path d="${benchPath}" fill="none" stroke="${t.text}" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.7"/>
+    <path d="${netPath}" fill="none" stroke="${t.brand}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${x(N-1).toFixed(1)}" cy="${y(net[N-1]).toFixed(1)}" r="3.5" fill="${t.brand}"/>
+  `;
+}
+renderChart();
+// 主题 / 品牌色 / 涨跌色约定变化 → 图表重绘（解耦，不耦合具体按钮）
+const chartWatch = new MutationObserver(() => renderChart());
+chartWatch.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme','data-mkt','style'] });
+
+/* — Data Table 增强：行多选 + 表头全选 — */
+document.querySelectorAll('.ui-table--selectable').forEach(tbl => {
+  const all = tbl.querySelector('.row-check-all');
+  const rows = () => Array.from(tbl.querySelectorAll('tbody tr'));
+  rows().forEach(tr => {
+    const cb = tr.querySelector('.row-check');
+    const toggle = () => { tr.classList.toggle('is-selected', cb.checked); tr.setAttribute('aria-selected', cb.checked); };
+    cb.addEventListener('change', toggle);
+    tr.addEventListener('click', e => { if (e.target.closest('.col-check')) return; cb.checked = !cb.checked; toggle(); });
+  });
+  if (all) all.addEventListener('change', () => rows().forEach(tr => { const cb = tr.querySelector('.row-check'); cb.checked = all.checked; cb.dispatchEvent(new Event('change')); }));
+});
+
+/* — Data Table 虚拟滚动：千只标的级，固定行高 + 仅渲染可视窗口 — */
+(function () {
+  const VTOTAL = 5000, VROW = 33, BUFFER = 6;
+  const NAMES = ['贵州茅台','宁德时代','招商银行','比亚迪','隆基绿能','中国平安','美的集团','东方财富','药明康德','京东方A','中信证券','五粮液','伊利股份','海康威视','立讯精密','迈瑞医疗','顺丰控股','三一重工','恒瑞医药','格力电器','兴业银行','平安银行','泸州老窖','紫金矿业','中芯国际','北方华创','汇川技术','万华化学','洋河股份','爱尔眼科'];
+  const SECTORS = ['白酒','新能源','银行','光伏','保险','家电','券商','医药','半导体','食品','证券','化工','医疗'];
+  const data = Array.from({ length: VTOTAL }, (_, i) => {
+    const name = NAMES[i % NAMES.length] + (i >= NAMES.length ? '·' + (Math.floor(i / NAMES.length) + 1) : '');
+    const price = (5 + Math.random() * 2000).toFixed(2);
+    const chg = Math.random() * 12 - 6;
+    const chgStr = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
+    const pe = (5 + Math.random() * 40).toFixed(1);
+    const turnover = (Math.random() * 3).toFixed(2) + '%';
+    return { name, price, chg, chgStr, pe, turnover, sector: SECTORS[i % SECTORS.length] };
+  });
+  const el = document.getElementById('vtable');
+  if (!el) return;
+  const view = el.querySelector('.ui-vtable-viewport');
+  const meta = el.parentElement.querySelector('.v-count');
+  view.style.height = (VTOTAL * VROW) + 'px';
+  function render(start) {
+    const vis = Math.ceil(el.clientHeight / VROW) + BUFFER * 2;
+    const s = Math.max(0, start - BUFFER), e = Math.min(VTOTAL, s + vis);
+    let html = '';
+    for (let i = s; i < e; i++) {
+      const d = data[i];
+      const cls = d.chg >= 0 ? 'ui-num ui-num--up' : 'ui-num ui-num--down';
+      html += '<div class="ui-vtable-row" style="transform:translateY(' + (i * VROW) + 'px)">' +
+        '<span class="sticky-col">' + d.name + '</span>' +
+        '<span class="ui-num" data-num>' + d.price + '</span>' +
+        '<span class="' + cls + '" data-num>' + d.chgStr + '</span>' +
+        '<span class="ui-num" data-num>' + d.pe + '</span>' +
+        '<span class="ui-num" data-num>' + d.turnover + '</span>' +
+        '<span>' + d.sector + '</span></div>';
+    }
+    view.innerHTML = html;
+    if (meta) meta.textContent = '渲染 ' + (e - s) + ' 行 / 共 ' + VTOTAL + ' 行';
+  }
+  el.addEventListener('scroll', () => render(Math.floor(el.scrollTop / VROW)), { passive: true });
+  render(0);
+})();
+
+/* ============================================================
+   17.30 金融辅助组件交互（Tree / Slider / Accordion / Steps / ContextMenu）
+   纯 DOM 逻辑，React/Vue 侧直接复用
+   ============================================================ */
+
+/* — Tree · 行业/板块树：折叠 + 多选 — */
+function initTree(tree) {
+  tree.querySelectorAll('.ui-tree-node').forEach(node => {
+    const row = node.querySelector(':scope > .ui-tree-row');
+    const caret = row.querySelector('.ui-tree-caret');
+    const toggle = () => {
+      const collapsed = node.classList.toggle('is-collapsed');
+      node.setAttribute('aria-expanded', String(!collapsed));
+    };
+    caret.addEventListener('click', e => { e.stopPropagation(); toggle(); });
+    row.addEventListener('click', e => {
+      if (e.target.closest('.ui-tree-check')) return;     // 勾选不触发折叠
+      if (node.querySelector(':scope > .ui-tree-children')) toggle();
+    });
+  });
+}
+document.querySelectorAll('.ui-tree').forEach(initTree);
+
+/* — Slider · 涨跌幅 / 市盈率双滑块区间筛选 — */
+function initSlider(s) {
+  const track = s.querySelector('.ui-slider-track');
+  const fill = s.querySelector('.ui-slider-fill');
+  const thumbs = Array.from(s.querySelectorAll('.ui-slider-thumb'));
+  const vals = s.parentElement.querySelector('.ui-slider-vals');
+  const min = Number(s.dataset.min), max = Number(s.dataset.max), step = Number(s.dataset.step || '1');
+  const pct = s.dataset.format === 'pct';
+  let lo = Number(s.dataset.start), hi = Number(s.dataset.end);
+  const fmtVal = v => pct ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : String(v);
+  function paint() {
+    const pLo = (lo - min) / (max - min) * 100, pHi = (hi - min) / (max - min) * 100;
+    fill.style.left = pLo + '%'; fill.style.width = (pHi - pLo) + '%';
+    thumbs[0].style.left = pLo + '%'; thumbs[1].style.left = pHi + '%';
+    thumbs[0].setAttribute('aria-valuenow', lo); thumbs[1].setAttribute('aria-valuenow', hi);
+    if (vals) { vals.querySelector('.s-min').textContent = fmtVal(lo); vals.querySelector('.s-max').textContent = fmtVal(hi); }
+  }
+  function valFromX(x) {
+    const r = track.getBoundingClientRect();
+    let p = (x - r.left) / r.width; p = Math.min(1, Math.max(0, p));
+    let v = Math.round((min + p * (max - min)) / step) * step;
+    return Math.min(max, Math.max(min, v));
+  }
+  thumbs.forEach((t, i) => {
+    t.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      const move = ev => { const v = valFromX(ev.clientX); if (i === 0) lo = Math.min(v, hi); else hi = Math.max(v, lo); paint(); };
+      const up = () => { document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', up); };
+      document.addEventListener('pointermove', move); document.addEventListener('pointerup', up);
+    });
+    t.addEventListener('keydown', e => {
+      let d = 0;
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') d = -step;
+      else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') d = step;
+      else if (e.key === 'Home') d = (i === 0 ? min - lo : min - hi);
+      else if (e.key === 'End') d = (i === 0 ? max - lo : max - hi);
+      else return;
+      e.preventDefault();
+      if (i === 0) lo = Math.min(Math.max(min, lo + d), hi); else hi = Math.max(Math.min(max, hi + d), lo);
+      paint();
+    });
+  });
+  paint();
+}
+document.querySelectorAll('.ui-slider').forEach(initSlider);
+
+/* — Accordion · 筛选条件分组折叠 — */
+function initAccordion(acc) {
+  acc.querySelectorAll('.ui-accordion-item').forEach(item => {
+    const header = item.querySelector('.ui-accordion-header');
+    const panel = item.querySelector('.ui-accordion-panel');
+    const setOpen = open => {
+      item.classList.toggle('is-open', open);
+      header.setAttribute('aria-expanded', String(open));
+      panel.style.maxHeight = open ? panel.scrollHeight + 'px' : '0px';
+    };
+    setOpen(item.classList.contains('is-open'));
+    header.addEventListener('click', () => setOpen(!item.classList.contains('is-open')));
+  });
+}
+document.querySelectorAll('.ui-accordion').forEach(initAccordion);
+
+/* — Steps · 回测流程向导：点击步骤切换当前/已完成 — */
+function initSteps(steps) {
+  const items = Array.from(steps.querySelectorAll('.ui-step'));
+  items.forEach((it, i) => {
+    if (!it.classList.contains('is-clickable')) return;
+    it.addEventListener('click', () => {
+      items.forEach((x, j) => {
+        x.classList.remove('is-current', 'is-done');
+        if (j < i) x.classList.add('is-done');
+        else if (j === i) x.classList.add('is-current');
+        const dot = x.querySelector('.ui-step-dot');
+        if (x.classList.contains('is-done')) dot.innerHTML = '<i data-lucide="check"></i>';
+        else dot.textContent = String(j + 1);
+      });
+      if (window.lucide && typeof lucide.createIcons === 'function') lucide.createIcons();
+    });
+  });
+}
+document.querySelectorAll('.ui-steps').forEach(initSteps);
+
+/* — ContextMenu · 标的一行右键菜单 — */
+function initContextMenu(target, menu) {
+  function open(x, y) {
+    menu.classList.add('is-open');
+    const r = menu.getBoundingClientRect();
+    let px = x, py = y;
+    if (x + r.width > window.innerWidth) px = x - r.width;
+    if (y + r.height > window.innerHeight) py = y - r.height;
+    menu.style.left = px + 'px'; menu.style.top = py + 'px';
+  }
+  const close = () => menu.classList.remove('is-open');
+  target.addEventListener('contextmenu', e => { e.preventDefault(); open(e.clientX, e.clientY); });
+  const ACT = { watch: ['已加入自选', 'success'], report: ['正在打开研报', 'info'], portfolio: ['已加入组合', 'success'], del: ['已删除标的', 'danger'] };
+  menu.querySelectorAll('.ui-contextmenu-item').forEach(it => it.addEventListener('click', () => {
+    const a = it.dataset.act, m = ACT[a] || ['操作', 'info'];
+    if (typeof showMessage === 'function') showMessage(m[0], m[1]);
+    close();
+  }));
+  document.addEventListener('click', e => { if (!menu.contains(e.target)) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+}
+initContextMenu(document.getElementById('cmTarget'), document.getElementById('cmMenu'));
+
+/* 入场序列：IntersectionObserver 触发 */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* lucide 图标体系接入：把 <i data-lucide> 占位替换为真实 SVG。
+   尺寸由 .ui-icon 的 --ui-icon-size 决定（随 .ui-size-* 档位缩放），颜色继承 currentColor。 */
+if (window.lucide && typeof lucide.createIcons === 'function') lucide.createIcons();
+</script>
+</body>
+</html>

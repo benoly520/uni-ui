@@ -30,6 +30,16 @@ export function createShowcase(view: HTMLElement): ShowcaseHandle {
   let reactRoots: Root[] = [];
   let vueApps: App[] = [];
 
+  // 框架偏好（React / Vue），持久化到 localStorage，跨组件与会话保留
+  const FW_KEY = 'uni-ui:playground-fw';
+  let currentFw: 'react' | 'vue' = 'react';
+  try {
+    const saved = localStorage.getItem(FW_KEY);
+    if (saved === 'react' || saved === 'vue') currentFw = saved;
+  } catch {
+    // localStorage 不可用时回退默认 React，不影响其余功能
+  }
+
   /** 构建左侧分组列表 */
   for (const cat of categories) {
     const group = document.createElement('div');
@@ -60,13 +70,22 @@ export function createShowcase(view: HTMLElement): ShowcaseHandle {
     vueApps = [];
 
     const cases = getCases(id);
-    const meta = allItems.find((i) => i.id === id)!;
+    const docApi = doc.api;
 
     const head = document.createElement('div');
     head.className = 'pg-demo-head';
     head.innerHTML = `<span id="pg-title"></span><code id="pg-path"></code>`;
     head.querySelector('#pg-title')!.textContent = doc.label;
     head.querySelector('#pg-path')!.textContent = `import { ${id} } from 'uni-ui/react'  ·  uni-ui/vue`;
+
+    // 组件级框架切换（React / Vue）：控制整页 demo、代码与 API 表，偏好持久化
+    const fwTabs = document.createElement('div');
+    fwTabs.className = 'pg-fw-tabs';
+    fwTabs.innerHTML = `
+      <button type="button" class="pg-fw" data-fw="react">React</button>
+      <button type="button" class="pg-fw" data-fw="vue">Vue</button>
+    `;
+    head.appendChild(fwTabs);
 
     const summary = document.createElement('p');
     summary.className = 'pg-summary';
@@ -87,19 +106,19 @@ export function createShowcase(view: HTMLElement): ShowcaseHandle {
       desc.className = 'pg-case-desc';
       desc.textContent = c.desc;
 
+      // demo 面板：React / Vue 各一块，由组件级框架切换控制显隐（默认 React）
       const panels = document.createElement('div');
       panels.className = 'pg-panels';
       panels.innerHTML = `
-        <section class="pg-panel"><h3>React</h3><div class="pg-stage" data-react></div></section>
-        <section class="pg-panel"><h3>Vue</h3><div class="pg-stage" data-vue></div></section>
+        <section class="pg-panel" data-fw="react"><div class="pg-stage" data-react></div></section>
+        <section class="pg-panel" data-fw="vue" hidden><div class="pg-stage" data-vue></div></section>
       `;
 
+      // 代码区：仅保留复制按钮；React/Vue 由用例级框架切换统一控制
       const code = document.createElement('div');
       code.className = 'pg-code';
       code.innerHTML = `
-        <div class="pg-code-tabs">
-          <button type="button" class="pg-fw active" data-fw="react">React</button>
-          <button type="button" class="pg-fw" data-fw="vue">Vue</button>
+        <div class="pg-code-bar">
           <button type="button" class="pg-copy">复制</button>
         </div>
         <pre class="pg-code-block" data-fw="react"><code></code></pre>
@@ -110,22 +129,16 @@ export function createShowcase(view: HTMLElement): ShowcaseHandle {
       reactCodeEl.textContent = c.reactCode;
       vueCodeEl.textContent = c.vueCode;
 
-      // 框架切换
-      const fwBtns = code.querySelectorAll<HTMLButtonElement>('.pg-fw');
-      const reactPre = code.querySelector<HTMLElement>('pre[data-fw="react"]')!;
-      const vuePre = code.querySelector<HTMLElement>('pre[data-fw="vue"]')!;
-      fwBtns.forEach((b) => {
-        b.onclick = () => {
-          const fw = b.dataset.fw;
-          fwBtns.forEach((x) => x.classList.toggle('active', x === b));
-          reactPre.hidden = fw !== 'react';
-          vuePre.hidden = fw !== 'vue';
-        };
-      });
-      // 复制当前可见代码
+      section.appendChild(title);
+      section.appendChild(desc);
+      section.appendChild(panels);
+      section.appendChild(code);
+      casesWrap.appendChild(section);
+
+      // 复制当前框架对应的代码
       const copyBtn = code.querySelector<HTMLButtonElement>('.pg-copy')!;
       copyBtn.onclick = () => {
-        const text = (reactPre.hidden ? vueCodeEl : reactCodeEl).textContent ?? '';
+        const text = (currentFw === 'react' ? reactCodeEl : vueCodeEl).textContent ?? '';
         navigator.clipboard?.writeText(text).then(
           () => {
             const old = copyBtn.textContent;
@@ -135,12 +148,6 @@ export function createShowcase(view: HTMLElement): ShowcaseHandle {
           () => {},
         );
       };
-
-      section.appendChild(title);
-      section.appendChild(desc);
-      section.appendChild(panels);
-      section.appendChild(code);
-      casesWrap.appendChild(section);
 
       // 挂载实时 demo（单个用例渲染失败不应影响其它用例与整页）
       const reactEl = panels.querySelector<HTMLElement>('[data-react]')!;
@@ -165,7 +172,7 @@ export function createShowcase(view: HTMLElement): ShowcaseHandle {
       }
     });
 
-    // 底部 API 表
+    // 底部 API 表（事件名随框架切换：Vue 下 onXxx → @xxx）
     const api = document.createElement('section');
     api.className = 'pg-api';
     const apiTitle = document.createElement('h2');
@@ -176,20 +183,42 @@ export function createShowcase(view: HTMLElement): ShowcaseHandle {
     table.className = 'pg-api-table';
     table.innerHTML = `
       <thead><tr><th>名称</th><th>类型</th><th>默认值</th><th>说明</th></tr></thead>
-      <tbody>${doc.api
-        .map(
-          (r) =>
-            `<tr><td><code>${escapeHtml(r.name)}</code></td><td><code>${escapeHtml(r.type)}</code></td><td><code>${escapeHtml(r.default)}</code></td><td>${escapeHtml(r.desc)}</td></tr>`,
-        )
-        .join('')}</tbody>
+      <tbody class="pg-api-tbody">${renderApiRows(doc.api, currentFw)}</tbody>
     `;
     api.appendChild(table);
+
+    /**
+     * 统一应用框架：同步切换条激活态、demo/代码显隐、API 表事件名。
+     * 排除 .pg-fw 按钮自身，避免切换时把切换按钮一并隐藏（此前 case 级实现的 bug）。
+     */
+    function setFw(fw: 'react' | 'vue'): void {
+      currentFw = fw;
+      try {
+        localStorage.setItem(FW_KEY, fw);
+      } catch {
+        // 忽略持久化失败，不影响当前会话的切换体验
+      }
+      view.querySelectorAll<HTMLElement>('.pg-fw').forEach((b) => {
+        b.classList.toggle('active', b.dataset.fw === fw);
+      });
+      main.querySelectorAll<HTMLElement>('[data-fw]:not(.pg-fw)').forEach((el) => {
+        el.hidden = el.dataset.fw !== fw;
+      });
+      const apiBody = main.querySelector<HTMLElement>('.pg-api-tbody');
+      if (apiBody) apiBody.innerHTML = renderApiRows(docApi, fw);
+    }
 
     main.innerHTML = '';
     main.appendChild(head);
     main.appendChild(summary);
     main.appendChild(casesWrap);
     main.appendChild(api);
+
+    // 绑定组件级框架切换，并应用持久化偏好（初始显隐 / 激活态 / API 表）
+    fwTabs.querySelectorAll<HTMLButtonElement>('.pg-fw').forEach((b) => {
+      b.onclick = () => setFw(b.dataset.fw as 'react' | 'vue');
+    });
+    setFw(currentFw);
 
     side
       .querySelectorAll('button')
@@ -217,4 +246,55 @@ function escapeHtml(s: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+/** 按框架解析 API 名称：事件名 onXxx → @xxx；children / 默认插槽 类二选一写法按框架取值 */
+function apiNameForFw(name: string, fw: 'react' | 'vue'): string {
+  // React 事件名 onXxx 在 Vue 下映射为 @xxx（kebab-case）
+  if (fw === 'vue' && /^on[A-Z]/.test(name)) {
+    const kebab = name
+      .slice(2)
+      .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+      .toLowerCase();
+    return `@${kebab}`;
+  }
+  // 形如 "children / 默认插槽" 的框架二选一写法：Vue 取含「插槽」部分，React 取另一部分
+  if (name.includes(' / ') && name.includes('插槽')) {
+    const parts = name.split(' / ').map((s) => s.trim());
+    const slotPart = parts.find((p) => p.includes('插槽'));
+    const otherPart = parts.find((p) => !p.includes('插槽'));
+    return (fw === 'vue' ? slotPart : otherPart) ?? name;
+  }
+  return name;
+}
+
+/** Vue 下把类型中的 ReactNode 替换为 VNode（Vue 语境下的等价类型） */
+function apiTypeForFw(type: string, fw: 'react' | 'vue'): string {
+  return fw === 'vue' ? type.replace(/ReactNode/g, 'VNode') : type;
+}
+
+/**
+ * 拆分 desc 中「X（React）/ Y（Vue）」的框架说明，按当前框架取对应部分。
+ * Vue 下若说明仅为事件名且与当前 name 相同，则统一展示为「事件回调」，避免重复。
+ */
+function apiDescForFw(desc: string, fw: 'react' | 'vue', fwName: string): string {
+  const m = desc.match(/^(.*?)（React）\s*\/\s*(.*?)（Vue）\s*$/);
+  if (!m) return desc;
+  if (fw === 'react') return m[1].trim();
+  const vuePart = m[2].trim();
+  if (/^@[\w-]+$/.test(vuePart) && vuePart === fwName) return '事件回调';
+  return vuePart;
+}
+
+/** 渲染 API 表行（name / type / desc 均随框架区分） */
+function renderApiRows(
+  rows: { name: string; type: string; default: string; desc: string }[],
+  fw: 'react' | 'vue',
+): string {
+  return rows
+    .map((r) => {
+      const fwName = apiNameForFw(r.name, fw);
+      return `<tr><td><code>${escapeHtml(fwName)}</code></td><td><code>${escapeHtml(apiTypeForFw(r.type, fw))}</code></td><td><code>${escapeHtml(r.default)}</code></td><td>${escapeHtml(apiDescForFw(r.desc, fw, fwName))}</td></tr>`;
+    })
+    .join('');
 }

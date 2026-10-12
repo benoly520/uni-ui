@@ -158,8 +158,8 @@ html::-webkit-scrollbar-thumb:hover { background: rgb(var(--ui-glass-tint) / 0.4
   padding: 2px 8px;
   border-radius: 6px;
 }
-.pg-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media (max-width: 880px) { .pg-panels { grid-template-columns: 1fr; } }
+/* demo 面板：改为单栏，由框架切换 tab 控制显隐（同一时刻只显示一个） */
+.pg-panels { display: block; }
 .pg-panel {
   border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-lg);
@@ -167,13 +167,6 @@ html::-webkit-scrollbar-thumb:hover { background: rgb(var(--ui-glass-tint) / 0.4
   background: rgb(var(--ui-glass-tint) / 0.10);
   backdrop-filter: blur(var(--ui-glass-blur)) saturate(var(--ui-glass-saturate));
   -webkit-backdrop-filter: blur(var(--ui-glass-blur)) saturate(var(--ui-glass-saturate));
-}
-.pg-panel h3 {
-  margin: 0 0 12px;
-  font-size: 12px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--ui-text-muted);
 }
 .pg-stage { min-height: 80px; display: flex; flex-direction: column; gap: 12px; }
 .pg-stage .demo-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
@@ -216,12 +209,19 @@ html::-webkit-scrollbar-thumb:hover { background: rgb(var(--ui-glass-tint) / 0.4
   overflow: hidden;
   background: rgb(var(--ui-glass-tint) / 0.04);
 }
-.pg-code-tabs {
+/* 代码复制栏：框架切换已上移到用例顶部的 .pg-fw-tabs，这里只承载复制按钮 */
+.pg-code-bar {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--ui-border);
+}
+/* 组件级框架切换条（位于页头右侧）：控制整页 React/Vue 显隐，与代码复制栏共用 .pg-fw 按钮样式 */
+.pg-fw-tabs {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 6px 8px;
-  border-bottom: 1px solid var(--ui-border);
+  margin-left: auto;
 }
 .pg-fw {
   border: 0;

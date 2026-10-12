@@ -16,10 +16,11 @@ export default defineConfig({
       'uni-ui/vue': resolve(root, 'src/vue/index.ts'),
       'uni-ui/theme.css': resolve(root, 'theme.css'),
       // 强制单实例：避免 playground 自身与库源码各引一份 react / vue（多实例会导致 hook 失效）
-      react: resolve(root, 'node_modules/react'),
-      'react-dom': resolve(root, 'node_modules/react-dom'),
-      'react/jsx-runtime': resolve(root, 'node_modules/react/jsx-runtime'),
-      vue: resolve(root, 'node_modules/vue'),
+      // 依赖实际装在 playground 自身的 node_modules（pnpm workspace 下仓库根没有 node_modules）
+      react: resolve(__dirname, 'node_modules/react'),
+      'react-dom': resolve(__dirname, 'node_modules/react-dom'),
+      'react/jsx-runtime': resolve(__dirname, 'node_modules/react/jsx-runtime'),
+      vue: resolve(__dirname, 'node_modules/vue'),
     },
     dedupe: ['react', 'react-dom', 'vue'],
   },

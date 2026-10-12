@@ -1,54 +1,128 @@
-/* Playground 外壳样式（仅 pg- 前缀，不与组件库的 ui-* 冲突）。
-   组件的视觉全部来自 uni-ui/theme.css，这里只负责 IDE 般的双栏布局。 */
-:root {
-  color-scheme: dark;
-}
+/* Playground 外壳样式（仅 pg- / site- / nav- 前缀，不与组件库的 ui-* 冲突）。
+   组件的视觉全部来自 uni-ui/theme.css（macOS 毛玻璃设计系统），这里只负责站点框架。 */
+
+/* 明暗主题跟随 data-theme，控制原生控件（滚动条等）配色 */
+[data-theme='dark'] { color-scheme: dark; }
+[data-theme='light'] { color-scheme: light; }
+
 * { box-sizing: border-box; }
-html, body, #app { height: 100%; margin: 0; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
-    'Microsoft YaHei', sans-serif;
-  background: #0b0d12;
-  color: #e7e9ee;
+html, body { margin: 0; }
+html, body, #app { min-height: 100%; }
+body { overflow-x: hidden; }
+
+/* 统一细滚动条：细窄（8px）、半透明、无两端箭头。
+   用玻璃着色令牌，暗色下浅、亮色下深，跟随主题；Firefox 走 scrollbar-width。 */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--ui-glass-tint) / 0.28) transparent;
+}
+html::-webkit-scrollbar { width: 8px; height: 8px; }
+html::-webkit-scrollbar-track { background: transparent; }
+html::-webkit-scrollbar-thumb {
+  background: rgb(var(--ui-glass-tint) / 0.28);
+  border-radius: 8px;
+}
+html::-webkit-scrollbar-thumb:hover { background: rgb(var(--ui-glass-tint) / 0.45); }
+
+/* 右侧演示区：常驻细滚动条 */
+.pg-main {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--ui-glass-tint) / 0.28) transparent;
+}
+.pg-main::-webkit-scrollbar { width: 8px; height: 8px; }
+.pg-main::-webkit-scrollbar-track { background: transparent; }
+.pg-main::-webkit-scrollbar-thumb {
+  background: rgb(var(--ui-glass-tint) / 0.28);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.pg-main::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--ui-glass-tint) / 0.45);
+  background-clip: padding-box;
 }
 
-.pg-header {
+/* 左侧组件菜单：默认隐藏滚动条，hover 滚动区时才出现（无箭头、细窄、半透明） */
+.pg-side {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+.pg-side:hover { scrollbar-color: rgb(var(--ui-glass-tint) / 0.28) transparent; }
+.pg-side::-webkit-scrollbar { width: 8px; height: 8px; }
+.pg-side::-webkit-scrollbar-track { background: transparent; }
+.pg-side::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.pg-side:hover::-webkit-scrollbar-thumb {
+  background: rgb(var(--ui-glass-tint) / 0.28);
+  background-clip: padding-box;
+}
+.pg-side:hover::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--ui-glass-tint) / 0.45);
+  background-clip: padding-box;
+}
+
+/* 站点整体：导航在上，视图在下，至少占满一屏 */
+#app {
   display: flex;
-  align-items: baseline;
-  gap: 14px;
-  padding: 14px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(20, 23, 31, 0.7);
-  backdrop-filter: blur(18px);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-.pg-brand { font-size: 18px; font-weight: 700; letter-spacing: 0.3px; }
-.pg-brand span { color: #6ea8fe; font-weight: 500; }
-.pg-hint { font-size: 12px; color: #9aa1ad; }
-.pg-hint code {
-  background: rgba(110, 168, 254, 0.15);
-  color: #9cc2ff;
-  padding: 1px 6px;
-  border-radius: 5px;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-.pg-body { display: flex; height: calc(100% - 53px); }
+/* 顶部导航内的路由链接（.nav 基础样式来自 theme.css） */
+.nav-links {
+  display: flex;
+  gap: var(--ui-space-4);
+  align-items: center;
+}
+.nav-link {
+  font-family: var(--ui-font-body);
+  font-weight: 600;
+  font-size: var(--ui-fs-md);
+  color: var(--ui-text-muted);
+  text-decoration: none;
+  padding: 4px 2px;
+  position: relative;
+  transition: color var(--ui-dur-fast) ease;
+}
+.nav-link:hover { color: var(--ui-text); }
+.nav-link.active { color: var(--ui-text); }
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--ui-color-brand);
+}
+
+/* 组件展示区：顶栏之后占满视口，左列表 + 右双栏内部各自滚动 */
+.pg-body {
+  display: flex;
+  height: calc(100vh - var(--nav-h, 56px));
+  border-top: 1px solid var(--ui-border);
+}
 .pg-side {
   width: 220px;
   flex: none;
   overflow-y: auto;
   padding: 12px 10px;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(16, 18, 25, 0.5);
+  border-right: 1px solid var(--ui-border);
+  background: rgb(var(--ui-glass-tint) / 0.30);
+  backdrop-filter: blur(var(--ui-glass-blur)) saturate(var(--ui-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--ui-glass-blur)) saturate(var(--ui-glass-saturate));
 }
 .pg-group { margin-bottom: 14px; }
 .pg-group-title {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #6b7280;
+  color: var(--ui-text-muted);
   padding: 4px 8px;
 }
 .pg-side button {
@@ -57,16 +131,16 @@ body {
   text-align: left;
   border: 0;
   background: transparent;
-  color: #cbd2dc;
+  color: var(--ui-text);
   padding: 7px 10px;
-  border-radius: 8px;
+  border-radius: var(--ui-radius-md);
   font-size: 13px;
   cursor: pointer;
 }
-.pg-side button:hover { background: rgba(255, 255, 255, 0.06); }
+.pg-side button:hover { background: rgb(var(--ui-glass-tint) / 0.12); }
 .pg-side button.active {
-  background: rgba(110, 168, 254, 0.18);
-  color: #fff;
+  background: var(--ui-color-brand-soft);
+  color: var(--ui-text);
 }
 
 .pg-main { flex: 1; overflow-y: auto; padding: 18px 22px; }
@@ -79,33 +153,52 @@ body {
 .pg-demo-head #pg-title { font-size: 16px; font-weight: 600; }
 .pg-demo-head code {
   font-size: 12px;
-  color: #9cc2ff;
-  background: rgba(110, 168, 254, 0.12);
+  color: var(--ui-color-brand);
+  background: var(--ui-color-brand-soft);
   padding: 2px 8px;
   border-radius: 6px;
 }
 .pg-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 @media (max-width: 880px) { .pg-panels { grid-template-columns: 1fr; } }
 .pg-panel {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
   padding: 16px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgb(var(--ui-glass-tint) / 0.10);
+  backdrop-filter: blur(var(--ui-glass-blur)) saturate(var(--ui-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--ui-glass-blur)) saturate(var(--ui-glass-saturate));
 }
 .pg-panel h3 {
   margin: 0 0 12px;
   font-size: 12px;
   letter-spacing: 1px;
   text-transform: uppercase;
-  color: #8b93a1;
+  color: var(--ui-text-muted);
 }
 .pg-stage { min-height: 80px; display: flex; flex-direction: column; gap: 12px; }
 .pg-stage .demo-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .pg-stage .demo-target {
-  border: 1px dashed rgba(110, 168, 254, 0.5);
-  border-radius: 10px;
+  border: 1px dashed var(--ui-color-brand);
+  border-radius: var(--ui-radius-md);
   padding: 20px;
   text-align: center;
-  color: #9cc2ff;
+  color: var(--ui-color-brand);
   user-select: none;
+}
+
+/* 首页底部 */
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--ui-space-3);
+  padding: var(--ui-space-6) var(--ui-space-5);
+  margin-top: var(--ui-space-6);
+  border-top: 1px solid var(--ui-border);
+}
+
+/* 窄屏：导航换行时链接与控件整体居中、间距收紧 */
+@media (max-width: 768px) {
+  .nav-links { order: 3; width: 100%; justify-content: flex-start; }
 }

@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      // 与 vite.config.ts 的 alias 保持一致：真实消费路径 → 库源码入口（免 build 直接类型可达）
+      "uni-ui/react": ["../src/react/index.ts"],
+      "uni-ui/vue": ["../src/vue/index.ts"],
+      "uni-ui/theme.css": ["../theme.css"],
+      // 强制单实例：库源码位于父目录，依赖装在 playground 的 node_modules（pnpm workspace 结构）
+      "react": ["node_modules/react"],
+      "react-dom": ["node_modules/react-dom"],
+      "react/jsx-runtime": ["node_modules/react/jsx-runtime"],
+      "vue": ["node_modules/vue"]
+    },
+    "types": ["vite/client"],
+    // 库源码以宽松类型书写，playground 仅对齐模块解析，不对 ../src 做全量严格检查
+    "noImplicitAny": false
+  },
+  "include": ["src"]
+}

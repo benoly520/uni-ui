@@ -31,6 +31,14 @@ import {
   showMessage,
 } from 'uni-ui/react';
 
+/** 单个用例：标题 + 说明 + React 代码片段 + 实时 demo 组件（title/desc/code 为单一来源） */
+export interface DemoCase {
+  title: string;
+  desc: string;
+  code: string;
+  Comp: React.FC;
+}
+
 const treeData = [
   {
     key: '1',
@@ -56,7 +64,7 @@ const treeData = [
 const tableColumns = [
   { key: 'name', title: '名称', sticky: true },
   { key: 'code', title: '代码', numeric: true },
-  { key: 'price', title: '最新价', numeric: true },
+  { key: 'price', title: '最新价', numeric: true, sortable: true },
   { key: 'chg', title: '涨跌幅', numeric: true },
 ];
 const tableData = [
@@ -65,274 +73,612 @@ const tableData = [
   { name: '招商银行', code: '600036', price: 38.42, chg: '+0.31%' },
 ];
 
-export const reactDemos: Record<string, React.FC> = {
-  Button: () => (
-    <div className="demo-row">
-      <Button>默认</Button>
-      <Button variant="primary">主要</Button>
-      <Button variant="glass">毛玻璃</Button>
-      <Button disabled>禁用</Button>
-    </div>
-  ),
+export const reactDocs: Record<string, DemoCase[]> = {
+  Button: [
+    {
+      title: '语义变体',
+      desc: '通过 variant 表达操作层级：primary 主操作、default 次操作、ghost 轻量、outline 描边、danger 危险操作。',
+      code: `<Button>默认</Button>\n<Button variant="primary">主要</Button>\n<Button variant="ghost">幽灵</Button>\n<Button variant="outline">描边</Button>\n<Button variant="danger">危险</Button>`,
+      Comp: () => (
+        <div className="demo-row">
+          <Button>默认</Button>
+          <Button variant="primary">主要</Button>
+          <Button variant="ghost">幽灵</Button>
+          <Button variant="outline">描边</Button>
+          <Button variant="danger">危险</Button>
+        </div>
+      ),
+    },
+    {
+      title: '尺寸与胶囊',
+      desc: 'size 提供 lg/md/sm/xs 四档；pill 叠加任意变体形成胶囊按钮。',
+      code: `<Button size="lg" variant="primary">大</Button>\n<Button variant="primary">中</Button>\n<Button size="sm" variant="primary">小</Button>\n<Button size="xs" variant="primary">超小</Button>\n<Button pill variant="glass">胶囊</Button>`,
+      Comp: () => (
+        <div className="demo-row">
+          <Button size="lg" variant="primary">大</Button>
+          <Button variant="primary">中</Button>
+          <Button size="sm" variant="primary">小</Button>
+          <Button size="xs" variant="primary">超小</Button>
+          <Button pill variant="glass">胶囊</Button>
+        </div>
+      ),
+    },
+    {
+      title: '加载与禁用',
+      desc: 'loading 显示 spinner 并禁用点击；disabled 进入原生禁用态；icon 可在文本前加图标。',
+      code: `<Button loading variant="primary">提交中</Button>\n<Button disabled>禁用</Button>\n<Button variant="outline" icon={<span>★</span>}>带图标</Button>`,
+      Comp: () => (
+        <div className="demo-row">
+          <Button loading variant="primary">提交中</Button>
+          <Button disabled>禁用</Button>
+          <Button variant="outline" icon={<span>★</span>}>带图标</Button>
+        </div>
+      ),
+    },
+  ],
 
-  Tag: () => (
-    <div className="demo-row">
-      <Tag>常规</Tag>
-      <Tag type="brand">品牌</Tag>
-      <Tag type="success">成功</Tag>
-      <Tag type="warning">警告</Tag>
-      <Tag type="danger">危险</Tag>
-    </div>
-  ),
+  Tag: [
+    {
+      title: '语义类型与可关闭',
+      desc: 'type 控制底色语义；closable 渲染关闭按钮并触发 onClose。',
+      code: `<Tag>常规</Tag>\n<Tag type="brand">品牌</Tag>\n<Tag type="up">上涨</Tag>\n<Tag type="down">下跌</Tag>\n<Tag closable onClose={() => {}}>可关闭</Tag>`,
+      Comp: () => (
+        <div className="demo-row">
+          <Tag>常规</Tag>
+          <Tag type="brand">品牌</Tag>
+          <Tag type="up">上涨</Tag>
+          <Tag type="down">下跌</Tag>
+          <Tag closable onClose={() => {}}>可关闭</Tag>
+        </div>
+      ),
+    },
+    {
+      title: '自定义色',
+      desc: 'color 直接覆盖 type 配色，适合品牌定制场景。',
+      code: `<Tag color="#7c5cff">紫</Tag>\n<Tag color="#00b894">青</Tag>`,
+      Comp: () => (
+        <div className="demo-row">
+          <Tag color="#7c5cff">紫</Tag>
+          <Tag color="#00b894">青</Tag>
+        </div>
+      ),
+    },
+  ],
 
-  Badge: () => (
-    <div className="demo-row">
-      <Badge tone="brand" count={9}><Avatar name="A" /></Badge>
-      <Badge tone="success" dot><Avatar name="B" /></Badge>
-      <Badge tone="danger" count={99}><Button>消息</Button></Badge>
-    </div>
-  ),
+  Badge: [
+    {
+      title: '计数与圆点',
+      desc: 'count 显示数字并配合 max 截断为 99+；dot 仅显示状态圆点；showZero 控制 0 值是否渲染。',
+      code: `<Badge tone="brand" count={9} />\n<Badge tone="danger" count={120} />\n<Badge tone="success" dot />`,
+      Comp: () => (
+        <div className="demo-row">
+          <Badge tone="brand" count={9}><Avatar name="A" /></Badge>
+          <Badge tone="danger" count={120}><Avatar name="B" /></Badge>
+          <Badge tone="success" dot><Avatar name="C" /></Badge>
+        </div>
+      ),
+    },
+    {
+      title: '附着于元素',
+      desc: 'Badge 通过 children 包裹任意元素（头像、按钮等）形成角标。',
+      code: `<Badge tone="danger" count={99}><Button>消息</Button></Badge>`,
+      Comp: () => (
+        <div className="demo-row">
+          <Badge tone="danger" count={99}><Button>消息</Button></Badge>
+          <Badge tone="warning" dot><Button variant="outline">待办</Button></Badge>
+        </div>
+      ),
+    },
+  ],
 
-  Avatar: () => (
-    <div className="demo-row">
-      <Avatar name="茅台" tone="brand" />
-      <Avatar name="宁" tone="success" />
-      <Avatar name="招" tone="danger" />
-      <Avatar name="银" />
-    </div>
-  ),
+  Avatar: [
+    {
+      title: '文字 / 图片 / 图标',
+      desc: 'text 取首字生成底色头像；src 优先渲染图片；icon 渲染图标头像。',
+      code: `<Avatar name="茅台" tone="brand" />\n<Avatar name="宁" tone="success" />\n<Avatar icon={<span>★</span>} tone="warning" />\n<Avatar src="https://i.pravatar.cc/80?img=12" />`,
+      Comp: () => (
+        <div className="demo-row">
+          <Avatar name="茅台" tone="brand" />
+          <Avatar name="宁" tone="success" />
+          <Avatar icon={<span>★</span>} tone="warning" />
+          <Avatar src="https://i.pravatar.cc/80?img=12" />
+        </div>
+      ),
+    },
+    {
+      title: '尺寸档位',
+      desc: 'size 支持 xs/sm/md/lg 预设，也接受数字自定义像素。',
+      code: `<Avatar size="xs" name="A" />\n<Avatar size="sm" name="B" />\n<Avatar size="md" name="C" />\n<Avatar size="lg" name="D" />`,
+      Comp: () => (
+        <div className="demo-row">
+          <Avatar size="xs" name="A" />
+          <Avatar size="sm" name="B" />
+          <Avatar size="md" name="C" />
+          <Avatar size="lg" name="D" />
+        </div>
+      ),
+    },
+  ],
 
-  Input: () => {
-    const [v, setV] = useState('');
-    return (
-      <div className="demo-row">
-        <Input value={v} onChange={(val: string) => setV(val)} placeholder="搜索标的 / 代码" />
-        <span className="ui-label">当前值：{v || '（空）'}</span>
-      </div>
-    );
-  },
+  Input: [
+    {
+      title: '受控与状态',
+      desc: 'value + onChange 受控；error 进入错误描边；disabled 禁用。',
+      code: `const [v, setV] = useState('');\n<Input value={v} onChange={setV} placeholder="搜索标的 / 代码" />\n<Input defaultValue="错误示例" error />\n<Input defaultValue="不可编辑" disabled />`,
+      Comp: () => {
+        const [v, setV] = useState('');
+        return (
+          <div className="demo-row">
+            <Input value={v} onChange={(val: string) => setV(val)} placeholder="搜索标的 / 代码" />
+            <Input defaultValue="错误示例" error />
+            <Input defaultValue="不可编辑" disabled />
+          </div>
+        );
+      },
+    },
+    {
+      title: '前后缀装饰',
+      desc: 'prefix / suffix 注入前导/后导图标或文本，常用于搜索与单位场景。',
+      code: `<Input prefix="🔍" placeholder="搜索" />\n<Input suffix="%" defaultValue="12" />`,
+      Comp: () => (
+        <div className="demo-row">
+          <Input prefix="🔍" placeholder="搜索" />
+          <Input suffix="%" defaultValue="12" />
+        </div>
+      ),
+    },
+  ],
 
-  Switch: () => {
-    const [on, setOn] = useState(true);
-    return (
-      <div className="demo-row">
-        <Switch checked={on} onChange={setOn} label="实时行情" />
-        <span className="ui-label">{on ? '开' : '关'}</span>
-      </div>
-    );
-  },
+  Switch: [
+    {
+      title: '受控开关',
+      desc: 'checked + onChange 受控；label 提供无障碍标签（role=switch）。',
+      code: `const [on, setOn] = useState(true);\n<Switch checked={on} onChange={setOn} label="实时行情" />`,
+      Comp: () => {
+        const [on, setOn] = useState(true);
+        return (
+          <div className="demo-row">
+            <Switch checked={on} onChange={setOn} label="实时行情" />
+            <span className="ui-label">{on ? '开' : '关'}</span>
+          </div>
+        );
+      },
+    },
+    {
+      title: '非受控与尺寸',
+      desc: 'defaultChecked 非受控初始；size 提供四档尺寸；disabled 禁用。',
+      code: `<Switch defaultChecked size="lg" />\n<Switch size="sm" disabled />`,
+      Comp: () => (
+        <div className="demo-row">
+          <Switch defaultChecked size="lg" />
+          <Switch size="sm" disabled />
+        </div>
+      ),
+    },
+  ],
 
-  Select: () => (
-    <div className="demo-row">
-      <Select
-        options={[
-          { label: '贵州茅台', value: '600519' },
-          { label: '宁德时代', value: '300750' },
-          { label: '招商银行', value: '600036' },
-        ]}
-        placeholder="选择标的"
-      />
-      <Select
-        multiple
-        searchable
-        options={[
-          { label: '银行', value: 'bank' },
-          { label: '券商', value: 'broker' },
-          { label: '保险', value: 'ins' },
-        ]}
-        placeholder="多选 + 搜索"
-      />
-    </div>
-  ),
+  Select: [
+    {
+      title: '单选',
+      desc: 'options 提供选项，placeholder 占位，选中后回调 value 与选项对象。',
+      code: `<Select options={[\n  { label: '贵州茅台', value: '600519' },\n  { label: '宁德时代', value: '300750' },\n]} placeholder="选择标的" />`,
+      Comp: () => (
+        <div className="demo-row">
+          <Select
+            options={[
+              { label: '贵州茅台', value: '600519' },
+              { label: '宁德时代', value: '300750' },
+              { label: '招商银行', value: '600036' },
+            ]}
+            placeholder="选择标的"
+          />
+        </div>
+      ),
+    },
+    {
+      title: '多选 + 搜索',
+      desc: 'multiple 开启多选（值为数组）；searchable 启用输入过滤。',
+      code: `<Select multiple searchable options={[...]} placeholder="多选 + 搜索" />`,
+      Comp: () => (
+        <div className="demo-row">
+          <Select
+            multiple
+            searchable
+            options={[
+              { label: '银行', value: 'bank' },
+              { label: '券商', value: 'broker' },
+              { label: '保险', value: 'ins' },
+            ]}
+            placeholder="多选 + 搜索"
+          />
+        </div>
+      ),
+    },
+  ],
 
-  NumberInput: () => (
-    <div className="demo-row">
-      <NumberInput prefix="¥" precision={2} defaultValue={1234567.5} />
-      <NumberInput suffix="%" precision={1} defaultValue={12.3} min={0} max={100} />
-    </div>
-  ),
+  NumberInput: [
+    {
+      title: '千分位与符号',
+      desc: 'precision 控制小数位并自动千分位；prefix / suffix 附加货币或单位符号。',
+      code: `<NumberInput prefix="¥" precision={2} defaultValue={1234567.5} />\n<NumberInput suffix="%" precision={1} defaultValue={12.3} />`,
+      Comp: () => (
+        <div className="demo-row">
+          <NumberInput prefix="¥" precision={2} defaultValue={1234567.5} />
+          <NumberInput suffix="%" precision={1} defaultValue={12.3} />
+        </div>
+      ),
+    },
+    {
+      title: '上下限钳制',
+      desc: 'min / max 钳制范围；step 控制步进，录入中保留草稿，失焦/步进才格式化。',
+      code: `<NumberInput min={0} max={100} step={5} defaultValue={50} suffix="%" />`,
+      Comp: () => (
+        <div className="demo-row">
+          <NumberInput min={0} max={100} step={5} defaultValue={50} suffix="%" />
+        </div>
+      ),
+    },
+  ],
 
-  DatePicker: () => (
-    <div className="demo-row">
-      <DatePicker defaultValue="2026-01-01" />
-      <DatePicker range defaultValue={['2026-01-01', '2026-01-31']} />
-    </div>
-  ),
+  DatePicker: [
+    {
+      title: '单日选择',
+      desc: 'defaultValue 传入 YYYY-MM-DD；点击外部关闭。',
+      code: `<DatePicker defaultValue="2026-01-01" />`,
+      Comp: () => (
+        <div className="demo-row">
+          <DatePicker defaultValue="2026-01-01" />
+        </div>
+      ),
+    },
+    {
+      title: '区间选择',
+      desc: 'range 开启区间模式，仅当起止两日均选满才触发 onChange。',
+      code: `<DatePicker range defaultValue={['2026-01-01', '2026-01-31']} />`,
+      Comp: () => (
+        <div className="demo-row">
+          <DatePicker range defaultValue={['2026-01-01', '2026-01-31']} />
+        </div>
+      ),
+    },
+  ],
 
-  Segmented: () => (
-    <div className="demo-row">
-      <Segmented
-        options={[
-          { label: '日K', value: 'd' },
-          { label: '周K', value: 'w' },
-          { label: '月K', value: 'm' },
-        ]}
-        defaultValue="d"
-      />
-    </div>
-  ),
+  Segmented: [
+    {
+      title: '基础分段',
+      desc: 'options 定义选项，defaultValue 非受控初始，滑块平滑跟随选中项。',
+      code: `<Segmented options={[\n  { label: '日K', value: 'd' },\n  { label: '周K', value: 'w' },\n  { label: '月K', value: 'm' },\n]} defaultValue="d" />`,
+      Comp: () => (
+        <div className="demo-row">
+          <Segmented
+            options={[
+              { label: '日K', value: 'd' },
+              { label: '周K', value: 'w' },
+              { label: '月K', value: 'm' },
+            ]}
+            defaultValue="d"
+          />
+        </div>
+      ),
+    },
+    {
+      title: '尺寸与禁用',
+      desc: 'size 四档尺寸；disabled 整组禁用。',
+      code: `<Segmented size="sm" options={[...]} defaultValue="d" />\n<Segmented disabled options={[...]} defaultValue="d" />`,
+      Comp: () => (
+        <div className="demo-row">
+          <Segmented
+            size="sm"
+            options={[{ label: 'A', value: 'a' }, { label: 'B', value: 'b' }]}
+            defaultValue="a"
+          />
+          <Segmented
+            disabled
+            options={[{ label: 'A', value: 'a' }, { label: 'B', value: 'b' }]}
+            defaultValue="a"
+          />
+        </div>
+      ),
+    },
+  ],
 
-  Search: () => (
-    <div className="demo-row">
-      <Search
-        options={[
-          { label: '贵州茅台', value: '600519', code: 'SH', tag: { text: '白酒', variant: 'up' } },
-          { label: '宁德时代', value: '300750', code: 'SZ' },
-        ]}
-        placeholder="搜索股票 / 代码"
-      />
-    </div>
-  ),
+  Search: [
+    {
+      title: '联想与键盘导航',
+      desc: 'options 提供联想项，支持 ↑↓ 选择、Enter 确认、Esc 关闭，并可带代码/涨跌标签。',
+      code: `<Search options={[\n  { label: '贵州茅台', value: '600519', code: 'SH', tag: { text: '白酒', variant: 'up' } },\n  { label: '宁德时代', value: '300750', code: 'SZ' },\n]} placeholder="搜索股票 / 代码" />`,
+      Comp: () => (
+        <div className="demo-row">
+          <Search
+            options={[
+              { label: '贵州茅台', value: '600519', code: 'SH', tag: { text: '白酒', variant: 'up' } },
+              { label: '宁德时代', value: '300750', code: 'SZ' },
+            ]}
+            placeholder="搜索股票 / 代码"
+          />
+        </div>
+      ),
+    },
+  ],
 
-  Stat: () => (
-    <div className="demo-row">
-      <Stat label="上证指数" value={3218.45} delta="+1.24%" trend="up" />
-      <Stat label="创业板指" value={2012.8} delta="-0.86%" trend="down" />
-      <Stat label="成交额" value="1.02" suffix="万亿" trend="muted" />
-    </div>
-  ),
+  Stat: [
+    {
+      title: '涨跌着色',
+      desc: 'trend 走全局涨跌色约定（up/down），muted 为中性灰；prefix/suffix 附加单位。',
+      code: `<Stat label="上证指数" value={3218.45} delta="+1.24%" trend="up" />\n<Stat label="创业板指" value={2012.8} delta="-0.86%" trend="down" />\n<Stat label="成交额" value="1.02" suffix="万亿" trend="muted" />`,
+      Comp: () => (
+        <div className="demo-row">
+          <Stat label="上证指数" value={3218.45} delta="+1.24%" trend="up" />
+          <Stat label="创业板指" value={2012.8} delta="-0.86%" trend="down" />
+          <Stat label="成交额" value="1.02" suffix="万亿" trend="muted" />
+        </div>
+      ),
+    },
+  ],
 
-  Progress: () => (
-    <div className="demo-row">
-      <Progress value={68} />
-      <Progress value={32} />
-    </div>
-  ),
+  Progress: [
+    {
+      title: '确定与不确定',
+      desc: 'value/max 表达进度比例；indeterminate 表示加载中未知进度。',
+      code: `<Progress value={68} />\n<Progress value={32} />\n<Progress indeterminate />`,
+      Comp: () => (
+        <div className="demo-row" style={{ width: 260, flexDirection: 'column', alignItems: 'stretch' }}>
+          <Progress value={68} />
+          <Progress value={32} />
+          <Progress indeterminate />
+        </div>
+      ),
+    },
+  ],
 
-  Skeleton: () => (
-    <div className="demo-row">
-      <Skeleton shape="circle" />
-      <Skeleton />
-      <Skeleton style={{ width: 220 }} />
-    </div>
-  ),
+  Skeleton: [
+    {
+      title: '占位形状',
+      desc: 'shape 支持 text / circle / rect；active 控制微光动画。',
+      code: `<Skeleton shape="circle" />\n<Skeleton />\n<Skeleton shape="rect" style={{ width: 220, height: 16 }} />`,
+      Comp: () => (
+        <div className="demo-row">
+          <Skeleton shape="circle" />
+          <Skeleton />
+          <Skeleton shape="rect" style={{ width: 220, height: 16 }} />
+        </div>
+      ),
+    },
+  ],
 
-  Empty: () => (
-    <div className="demo-row">
-      <Empty text="暂无自选标的" />
-    </div>
-  ),
+  Empty: [
+    {
+      title: '空状态占位',
+      desc: 'description 提供文案，children 作为操作区（如「新建」按钮）。',
+      code: `<Empty text="暂无自选标的">\n  <Button variant="primary">添加自选</Button>\n</Empty>`,
+      Comp: () => (
+        <div className="demo-row">
+          <Empty text="暂无自选标的">
+            <Button variant="primary">添加自选</Button>
+          </Empty>
+        </div>
+      ),
+    },
+  ],
 
-  Tabs: () => (
-    <Tabs
-      items={[
-        { key: 'a', label: '概况', content: <p>公司基本面与行业地位。</p> },
-        { key: 'b', label: '财务', content: <p>营收 / 利润 / 现金流。</p> },
-        { key: 'c', label: '研报', content: <p>近期券商观点。</p> },
-      ]}
-    />
-  ),
-
-  Breadcrumb: () => (
-    <Breadcrumb
-      items={[
-        { label: '研究', href: '#' },
-        { label: '行业', href: '#' },
-        { label: '白酒' },
-      ]}
-    />
-  ),
-
-  Steps: () => (
-    <Steps
-      steps={[
-        { title: '选股', desc: '筛选池' },
-        { title: '回测', desc: '历史验证' },
-        { title: '实盘', desc: '跟踪' },
-      ]}
-      defaultCurrent={1}
-    />
-  ),
-
-  Pagination: () => <Pagination total={240} pageSize={10} defaultPage={3} />,
-
-  Tooltip: () => (
-    <div className="demo-row">
-      <Tooltip content="这是一条提示"><Button>悬停查看</Button></Tooltip>
-      <Tooltip content="跟随主题表面" variant="surface"><Button variant="glass">surface 变体</Button></Tooltip>
-    </div>
-  ),
-
-  Popover: () => (
-    <div className="demo-row">
-      <Popover content={<div>面板可放<strong>可交互</strong>内容，如按钮。</div>}>
-        <Button>触发浮层</Button>
-      </Popover>
-    </div>
-  ),
-
-  Dialog: () => {
-    const [open, setOpen] = useState(false);
-    return (
-      <>
-        <Button onClick={() => setOpen(true)}>打开 Dialog</Button>
-        <Dialog
-          open={open}
-          onOpenChange={setOpen}
-          title="新建策略"
-          footer={<Button variant="primary" onClick={() => setOpen(false)}>确定</Button>}
-        >
-          <p>Dialog 支持焦点陷阱、Esc / 点遮罩关闭，纯走 theme.css。</p>
-        </Dialog>
-      </>
-    );
-  },
-
-  Drawer: () => {
-    const [open, setOpen] = useState(false);
-    return (
-      <>
-        <Button onClick={() => setOpen(true)}>打开 Drawer</Button>
-        <Drawer open={open} onOpenChange={setOpen} title="筛选条件" subtitle="右侧滑出">
-          <p>Drawer 用于承载较复杂的筛选 / 表单。</p>
-        </Drawer>
-      </>
-    );
-  },
-
-  ContextMenu: () => {
-    const target = useRef<HTMLDivElement>(null);
-    return (
-      <>
-        <div ref={target} className="demo-target">右键此区域唤出菜单</div>
-        <ContextMenu
-          targetRef={target}
+  Tabs: [
+    {
+      title: '标签切换',
+      desc: 'items 定义标签与面板内容，支持受控 value 与非受控 defaultValue。',
+      code: `<Tabs items={[\n  { key: 'a', label: '概况', content: <p>公司基本面。</p> },\n  { key: 'b', label: '财务', content: <p>营收 / 利润。</p> },\n  { key: 'c', label: '研报', content: <p>券商观点。</p> },\n]} />`,
+      Comp: () => (
+        <Tabs
           items={[
-            { key: 'edit', label: '编辑' },
-            { key: 'copy', label: '复制' },
-            { key: 'del', label: '删除', danger: true },
+            { key: 'a', label: '概况', content: <p>公司基本面与行业地位。</p> },
+            { key: 'b', label: '财务', content: <p>营收 / 利润 / 现金流。</p> },
+            { key: 'c', label: '研报', content: <p>近期券商观点。</p> },
           ]}
-          onSelect={(k) => toast(`执行：${k}`)}
         />
-      </>
-    );
-  },
+      ),
+    },
+  ],
 
-  Tree: () => (
-    <Tree data={treeData} defaultExpandedKeys={['1']} defaultCheckedKeys={['1-1']} />
-  ),
+  Breadcrumb: [
+    {
+      title: '路径导航',
+      desc: 'items 描述路径，末项自动标记为当前页；separator 自定义分隔符。',
+      code: `<Breadcrumb items={[\n  { label: '研究', href: '#' },\n  { label: '行业', href: '#' },\n  { label: '白酒' },\n]} />`,
+      Comp: () => (
+        <Breadcrumb
+          items={[
+            { label: '研究', href: '#' },
+            { label: '行业', href: '#' },
+            { label: '白酒' },
+          ]}
+        />
+      ),
+    },
+  ],
 
-  Slider: () => (
-    <div className="demo-row" style={{ width: 320 }}>
-      <Slider min={0} max={100} defaultValue={[20, 80]} format="pct" />
-    </div>
-  ),
+  Steps: [
+    {
+      title: '流程向导',
+      desc: 'steps 描述流程，defaultCurrent 非受控初始；clickable 时点击步骤触发 onChange。',
+      code: `<Steps steps={[\n  { title: '选股', desc: '筛选池' },\n  { title: '回测', desc: '历史验证' },\n  { title: '实盘', desc: '跟踪' },\n]} defaultCurrent={1} />`,
+      Comp: () => (
+        <Steps
+          steps={[
+            { title: '选股', desc: '筛选池' },
+            { title: '回测', desc: '历史验证' },
+            { title: '实盘', desc: '跟踪' },
+          ]}
+          defaultCurrent={1}
+        />
+      ),
+    },
+  ],
 
-  DataTable: () => (
-    <DataTable columns={tableColumns} data={tableData} compact selectable rowKey="code" />
-  ),
+  Pagination: [
+    {
+      title: '分页',
+      desc: 'total + pageSize 推导页数，defaultPage 非受控初始；onChange 翻页回调。',
+      code: `<Pagination total={240} pageSize={10} defaultPage={3} />`,
+      Comp: () => <Pagination total={240} pageSize={10} defaultPage={3} />,
+    },
+  ],
 
-  Toast: () => (
-    <div className="demo-row">
-      <Button onClick={() => toast('操作成功')}>默认 Toast</Button>
-      <Button variant="glass" onClick={() => toast('正在保存…', { duration: 0 })}>常驻 Toast</Button>
-    </div>
-  ),
+  Tooltip: [
+    {
+      title: '提示变体',
+      desc: 'variant=invert 反转色；surface 跟随主题表面并带毛玻璃。默认 placement=top。',
+      code: `<Tooltip content="这是一条提示"><Button>悬停查看</Button></Tooltip>\n<Tooltip content="跟随主题表面" variant="surface"><Button variant="glass">surface</Button></Tooltip>`,
+      Comp: () => (
+        <div className="demo-row">
+          <Tooltip content="这是一条提示"><Button>悬停查看</Button></Tooltip>
+          <Tooltip content="跟随主题表面" variant="surface"><Button variant="glass">surface</Button></Tooltip>
+        </div>
+      ),
+    },
+  ],
 
-  Message: () => (
-    <div className="demo-row">
-      <Button onClick={() => showMessage('数据已更新', 'success')}>success</Button>
-      <Button variant="glass" onClick={() => showMessage('请求失败', 'error')}>error</Button>
-    </div>
-  ),
+  Popover: [
+    {
+      title: '可交互浮层',
+      desc: 'content 可放置按钮等可交互元素（区别于 Tooltip），hover/focus 弹出，外部点击关闭。',
+      code: `<Popover content={<div>面板可放<strong>可交互</strong>内容。</div>}>\n  <Button>触发浮层</Button>\n</Popover>`,
+      Comp: () => (
+        <div className="demo-row">
+          <Popover content={<div>面板可放<strong>可交互</strong>内容，如按钮。</div>}>
+            <Button>触发浮层</Button>
+          </Popover>
+        </div>
+      ),
+    },
+  ],
+
+  Dialog: [
+    {
+      title: '模态对话框',
+      desc: 'open 为必填受控；内置焦点陷阱、Esc / 点遮罩关闭；title / footer 配置头部与底部。',
+      code: `const [open, setOpen] = useState(false);\n<Button onClick={() => setOpen(true)}>打开 Dialog</Button>\n<Dialog open={open} onOpenChange={setOpen} title="新建策略"\n  footer={<Button variant="primary" onClick={() => setOpen(false)}>确定</Button>}>\n  <p>支持焦点陷阱与 Esc 关闭。</p>\n</Dialog>`,
+      Comp: () => {
+        const [open, setOpen] = useState(false);
+        return (
+          <>
+            <Button onClick={() => setOpen(true)}>打开 Dialog</Button>
+            <Dialog
+              open={open}
+              onOpenChange={setOpen}
+              title="新建策略"
+              footer={<Button variant="primary" onClick={() => setOpen(false)}>确定</Button>}
+            >
+              <p>Dialog 支持焦点陷阱、Esc / 点遮罩关闭，纯走 theme.css。</p>
+            </Dialog>
+          </>
+        );
+      },
+    },
+  ],
+
+  Drawer: [
+    {
+      title: '侧滑抽屉',
+      desc: 'side 控制滑出方向（right/left/bottom）；showClose 控制关闭按钮；同样具备焦点陷阱。',
+      code: `const [open, setOpen] = useState(false);\n<Drawer open={open} onOpenChange={setOpen} title="筛选条件" subtitle="右侧滑出">\n  <p>承载较复杂的筛选 / 表单。</p>\n</Drawer>`,
+      Comp: () => {
+        const [open, setOpen] = useState(false);
+        return (
+          <>
+            <Button onClick={() => setOpen(true)}>打开 Drawer</Button>
+            <Drawer open={open} onOpenChange={setOpen} title="筛选条件" subtitle="右侧滑出">
+              <p>Drawer 用于承载较复杂的筛选 / 表单。</p>
+            </Drawer>
+          </>
+        );
+      },
+    },
+  ],
+
+  ContextMenu: [
+    {
+      title: '右键菜单',
+      desc: 'targetRef 指定右键目标；items 定义菜单项（支持 shortcut / danger / separator）；onSelect 回调 key。',
+      code: `const target = useRef(null);\n<ContextMenu targetRef={target} items={[\n  { key: 'edit', label: '编辑' },\n  { key: 'copy', label: '复制' },\n  { key: 'del', label: '删除', danger: true },\n]} onSelect={(k) => toast('执行：' + k)} />\n<div ref={target} className="demo-target">右键此区域</div>`,
+      Comp: () => {
+        const target = useRef<HTMLDivElement>(null);
+        return (
+          <>
+            <div ref={target} className="demo-target">右键此区域唤出菜单</div>
+            <ContextMenu
+              targetRef={target}
+              items={[
+                { key: 'edit', label: '编辑' },
+                { key: 'copy', label: '复制' },
+                { key: 'del', label: '删除', danger: true },
+              ]}
+              onSelect={(k) => toast(`执行：${k}`)}
+            />
+          </>
+        );
+      },
+    },
+  ],
+
+  Tree: [
+    {
+      title: '勾选与展开',
+      desc: 'checkable 显示勾选框；defaultExpandedKeys / defaultCheckedKeys 控制初始展开与勾选。',
+      code: `<Tree data={treeData} defaultExpandedKeys={['1']} defaultCheckedKeys={['1-1']} />`,
+      Comp: () => (
+        <Tree data={treeData} defaultExpandedKeys={['1']} defaultCheckedKeys={['1-1']} />
+      ),
+    },
+  ],
+
+  Slider: [
+    {
+      title: '区间滑块',
+      desc: '双滑块选择区间；format 控制标签格式（pct/num）；支持拖拽与键盘微调。',
+      code: `<Slider min={0} max={100} defaultValue={[20, 80]} format="pct" />`,
+      Comp: () => (
+        <div className="demo-row" style={{ width: 320 }}>
+          <Slider min={0} max={100} defaultValue={[20, 80]} format="pct" />
+        </div>
+      ),
+    },
+  ],
+
+  DataTable: [
+    {
+      title: '排序 / 选中 / 冻结列',
+      desc: 'numeric 右对齐并涨跌着色；sticky 冻结首列；sortable 开启排序；selectable 行多选。',
+      code: `<DataTable columns={columns} data={data} compact selectable\n  rowKey="code" />`,
+      Comp: () => (
+        <DataTable columns={tableColumns} data={tableData} compact selectable rowKey="code" />
+      ),
+    },
+  ],
+
+  Toast: [
+    {
+      title: '命令式轻提示',
+      desc: 'toast(content, options) 单例挂载 body；duration=0 常驻，重复调用重置计时。',
+      code: `toast('操作成功');\ntoast('正在保存…', { duration: 0 });`,
+      Comp: () => (
+        <div className="demo-row">
+          <Button onClick={() => toast('操作成功')}>默认 Toast</Button>
+          <Button variant="glass" onClick={() => toast('正在保存…', { duration: 0 })}>常驻 Toast</Button>
+        </div>
+      ),
+    },
+  ],
+
+  Message: [
+    {
+      title: '命令式通知',
+      desc: 'showMessage(text, type?, duration?) 支持 success/warning/info/danger 四种语义。',
+      code: `showMessage('数据已更新', 'success');\nshowMessage('请求失败', 'danger');`,
+      Comp: () => (
+        <div className="demo-row">
+          <Button onClick={() => showMessage('数据已更新', 'success')}>success</Button>
+          <Button variant="glass" onClick={() => showMessage('请求失败', 'danger')}>danger</Button>
+        </div>
+      ),
+    },
+  ],
 };

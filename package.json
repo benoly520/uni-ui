@@ -29,6 +29,11 @@
       "types": "./dist/vue/*.d.ts",
       "import": "./dist/vue/*.js"
     },
+    "./plain": {
+      "types": "./src/plain/index.ts",
+      "import": "./src/plain/index.ts"
+    },
+    "./plain/*": "./src/plain/*",
     "./theme.css": "./theme.css",
     "./theme": "./theme.css"
   },

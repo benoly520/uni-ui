@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { reactDocs } from './react-demos';
 import { vueDocs } from './vue-demos';
+import { plainDocs } from './plain-demos';
 
 export interface ApiRow {
   /** 属性 / 事件名 */
@@ -24,14 +25,16 @@ export interface ComponentDoc {
   api: ApiRow[];
 }
 
-/** 合并后的单个用例：标题 / 说明 + React/Vue 实时 demo + 可复制代码 */
+/** 合并后的单个用例：标题 / 说明 + React/Vue/Plain 实时 demo + 可复制代码 */
 export interface FullCase {
   title: string;
   desc: string;
   reactCode: string;
   vueCode: string;
+  plainCode: string;
   reactComp: FC;
   vueComp: unknown;
+  plainComp: unknown;
 }
 
 /**
@@ -478,15 +481,23 @@ export function getDoc(id: string): ComponentDoc | undefined {
  * 合并 React 与 Vue 用例为完整用例列表。
  * reactDocs[id] 提供 title/desc/reactCode/reactComp；vueDocs[id] 按相同顺序提供 vueCode/vueComp。
  */
+/**
+ * 合并 React / Vue / Plain 用例为完整用例列表。
+ * reactDocs[id] 提供 title/desc/reactCode/reactComp；vueDocs / plainDocs 按相同顺序提供对应实现。
+ */
 export function getCases(id: string): FullCase[] {
   const r = reactDocs[id] ?? [];
   const v = vueDocs[id] ?? [];
-  return r.map((rc, i) => ({
-    title: rc.title,
-    desc: rc.desc,
-    reactCode: rc.code,
+  const p = plainDocs[id] ?? [];
+  const n = Math.max(r.length, v.length, p.length);
+  return Array.from({ length: n }, (_, i) => ({
+    title: r[i]?.title ?? p[i]?.title ?? '',
+    desc: r[i]?.desc ?? p[i]?.desc ?? '',
+    reactCode: r[i]?.code ?? '',
     vueCode: v[i]?.code ?? '',
-    reactComp: rc.Comp,
-    vueComp: v[i]?.Comp,
+    plainCode: p[i]?.code ?? '',
+    reactComp: r[i]?.Comp ?? (() => null),
+    vueComp: v[i]?.Comp ?? null,
+    plainComp: p[i]?.Comp ?? null,
   }));
 }

@@ -12,7 +12,11 @@
       // 与 vite.config.ts 的 alias 保持一致：真实消费路径 → 库源码入口（免 build 直接类型可达）
       "uni-ui/react": ["../src/react/index.ts"],
       "uni-ui/vue": ["../src/vue/index.ts"],
+      "uni-ui/plain": ["../src/plain/index.ts"],
       "uni-ui/theme.css": ["../theme.css"],
+      "plain": ["../../plain-framework/dist/index.d.ts"],
+      "plain/vite": ["../../plain-framework/dist/vite/index.d.ts"],
+      "plain/compiler": ["../../plain-framework/dist/compiler/index.d.ts"],
       // 强制单实例：库源码位于父目录，依赖装在 playground 的 node_modules（pnpm workspace 结构）
       "react": ["node_modules/react"],
       "react-dom": ["node_modules/react-dom"],

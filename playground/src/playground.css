@@ -144,6 +144,7 @@ html::-webkit-scrollbar-thumb:hover { background: rgb(var(--ui-glass-tint) / 0.4
 }
 
 .pg-main { flex: 1; overflow-y: auto; padding: 18px 22px; }
+/* 组件页头（标题 + 导入路径）：普通流，随内容一起滚动 */
 .pg-demo-head {
   display: flex;
   align-items: center;
@@ -158,8 +159,12 @@ html::-webkit-scrollbar-thumb:hover { background: rgb(var(--ui-glass-tint) / 0.4
   padding: 2px 8px;
   border-radius: 6px;
 }
-/* demo 面板：改为单栏，由框架切换 tab 控制显隐（同一时刻只显示一个） */
-.pg-panels { display: block; }
+/* demo 面板：每个框架一块，由组件级框架切换控制显隐，同一时刻只显示当前框架 */
+.pg-panels {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
 .pg-panel {
   border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-lg);
@@ -216,12 +221,23 @@ html::-webkit-scrollbar-thumb:hover { background: rgb(var(--ui-glass-tint) / 0.4
   padding: 6px 8px;
   border-bottom: 1px solid var(--ui-border);
 }
-/* 组件级框架切换条（位于页头右侧）：控制整页 React/Vue 显隐，与代码复制栏共用 .pg-fw 按钮样式 */
+/* 组件级框架切换条：仅这组按钮脱离文档流、悬浮固定在内容区右上角（页头标题/路径仍随内容滚动）；
+   顶部让开站点导航（--nav-h），右侧对齐 .pg-main 的内边距 + 滚动条宽度 */
 .pg-fw-tabs {
+  position: fixed;
+  top: calc(var(--nav-h, 56px) + 14px);
+  right: 30px;
+  z-index: 20;
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-left: auto;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgb(var(--ui-glass-tint) / 0.72);
+  backdrop-filter: blur(var(--ui-glass-blur)) saturate(var(--ui-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--ui-glass-blur)) saturate(var(--ui-glass-saturate));
+  border: 1px solid var(--ui-border);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.10);
 }
 .pg-fw {
   border: 0;

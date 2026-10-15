@@ -1,6 +1,6 @@
 import { resolve, signal } from 'plain';
 import { cx } from './_shared';
-import { IconCaret } from './icons';
+import { IconCaret, IconCheck } from './icons';
 import type { MaybeGetter } from './_shared';
 
 export interface SelectOption {
@@ -128,6 +128,11 @@ export function Select(props: SelectProps) {
                 }}
               >
                 {o.label}
+                {isMulti() && (
+                  <span class="check ui-icon">
+                    <IconCheck />
+                  </span>
+                )}
               </div>
             );
           })}

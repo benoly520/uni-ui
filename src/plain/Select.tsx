@@ -118,7 +118,7 @@ export function Select(props: SelectProps) {
             const isSel = () => selected().includes(o.value);
             return (
               <div
-                class={cx(isMulti() && 'multi', isSel() && 'is-selected')}
+                class={cx('ui-select-option', isMulti() && 'multi', isSel() && 'is-selected')}
                 role="option"
                 data-val={o.value}
                 aria-selected={isSel() ? 'true' : 'false'}

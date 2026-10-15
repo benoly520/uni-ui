@@ -48,7 +48,7 @@ export const docs: ComponentDoc[] = [
     category: '基础',
     summary: '承载主操作与次要操作的点击控件，支持语义变体、尺寸、胶囊、加载与图标。',
     api: [
-      { name: 'variant', type: "'primary' | 'default' | 'ghost' | 'outline' | 'danger'", default: "'default'", desc: '语义变体，决定颜色与强调程度（React 另支持 glass；Vue 无）' },
+      { name: 'variant', type: "'primary' | 'default' | 'ghost' | 'outline' | 'danger'", default: "'default'", desc: '语义变体，决定颜色与强调程度（三端一致）' },
       { name: 'size', type: "'lg' | 'md' | 'sm' | 'xs'", default: "'md'", desc: '尺寸修饰' },
       { name: 'pill', type: 'boolean', default: 'false', desc: '胶囊形状，可叠加任意变体' },
       { name: 'loading', type: 'boolean', default: 'false', desc: '文字透明 + spinner，禁用点击' },

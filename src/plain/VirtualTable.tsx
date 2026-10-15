@@ -99,7 +99,7 @@ export function VirtualTable(props: VirtualTableProps) {
         </div>
         <div
           class="ui-vtable-viewport"
-          style={() => ({ height: `${total() * Number(resolve(props.rowHeight) ?? 33)}px` })}
+          style={{ height: `${total() * Number(resolve(props.rowHeight) ?? 33)}px` }}
         >
           {(windowIndices()).map((i) => {
             const row = (resolve(props.rows) as Record<string, any>[])[i];
@@ -129,7 +129,7 @@ export function VirtualTable(props: VirtualTableProps) {
           })}
         </div>
       </div>
-      <div class="ui-vtable-meta">渲染 {() => range()[1] - range()[0]} 行 / 共 {total()} 行</div>
+      <div class="ui-vtable-meta">渲染 {range()[1] - range()[0]} 行 / 共 {total()} 行</div>
     </>
   );
 }

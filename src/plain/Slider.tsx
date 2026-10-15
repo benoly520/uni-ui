@@ -10,7 +10,7 @@ export interface SliderProps {
   step?: MaybeGetter<number>;
   value?: MaybeGetter<[number, number]>;
   defaultValue?: MaybeGetter<[number, number]>;
-  format?: MaybeGetter<SliderFormat>;
+  format?: SliderFormat;
   onChange?: (value: [number, number]) => void;
   minLabel?: MaybeGetter<string>;
   maxLabel?: MaybeGetter<string>;
@@ -28,7 +28,19 @@ export function Slider(props: SliderProps) {
   const max = () => Number(resolve(props.max) ?? 100);
   const step = () => Number(resolve(props.step) ?? 1);
   const isControlled = () => resolve(props.value) != null;
-  const fmt = () => resolve(props.format) ?? 'num';
+  /**
+   * format 是「值本身可能是函数」的 prop，不能用 resolve 读取（resolve 会把用户传入的
+   * 格式化函数当成取值函数直接调用）。plain 编译器又会把普通 prop 包成 0 参取值函数，
+   * 因此用形参个数区分：0 参 = 编译器包装的取值函数，≥1 参 = 用户格式化函数。
+   */
+  const fmt = (): SliderFormat => {
+    const raw = props.format as any;
+    if (raw == null) return 'num';
+    if (typeof raw === 'function') {
+      return raw.length === 0 ? (raw() as SliderFormat) : (raw as SliderFormat);
+    }
+    return raw as SliderFormat;
+  };
   const minLabel = () => resolve(props.minLabel) ?? '最小值';
   const maxLabel = () => resolve(props.maxLabel) ?? '最大值';
   const dv: [number, number] = isControlled()
@@ -54,16 +66,24 @@ export function Slider(props: SliderProps) {
     return String(v);
   };
 
+  /**
+   * 拖拽 / 键盘改值：先用当前生效值做 lo≤hi 约束，再回报**新值**。
+   * 旧实现用 loInner()/hiInner() 做约束、并回报 lo()/hi()：受控模式下这两个都是旧值，
+   * 导致父组件回写时把滑块又拽回原位（React 端回报的是 next）。
+   */
   const setHandle = (handle: number, nv: number) => {
     nv = Math.min(max(), Math.max(min(), nv));
+    let next: [number, number];
     if (handle === 0) {
-      const n = Math.min(nv, hiInner());
+      const n = Math.min(nv, hi());
       if (!isControlled()) loInner.set(n);
+      next = [n, hi()];
     } else {
-      const n = Math.max(nv, loInner());
+      const n = Math.max(nv, lo());
       if (!isControlled()) hiInner.set(n);
+      next = [lo(), n];
     }
-    props.onChange?.([lo(), hi()]);
+    props.onChange?.(next);
   };
   const startDrag = (handle: number) => (e: MouseEvent) => {
     e.preventDefault();
@@ -104,10 +124,10 @@ export function Slider(props: SliderProps) {
         <div class="ui-slider-track">
           <div
             class="ui-slider-fill"
-            style={() => ({
+            style={{
               left: pct(lo()) + '%',
               width: pct(hi()) - pct(lo()) + '%',
-            })}
+            }}
           ></div>
           <div
             class="ui-slider-thumb"
@@ -118,7 +138,7 @@ export function Slider(props: SliderProps) {
             aria-valuemax={max()}
             aria-valuenow={lo()}
             aria-label={minLabel()}
-            style={() => ({ left: pct(lo()) + '%' })}
+            style={{ left: pct(lo()) + '%' }}
             onPointerDown={startDrag(0)}
             onKeyDown={onKey(0)}
           ></div>
@@ -131,15 +151,15 @@ export function Slider(props: SliderProps) {
             aria-valuemax={max()}
             aria-valuenow={hi()}
             aria-label={maxLabel()}
-            style={() => ({ left: pct(hi()) + '%' })}
+            style={{ left: pct(hi()) + '%' }}
             onPointerDown={startDrag(1)}
             onKeyDown={onKey(1)}
           ></div>
         </div>
       </div>
       <div class="ui-slider-vals">
-        <span class="s-min">{() => fmtVal(lo())}</span>
-        <span class="s-max">{() => fmtVal(hi())}</span>
+        <span class="s-min">{fmtVal(lo())}</span>
+        <span class="s-max">{fmtVal(hi())}</span>
       </div>
     </div>
   );

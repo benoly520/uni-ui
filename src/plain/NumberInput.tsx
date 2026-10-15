@@ -76,16 +76,25 @@ export function NumberInput(props: NumberInputProps) {
     <div
       id={resolve(props.id)}
       class={cx('ui-number', resolve(props.className))}
-      data-min={dataNum(min())}
-      data-max={dataNum(max())}
+      data-min={min() !== -Infinity ? dataNum(min()) : undefined}
+      data-max={max() !== Infinity ? dataNum(max()) : undefined}
       data-step={dataNum(step())}
       data-precision={dataNum(precision())}
-      data-prefix={prefix() ?? ''}
-      data-suffix={suffix() ?? ''}
+      data-prefix={prefix()}
+      data-suffix={suffix()}
       aria-label={resolve(props['aria-label'])}
       style={resolve(props.style)}
     >
       {prefix() != null && <span class="ui-number-prefix">{prefix()}</span>}
+      <button
+        type="button"
+        class="ui-number-step"
+        data-step="down"
+        aria-label="减少"
+        onClick={() => stepBy(-1)}
+      >
+        −
+      </button>
       <input
         class="ui-number-input"
         inputMode="decimal"
@@ -101,13 +110,16 @@ export function NumberInput(props: NumberInputProps) {
           if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
         }}
       />
-      {suffix() != null && <span class="ui-number-suffix">{suffix()}</span>}
-      <button class="ui-number-step" data-step="down" aria-label="减少" onClick={() => stepBy(-1)}>
-        −
-      </button>
-      <button class="ui-number-step" data-step="up" aria-label="增加" onClick={() => stepBy(1)}>
+      <button
+        type="button"
+        class="ui-number-step"
+        data-step="up"
+        aria-label="增加"
+        onClick={() => stepBy(1)}
+      >
         +
       </button>
+      {suffix() != null && <span class="ui-number-suffix">{suffix()}</span>}
     </div>
   );
 }

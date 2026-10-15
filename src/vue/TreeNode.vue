@@ -39,7 +39,8 @@ function onCheckClick() {
   >
     <div class="ui-tree-row" @click="onRowClick">
       <span class="ui-tree-caret ui-icon" @click.stop="onCaretClick">
-        <svg v-if="hasChildren" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <!-- 叶子节点也渲染 caret：由 theme.css .ui-tree-leaf 的 visibility:hidden 隐藏（与 React 端一致） -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
           <path d="M6 9l6 6 6-6" />
         </svg>
       </span>

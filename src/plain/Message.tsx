@@ -36,7 +36,7 @@ export function Message(props: MessageProps) {
       style={resolve(props.style)}
     >
       <span class="dot" />
-      <span class="msg-text">{() => resolve(props.children) ?? resolve(props.content)}</span>
+      <span class="msg-text">{resolve(props.children) ?? resolve(props.content)}</span>
     </div>
   );
 }

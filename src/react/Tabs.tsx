@@ -101,7 +101,8 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(function Tabs(
   // 选中项滚动入视
   useEffect(() => {
     const tab = scrollRef.current?.querySelector<HTMLElement>(`#tab-${CSS.escape(selected)}`);
-    tab?.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' });
+    // scrollIntoView 在 jsdom / 老旧环境中不存在，可选链只保护 tab 为 null 的情况，故需显式判方法
+    tab?.scrollIntoView?.({ inline: 'nearest', block: 'nearest', behavior: 'smooth' });
   }, [selected]);
 
   const onKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {

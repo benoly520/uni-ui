@@ -27,3 +27,26 @@ export type { Renderable };
 export function numAttr(b: any): string | undefined {
   return b ? '' : undefined;
 }
+
+/**
+ * 纯布尔 HTML 属性（hidden / disabled 等）的取值：真 -> ''（渲染成 `hidden=""`，与 React 一致），
+ * 假 -> undefined（不渲染）。返回类型放宽为 any 是为了能直接喂给 JSX 的布尔属性位。
+ */
+export function boolAttr(b: boolean): any {
+  return b ? '' : undefined;
+}
+
+/**
+ * 合并内联样式：base 为组件计算值，extra 为外部传入的 style。
+ * 注意：plain 编译器的 style 属性只接受「对象或字符串」的求值结果，
+ * **不接受取值函数**（`style={() => ({...})}` 会被静默丢弃），
+ * 而属性表达式本身就在 effect 内求值，因此这里直接用对象即可保持响应式。
+ * extra 为字符串时无法与组件计算值合并，按对象语义忽略（与 React 端 CSSProperties 一致）。
+ */
+export function mergeStyle(
+  base: Record<string, any>,
+  extra?: string | Record<string, any>,
+): Record<string, any> {
+  if (!extra || typeof extra === 'string') return base;
+  return { ...base, ...extra };
+}

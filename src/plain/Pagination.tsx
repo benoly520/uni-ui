@@ -21,22 +21,20 @@ function range(start: number, end: number): number[] {
   return a;
 }
 
+/** 页码窗口算法：与 React / Vue 端逐字一致（否则三端渲染出的页码数量会不同） */
 function getPages(current: number, totalPages: number, sibling: number): (number | '...')[] {
   const totalNumbers = sibling * 2 + 5;
   if (totalPages <= totalNumbers) return range(1, totalPages);
-  const left = Math.max(current - sibling, 1);
-  const right = Math.min(current + sibling, totalPages);
+  const left = Math.max(2, current - sibling);
+  const right = Math.min(totalPages - 1, current + sibling);
   const showLeft = left > 2;
   const showRight = right < totalPages - 1;
-  if (!showLeft && showRight) {
-    const leftCount = 3 + 2 * sibling;
-    return [...range(1, leftCount), '...', totalPages];
-  }
-  if (showLeft && !showRight) {
-    const rightCount = 3 + 2 * sibling;
-    return [1, '...', ...range(totalPages - rightCount + 1, totalPages)];
-  }
-  return [1, '...', ...range(left, right), '...', totalPages];
+  const pages: (number | '...')[] = [1];
+  if (showLeft) pages.push('...');
+  for (let i = left; i <= right; i++) pages.push(i);
+  if (showRight) pages.push('...');
+  pages.push(totalPages);
+  return pages;
 }
 
 /**
@@ -68,6 +66,7 @@ export function Pagination(props: PaginationProps) {
       style={resolve(props.style)}
     >
       <button
+        type="button"
         aria-label="上一页"
         data-prev={true}
         disabled={cur() <= 1}
@@ -102,6 +101,7 @@ export function Pagination(props: PaginationProps) {
         );
       })}
       <button
+        type="button"
         aria-label="下一页"
         data-next={true}
         disabled={cur() >= totalPages()}

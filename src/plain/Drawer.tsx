@@ -2,18 +2,28 @@ import { resolve, signal, effect } from 'plain';
 import { cx } from './_shared';
 import type { MaybeGetter, Renderable } from './_shared';
 
-const FOCUSABLE = 'a[href],button:not([disabled]),textarea,input,select,[tabindex]:not([tabindex="-1"])';
+/** 焦点陷阱可聚焦选择器：与 React / Vue 端保持一致 */
+const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
-export type DrawerPlacement = 'left' | 'right' | 'top' | 'bottom';
+export type DrawerSide = 'right' | 'left' | 'bottom';
+
+/** @deprecated 旧命名，等价于 DrawerSide（保留以兼容已发布的类型引用） */
+export type DrawerPlacement = DrawerSide;
 
 export interface DrawerProps {
   open?: MaybeGetter<boolean>;
   defaultOpen?: MaybeGetter<boolean>;
   onOpenChange?: (open: boolean) => void;
+  /** 滑出方向：right（默认）/ left / bottom */
+  side?: MaybeGetter<DrawerSide>;
+  /** @deprecated 旧命名，等价于 side */
+  placement?: MaybeGetter<DrawerSide>;
   title?: MaybeGetter<Renderable>;
+  /** 副标题（位于标题下方 .ui-label） */
+  subtitle?: MaybeGetter<Renderable>;
+  /** 是否显示右上角关闭按钮 */
+  showClose?: MaybeGetter<boolean>;
   children?: MaybeGetter<Renderable>;
-  footer?: MaybeGetter<Renderable>;
-  placement?: MaybeGetter<DrawerPlacement>;
   closeOnOverlay?: MaybeGetter<boolean>;
   closeOnEsc?: MaybeGetter<boolean>;
   ariaLabel?: MaybeGetter<string>;
@@ -24,8 +34,8 @@ export interface DrawerProps {
 
 /**
  * Drawer · 抽屉（浮层）
- * 侧边/上下滑出；受控/非受控；点击遮罩 / Esc 关闭；Tab 焦点循环；打开时聚焦首个可聚焦项。
- * 焦点逻辑改用 ref + effect，消除旧实现在文档上长期挂监听的泄漏。
+ * 侧边/上下滑出；受控/非受控；点击遮罩 / Esc 关闭；Tab 焦点循环；关闭时置 inert。
+ * DOM 结构与 React / Vue 端逐字对齐（.ui-drawer-overlay > aside.ui-drawer > header/.body）。
  */
 export function Drawer(props: DrawerProps) {
   const isControlled = () => resolve(props.open) != null;
@@ -33,7 +43,8 @@ export function Drawer(props: DrawerProps) {
   const isOpen = () => (isControlled() ? !!resolve(props.open) : inner());
   const closeOnOverlay = () => resolve(props.closeOnOverlay) ?? true;
   const closeOnEsc = () => resolve(props.closeOnEsc) ?? true;
-  const placement = () => resolve(props.placement) ?? 'right';
+  const side = () => resolve(props.side) ?? resolve(props.placement) ?? 'right';
+  const showClose = () => resolve(props.showClose) ?? true;
   const onOpenChange = props.onOpenChange;
 
   const setOpen = (v: boolean) => {
@@ -41,39 +52,64 @@ export function Drawer(props: DrawerProps) {
     onOpenChange?.(v);
   };
 
-  let panelEl: HTMLElement | null = null;
-  const refCb = (el: HTMLElement) => {
-    panelEl = el;
-    const onKey = (e: KeyboardEvent) => {
-      if (closeOnEsc() && e.key === 'Escape' && isOpen()) {
-        e.preventDefault();
-        setOpen(false);
-        return;
-      }
-      if (e.key !== 'Tab') return;
-      const f = el.querySelectorAll<HTMLElement>(FOCUSABLE);
-      if (!f.length) return;
-      const first = f[0];
-      const last = f[f.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-    el.addEventListener('keydown', onKey);
-    return () => el.removeEventListener('keydown', onKey);
+  let overlayEl: HTMLElement | null = null;
+
+  /** 同步 inert / aria-hidden：关闭时把整块遮罩移出无障碍树与 Tab 序列 */
+  const applyInert = () => {
+    const el = overlayEl;
+    if (!el) return;
+    if (isOpen()) {
+      el.removeAttribute('inert');
+      el.setAttribute('aria-hidden', 'false');
+    } else {
+      el.setAttribute('inert', '');
+      el.setAttribute('aria-hidden', 'true');
+    }
   };
 
-  effect(() => {
-    if (isOpen()) {
-      requestAnimationFrame(() => {
-        const f = panelEl?.querySelectorAll<HTMLElement>(FOCUSABLE);
-        if (f && f.length) f[0].focus();
-      });
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (closeOnEsc() && e.key === 'Escape' && isOpen()) {
+      e.preventDefault();
+      setOpen(false);
+      return;
     }
+    if (e.key !== 'Tab') return;
+    const el = overlayEl;
+    if (!el) return;
+    const f = el.querySelectorAll<HTMLElement>(FOCUSABLE);
+    if (!f.length) return;
+    const first = f[0];
+    const last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  };
+
+  const refCb = (el: HTMLElement) => {
+    overlayEl = el;
+    el.addEventListener('keydown', onKeyDown);
+    applyInert();
+    return () => {
+      el.removeEventListener('keydown', onKeyDown);
+      overlayEl = null;
+    };
+  };
+
+  // open 变化时同步 inert，并在打开时把焦点移入面板
+  effect(() => {
+    const open = isOpen();
+    applyInert();
+    if (!open) return;
+    requestAnimationFrame(() => {
+      const el = overlayEl;
+      if (!el) return;
+      const f = el.querySelectorAll<HTMLElement>(FOCUSABLE);
+      (f[0] ?? el).focus();
+    });
   });
 
   const dialogLabel = () =>
@@ -83,7 +119,8 @@ export function Drawer(props: DrawerProps) {
   return (
     <div
       id={resolve(props.id)}
-      class={cx('ui-overlay', isOpen() && 'show', resolve(props.className))}
+      ref={refCb}
+      class={cx('ui-drawer-overlay', isOpen() && 'show', resolve(props.className))}
       role="presentation"
       aria-hidden={!isOpen()}
       style={resolve(props.style)}
@@ -91,19 +128,40 @@ export function Drawer(props: DrawerProps) {
         if (closeOnOverlay() && e.target === e.currentTarget) setOpen(false);
       }}
     >
-      <div
-        ref={refCb}
-        class={cx('ui-drawer', 'ui-glass', 'ui-drawer--' + placement())}
+      <aside
+        class={cx(
+          'ui-drawer',
+          'ui-glass',
+          side() !== 'right' && 'ui-drawer--' + side(),
+        )}
         role="dialog"
         aria-modal="true"
         aria-label={dialogLabel()}
       >
-        {resolve(props.title) != null && <h3>{() => resolve(props.title)}</h3>}
-        <div class="ui-drawer-body">{() => resolve(props.children)}</div>
-        {resolve(props.footer) != null && (
-          <div class="ui-drawer-foot">{() => resolve(props.footer)}</div>
+        {(resolve(props.title) != null || showClose()) && (
+          <header>
+            <div>
+              {resolve(props.title) != null && (
+                <div class="ui-drawer-title">{resolve(props.title)}</div>
+              )}
+              {resolve(props.subtitle) != null && (
+                <div class="ui-label">{resolve(props.subtitle)}</div>
+              )}
+            </div>
+            {showClose() && (
+              <button
+                class="ui-btn ui-btn--ghost ui-size-sm"
+                aria-label="关闭"
+                type="button"
+                onClick={() => setOpen(false)}
+              >
+                ✕
+              </button>
+            )}
+          </header>
         )}
-      </div>
+        <div class="body">{resolve(props.children)}</div>
+      </aside>
     </div>
   );
 }

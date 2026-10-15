@@ -142,9 +142,9 @@ export const vueDocs: Record<string, DemoCase[]> = {
       code: `<Badge tone="brand" :count="9"><Avatar text="A" /></Badge>\n<Badge tone="danger" :count="120"><Avatar text="B" /></Badge>\n<Badge tone="success" dot><Avatar text="C" /></Badge>`,
       Comp: S(() => () =>
         h('div', { class: 'demo-row' }, [
-          h(Badge, { tone: 'brand', count: 9 }, { default: () => h(Avatar, { name: 'A' }) }),
-          h(Badge, { tone: 'danger', count: 120 }, { default: () => h(Avatar, { name: 'B' }) }),
-          h(Badge, { tone: 'success', dot: true }, { default: () => h(Avatar, { name: 'C' }) }),
+          h(Badge, { tone: 'brand', count: 9 }, { default: () => h(Avatar, { text: 'A' }) }),
+          h(Badge, { tone: 'danger', count: 120 }, { default: () => h(Avatar, { text: 'B' }) }),
+          h(Badge, { tone: 'success', dot: true }, { default: () => h(Avatar, { text: 'C' }) }),
         ]),
       ),
     },
@@ -164,8 +164,8 @@ export const vueDocs: Record<string, DemoCase[]> = {
       code: `<Avatar text="茅台" tone="brand" />\n<Avatar text="宁" tone="success" />\n<Avatar :icon="() => '★'" tone="warning" />\n<Avatar src="https://i.pravatar.cc/80?img=12" />`,
       Comp: S(() => () =>
         h('div', { class: 'demo-row' }, [
-          h(Avatar, { name: '茅台', tone: 'brand' }),
-          h(Avatar, { name: '宁', tone: 'success' }),
+          h(Avatar, { text: '茅台', tone: 'brand' }),
+          h(Avatar, { text: '宁', tone: 'success' }),
           h(Avatar, { icon: h('span', '★'), tone: 'warning' }),
           h(Avatar, { src: 'https://i.pravatar.cc/80?img=12' }),
         ]),
@@ -175,10 +175,10 @@ export const vueDocs: Record<string, DemoCase[]> = {
       code: `<Avatar size="xs" text="A" />\n<Avatar size="sm" text="B" />\n<Avatar size="md" text="C" />\n<Avatar size="lg" text="D" />`,
       Comp: S(() => () =>
         h('div', { class: 'demo-row' }, [
-          h(Avatar, { size: 'xs', name: 'A' }),
-          h(Avatar, { size: 'sm', name: 'B' }),
-          h(Avatar, { size: 'md', name: 'C' }),
-          h(Avatar, { size: 'lg', name: 'D' }),
+          h(Avatar, { size: 'xs', text: 'A' }),
+          h(Avatar, { size: 'sm', text: 'B' }),
+          h(Avatar, { size: 'md', text: 'C' }),
+          h(Avatar, { size: 'lg', text: 'D' }),
         ]),
       ),
     },
@@ -393,7 +393,7 @@ export const vueDocs: Record<string, DemoCase[]> = {
       code: `<Empty description="暂无自选标的">\n  <Button variant="primary">添加自选</Button>\n</Empty>`,
       Comp: S(() => () =>
         h('div', { class: 'demo-row' }, [
-          h(Empty, { text: '暂无自选标的' }, { default: () => h(Button, { variant: 'primary' }, '添加自选') }),
+          h(Empty, { description: '暂无自选标的' }, { default: () => h(Button, { variant: 'primary' }, '添加自选') }),
         ]),
       ),
     },
@@ -458,7 +458,7 @@ export const vueDocs: Record<string, DemoCase[]> = {
       Comp: S(() => () =>
         h('div', { class: 'demo-row' }, [
           h(Tooltip, { content: '这是一条提示' }, { default: () => h(Button, null, '悬停查看') }),
-          h(Tooltip, { content: '跟随主题表面', variant: 'surface' }, { default: () => h(Button, null, 'surface') }),
+          h(Tooltip, { content: '跟随主题表面', variant: 'surface' }, { default: () => h(Button, { variant: 'outline' }, 'surface') }),
         ]),
       ),
     },
@@ -536,7 +536,7 @@ export const vueDocs: Record<string, DemoCase[]> = {
           const target = ref<HTMLElement | null>(null);
           const items = [
             { key: 'edit', label: '编辑' },
-            { key: 'copy', label: '复制' },
+            { key: 'copy', label: '复制', shortcut: '⌘C' },
             { key: 'del', label: '删除', danger: true },
           ];
           return () =>

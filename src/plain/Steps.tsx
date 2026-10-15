@@ -29,40 +29,61 @@ export function Steps(props: StepsProps) {
   const inner = signal<number>(Number(resolve(props.defaultCurrent) ?? 0));
   const cur = () => (isControlled() ? Number(resolve(props.current)) : inner());
   const stepsArr = () => resolve(props.steps) || [];
+  /**
+   * 步骤与连接线的扁平序列：连接线是 .ui-step 的兄弟节点（与 React / Vue 端及设计稿一致）。
+   * 用「序列 + map + 三元」而不是 Fragment：plain 编译器的列表项必须是单个顶层元素。
+   * 注意：plain 的 map 回调首参会包成 rowProxy，**不能用 `item === 'line'` 这类原始值比较**，
+   * 因此这里返回带 line/index 字段的对象，统一走属性读取。
+   */
+  interface StepSeqItem {
+    line: boolean;
+    index: number;
+  }
+  const seq = (): StepSeqItem[] => {
+    const steps = stepsArr();
+    const out: StepSeqItem[] = [];
+    steps.forEach((_, i) => {
+      out.push({ line: false, index: i });
+      if (i < steps.length - 1) out.push({ line: true, index: i });
+    });
+    return out;
+  };
   return (
     <div
       id={resolve(props.id)}
       class={cx('ui-steps', resolve(props.className))}
       style={resolve(props.style)}
     >
-      {stepsArr().map((git, i) => {
-        const it = git;
-        return (
+      {seq().map((git) =>
+        git.line ? (
+          <span class="ui-step-line"></span>
+        ) : (
           <div
             class={cx(
               'ui-step',
-              i < cur() && 'is-done',
-              i === cur() && 'is-current',
+              git.index < cur() && 'is-done',
+              git.index === cur() && 'is-current',
               clickable() && 'is-clickable',
             )}
-            data-step={i}
+            data-step={git.index}
             onClick={() => {
               if (!clickable()) return;
-              if (!isControlled()) inner.set(i);
-              props.onChange?.(i);
+              if (!isControlled()) inner.set(git.index);
+              props.onChange?.(git.index);
             }}
           >
             <span class="ui-step-dot">
-              {i < cur() ? <IconCheck /> : '' + (i + 1)}
+              {git.index < cur() ? <IconCheck /> : '' + (git.index + 1)}
             </span>
             <span class="ui-step-text">
-              <span class="ui-step-title">{it.title}</span>
-              {it.desc != null && <span class="ui-step-desc">{it.desc}</span>}
+              <span class="ui-step-title">{stepsArr()[git.index].title}</span>
+              {stepsArr()[git.index].desc != null && (
+                <span class="ui-step-desc">{stepsArr()[git.index].desc}</span>
+              )}
             </span>
-            {i < stepsArr().length - 1 && <span class="ui-step-line"></span>}
           </div>
-        );
-      })}
+        ),
+      )}
     </div>
   );
 }

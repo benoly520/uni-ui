@@ -32,7 +32,7 @@ export function Switch(props: SwitchProps) {
       type="button"
       role="switch"
       class={cx('ui-switch', size() !== 'md' && 'ui-size-' + size(), resolve(props.className))}
-      aria-checked={on()}
+      aria-checked={on() ? 'true' : 'false'}
       aria-label={resolve(props.label)}
       disabled={disabled()}
       style={resolve(props.style)}

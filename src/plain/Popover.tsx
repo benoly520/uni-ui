@@ -1,5 +1,5 @@
 import { resolve, signal, effect } from 'plain';
-import { cx } from './_shared';
+import { cx, boolAttr } from './_shared';
 import type { MaybeGetter, Renderable } from './_shared';
 
 export interface PopoverProps {
@@ -56,6 +56,8 @@ export function Popover(props: PopoverProps) {
     const trigger = el.firstElementChild as HTMLElement | null;
     if (trigger) {
       trigger.setAttribute('aria-controls', popId);
+      // 初始态也要写 aria-expanded：下面的 effect 首次运行时 ref 可能还没绑定
+      trigger.setAttribute('aria-expanded', shown() ? 'true' : 'false');
       const onClick = () => setOpen(!shown());
       const onFocusIn = () => show();
       const onFocusOut = (e: FocusEvent) => {
@@ -102,9 +104,9 @@ export function Popover(props: PopoverProps) {
         id={popId}
         role="dialog"
         aria-label={ariaLabel()}
-        hidden={!shown()}
+        hidden={boolAttr(!shown())}
       >
-        {() => resolve(props.content)}
+        {resolve(props.content)}
       </div>
     </div>
   );

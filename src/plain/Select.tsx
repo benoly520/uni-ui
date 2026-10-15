@@ -85,59 +85,58 @@ export function Select(props: SelectProps) {
     <div
       id={resolve(props.id)}
       class={cx('ui-select', open() && 'open', resolve(props.className))}
-      data-multiple={isMulti() ? '' : undefined}
+      data-multiple={isMulti() || undefined}
       aria-label={ariaLabel()}
       style={resolve(props.style)}
     >
       <button
+        type="button"
         class="ui-select-trigger"
         aria-haspopup="listbox"
-        aria-expanded={open()}
+        aria-expanded={open() ? 'true' : 'false'}
         onClick={(e: MouseEvent) => {
           e.stopPropagation();
           open.set(!open());
         }}
       >
-        <span>{labelText()}</span>
+        {labelText()}
         <span class="caret ui-icon">
           <IconCaret />
         </span>
       </button>
-      {open() ? (
-        <div class="ui-select-menu" role="listbox">
-          {searchable() && (
-            <input
-              class="ui-select-search"
-              placeholder="搜索…"
-              value={query()}
-              onInput={(e: Event) => query.set((e.target as HTMLInputElement).value)}
-            />
-          )}
-          {filtered().map((git) => {
-            const o = git;
-            const isSel = () => selected().includes(o.value);
-            return (
-              <div
-                class={cx('ui-select-option', isMulti() && 'multi', isSel() && 'is-selected')}
-                role="option"
-                data-val={o.value}
-                aria-selected={isSel() ? 'true' : 'false'}
-                onClick={(e: MouseEvent) => {
-                  e.stopPropagation();
-                  onOptionClick(o);
-                }}
-              >
-                {o.label}
-                {isMulti() && (
-                  <span class="check ui-icon">
-                    <IconCheck />
-                  </span>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      ) : null}
+      <div class="ui-select-menu" role="listbox">
+        {searchable() && (
+          <input
+            class="ui-select-search"
+            placeholder="搜索…"
+            value={query()}
+            onInput={(e: Event) => query.set((e.target as HTMLInputElement).value)}
+          />
+        )}
+        {filtered().map((git) => {
+          const o = git;
+          const isSel = () => selected().includes(o.value);
+          return (
+            <div
+              class={cx('ui-select-option', isMulti() && 'multi')}
+              role="option"
+              data-val={o.value}
+              aria-selected={isSel() ? 'true' : 'false'}
+              onClick={(e: MouseEvent) => {
+                e.stopPropagation();
+                onOptionClick(o);
+              }}
+            >
+              {o.label}
+              {isMulti() && (
+                <span class="check ui-icon">
+                  <IconCheck />
+                </span>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

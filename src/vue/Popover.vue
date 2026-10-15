@@ -1,3 +1,11 @@
+<script lang="ts">
+/** 模块级自增：保证多实例面板 id 唯一（实例级计数器会让每个实例都从 1 开始） */
+let popSeq = 0;
+function nextPopId() {
+  return `pop-${++popSeq}`;
+}
+</script>
+
 <script setup lang="ts">
 import { computed, cloneVNode, ref, onMounted, onUnmounted, type VNode } from 'vue';
 
@@ -22,8 +30,7 @@ const emit = defineEmits<{
   (e: 'open-change', open: boolean): void;
 }>();
 
-let _uid = 0;
-const popId = props.id ?? `pop-${(_uid += 1)}`;
+const popId = props.id ?? nextPopId();
 
 const isControlled = computed(() => props.open != null);
 const innerOpen = ref(props.defaultOpen);

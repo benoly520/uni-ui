@@ -2,6 +2,20 @@ import { resolve } from 'plain';
 import { cx } from './_shared';
 import type { MaybeGetter, Renderable } from './_shared';
 
+/** 关闭按钮内联样式：与 React / Vue 端保持一致（.ui-tag-close 无 theme.css 规则） */
+const CLOSE_STYLE = {
+  border: 'none',
+  background: 'transparent',
+  color: 'currentColor',
+  cursor: 'pointer',
+  display: 'inline-flex',
+  alignItems: 'center',
+  padding: '0',
+  marginLeft: '2px',
+  fontSize: 'inherit',
+  lineHeight: '1',
+};
+
 export type TagType = 'brand' | 'up' | 'down' | 'default';
 
 export interface TagProps {
@@ -47,9 +61,10 @@ export function Tag(props: TagProps) {
           type="button"
           class="ui-tag-close"
           aria-label="关闭"
+          style={CLOSE_STYLE}
           onClick={() => props.onClose?.()}
         >
-          ×
+          <span aria-hidden="true">×</span>
         </button>
       )}
     </span>

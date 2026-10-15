@@ -1,5 +1,5 @@
 import { resolve, signal, effect } from 'plain';
-import { cx } from './_shared';
+import { cx, mergeStyle } from './_shared';
 import type { MaybeGetter, Renderable } from './_shared';
 
 export interface ContextMenuItem {
@@ -119,11 +119,10 @@ export function ContextMenu(props: ContextMenuProps) {
       class={cx('ui-contextmenu', shown() && 'is-open', resolve(props.className))}
       role="menu"
       aria-label={ariaLabel()}
-      style={() => ({
-        left: pos().x + 'px',
-        top: pos().y + 'px',
-        ...(resolve(props.style) as any),
-      })}
+      style={mergeStyle(
+        { left: pos().x + 'px', top: pos().y + 'px' },
+        resolve(props.style),
+      )}
     >
       {items().map((it) =>
         it.separator ? (
@@ -138,7 +137,7 @@ export function ContextMenu(props: ContextMenuProps) {
               close();
             }}
           >
-            <span>{() => resolve(it.label)}</span>
+            <span>{resolve(it.label)}</span>
             {it.shortcut != null && <span class="ui-contextmenu-shortcut">{it.shortcut}</span>}
           </div>
         ),

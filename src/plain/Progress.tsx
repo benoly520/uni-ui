@@ -31,11 +31,17 @@ export function Progress(props: ProgressProps) {
       style={resolve(props.style)}
     >
       <span
-        style={() => {
-          if (indeterminate()) return {};
-          const pct = Math.max(0, Math.min(100, (Number(value()) / Number(max())) * 100));
-          return { width: pct + '%' };
-        }}
+        style={
+          indeterminate()
+            ? {}
+            : {
+                width:
+                  Math.max(
+                    0,
+                    Math.min(100, (Number(value()) / (Number(max()) || 1)) * 100),
+                  ) + '%',
+              }
+        }
       ></span>
     </div>
   );

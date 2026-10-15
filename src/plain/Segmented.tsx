@@ -47,7 +47,8 @@ export function Segmented(props: SegmentedProps) {
     if (!el) return;
     requestAnimationFrame(() => {
       const idx = opts().findIndex((o) => o.value === selected());
-      const b = el.querySelector('[data-seg="' + idx + '"]') as HTMLElement | null;
+      // 不用自定义 data-* 标记（会与 React / Vue 端 DOM 不一致）：thumb 是第 0 个子节点
+      const b = (el.children[idx + 1] as HTMLElement | undefined) ?? null;
       const thumb = el.querySelector('.thumb') as HTMLElement | null;
       if (b && thumb) {
         thumb.style.left = b.offsetLeft + 'px';
@@ -88,12 +89,11 @@ export function Segmented(props: SegmentedProps) {
         return (
           <button
             type="button"
-            data-seg={idx}
-            aria-pressed={selected() === o.value}
+            aria-pressed={selected() === o.value ? 'true' : 'false'}
             disabled={disabled() || !!o.disabled}
             onClick={() => select(o)}
           >
-            <span>{o.label}</span>
+            {resolve(o.label)}
           </button>
         );
       })}

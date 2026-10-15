@@ -86,7 +86,7 @@ export function Form(props: FormProps) {
             onChange={(e: Event) => setVal(f.name, e)}
           />
           <div class="ui-form-error" data-for={f.name}>
-            {() => err()}
+            {err() ?? ''}
           </div>
         </div>
       );
@@ -103,7 +103,7 @@ export function Form(props: FormProps) {
       {grid() ? <div class="ui-form-grid">{rowMap()}</div> : rowMap()}
       <div class="row">
         <button type="submit" class="ui-btn ui-btn--primary">
-          {() => submitText()}
+          {submitText()}
         </button>
       </div>
     </form>

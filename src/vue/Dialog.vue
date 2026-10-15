@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onBeforeUnmount, type CSSProperties, type VNode } from 'vue';
+import { computed, ref, watch, onMounted, onBeforeUnmount, type VNode } from 'vue';
 
 const props = withDefaults(
   defineProps<{
@@ -57,31 +57,31 @@ function onOverlayMouseDown(e: MouseEvent) {
 
 let escHandler: ((e: KeyboardEvent) => void) | null = null;
 
-watch(
-  () => props.open,
-  (open) => {
-    const overlay = overlayRef.value;
-    if (!overlay) return;
-    if (open) {
-      lastFocus = document.activeElement as HTMLElement | null;
-      overlay.removeAttribute('inert');
-      overlay.setAttribute('aria-hidden', 'false');
-      requestAnimationFrame(() => {
-        const f = focusables();
-        (f[0] ?? overlay).focus();
-      });
-      escHandler = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') emit('open-change', false);
-      };
-      document.addEventListener('keydown', escHandler);
-    } else {
-      overlay.setAttribute('inert', '');
-      overlay.setAttribute('aria-hidden', 'true');
-      lastFocus?.focus?.();
-    }
-  },
-  { immediate: true },
-);
+function applyOpen(open: boolean) {
+  const overlay = overlayRef.value;
+  if (!overlay) return;
+  if (open) {
+    lastFocus = document.activeElement as HTMLElement | null;
+    overlay.removeAttribute('inert');
+    overlay.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(() => {
+      const f = focusables();
+      (f[0] ?? overlay).focus();
+    });
+    escHandler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') emit('open-change', false);
+    };
+    document.addEventListener('keydown', escHandler);
+  } else {
+    overlay.setAttribute('inert', '');
+    overlay.setAttribute('aria-hidden', 'true');
+    lastFocus?.focus?.();
+  }
+}
+
+watch(() => props.open, applyOpen, { immediate: true });
+// immediate 回调在模板 ref 绑定时执行（此时 overlayRef 仍为 null），故挂载后需再同步一次初始关闭态
+onMounted(() => applyOpen(props.open));
 
 onBeforeUnmount(() => {
   if (escHandler) document.removeEventListener('keydown', escHandler);
@@ -90,6 +90,17 @@ onBeforeUnmount(() => {
 const slots = defineSlots<{ default?: () => VNode[]; footer?: () => VNode[] }>();
 const labelText = () =>
   props.ariaLabel ?? (typeof props.title === 'string' ? props.title : '对话框');
+
+/**
+ * footer / title 允许直接传 VNode（与 React 端 footer={<Button/>} 等价）。
+ * 不能用 {{ footer }} 插值：toDisplayString 会对 VNode 做 JSON.stringify，触发
+ * "Converting circular structure to JSON"（VNode.component.vnode 自引用）。
+ */
+const renderFooter = () => props.footer as VNode;
+const renderTitle = () => props.title as VNode;
+const titleIsNode = computed(
+  () => typeof props.title === 'object' || typeof props.title === 'function',
+);
 </script>
 
 <template>
@@ -108,10 +119,15 @@ const labelText = () =>
       aria-modal="true"
       :aria-label="labelText()"
     >
-      <h3 v-if="title != null">{{ title }}</h3>
+      <h3 v-if="title != null">
+        <component :is="renderTitle" v-if="titleIsNode" />
+        <template v-else>{{ title }}</template>
+      </h3>
       <slot />
       <div v-if="$slots.footer || footer != null" class="ui-dialog-actions">
-        <slot name="footer">{{ footer }}</slot>
+        <slot name="footer">
+          <component :is="renderFooter" />
+        </slot>
       </div>
     </div>
   </div>

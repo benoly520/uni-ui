@@ -114,7 +114,7 @@ export function Tooltip(props: TooltipProps) {
     >
       {resolve(props.children)}
       <span class="bubble" role="tooltip" id={tipId} aria-hidden={!shown()}>
-        {() => resolve(props.content)}
+        {resolve(props.content)}
       </span>
     </span>
   );

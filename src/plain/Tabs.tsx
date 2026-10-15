@@ -1,5 +1,5 @@
 import { resolve, signal, effect } from 'plain';
-import { cx } from './_shared';
+import { cx, boolAttr } from './_shared';
 import type { MaybeGetter, Renderable } from './_shared';
 
 export interface TabItem {
@@ -128,12 +128,12 @@ export function Tabs(props: TabsProps) {
                 <button
                   role="tab"
                   id={`tab-${it.key}`}
-                  aria-selected={active()}
+                  aria-selected={active() ? 'true' : 'false'}
                   aria-controls={`panel-${it.key}`}
                   tabIndex={active() ? 0 : -1}
                   onClick={() => select(it.key)}
                 >
-                  {() => resolve(it.label)}
+                  {resolve(it.label)}
                 </button>
               );
             })}
@@ -154,9 +154,9 @@ export function Tabs(props: TabsProps) {
             id={`panel-${it.key}`}
             role="tabpanel"
             aria-labelledby={`tab-${it.key}`}
-            hidden={!active()}
+            hidden={boolAttr(!active())}
           >
-            {() => resolve(it.content)}
+            {resolve(it.content)}
           </div>
         );
       })}

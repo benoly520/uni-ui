@@ -39,12 +39,12 @@ export function Stat(props: StatProps) {
           class={cx('value', 'ui-num', trend() && 'ui-num--' + trend())}
           data-num={trend()}
         >
-          {'' + prefix() + value() + suffix()}
+          {(prefix() ?? '') + String(value()) + (suffix() ?? '')}
         </span>
       )}
       {delta() != null && (
         <span
-          class={cx('delta', 'ui-num', trend() && 'ui-num--' + trend())}
+          class={cx('delta', trend() && 'ui-num--' + trend())}
           data-num={trend()}
         >
           {String(delta())}

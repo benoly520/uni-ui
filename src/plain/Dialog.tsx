@@ -38,8 +38,23 @@ export function Dialog(props: DialogProps) {
   };
 
   let overlayEl: HTMLElement | null = null;
+
+  /** 同步 inert / aria-hidden：关闭时把整块遮罩移出无障碍树与 Tab 序列（与 React / Vue 端一致） */
+  const applyInert = () => {
+    const el = overlayEl;
+    if (!el) return;
+    if (isOpen()) {
+      el.removeAttribute('inert');
+      el.setAttribute('aria-hidden', 'false');
+    } else {
+      el.setAttribute('inert', '');
+      el.setAttribute('aria-hidden', 'true');
+    }
+  };
+
   const refCb = (el: HTMLElement) => {
     overlayEl = el;
+    applyInert();
     const onKey = (e: KeyboardEvent) => {
       if (closeOnEsc() && e.key === 'Escape' && isOpen()) {
         e.preventDefault();
@@ -64,7 +79,9 @@ export function Dialog(props: DialogProps) {
   };
 
   effect(() => {
-    if (isOpen()) {
+    const open = isOpen();
+    applyInert();
+    if (open) {
       requestAnimationFrame(() => {
         const f = overlayEl?.querySelectorAll<HTMLElement>(FOCUSABLE);
         if (f && f.length) f[0].focus();
@@ -94,10 +111,10 @@ export function Dialog(props: DialogProps) {
         aria-modal="true"
         aria-label={dialogLabel()}
       >
-        {resolve(props.title) != null && <h3>{() => resolve(props.title)}</h3>}
-        <div>{() => resolve(props.children)}</div>
+        {resolve(props.title) != null && <h3>{resolve(props.title)}</h3>}
+        <div>{resolve(props.children)}</div>
         {resolve(props.footer) != null && (
-          <div class="ui-dialog-actions">{() => resolve(props.footer)}</div>
+          <div class="ui-dialog-actions">{resolve(props.footer)}</div>
         )}
       </div>
     </div>

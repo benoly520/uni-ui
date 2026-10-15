@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onBeforeUnmount, type CSSProperties, type VNode } from 'vue';
+import { ref, watch, onMounted, onBeforeUnmount, type VNode } from 'vue';
 
 type DrawerSide = 'right' | 'left' | 'bottom';
 
@@ -65,31 +65,31 @@ function onOverlayMouseDown(e: MouseEvent) {
 
 let escHandler: ((e: KeyboardEvent) => void) | null = null;
 
-watch(
-  () => props.open,
-  (open) => {
-    const overlay = overlayRef.value;
-    if (!overlay) return;
-    if (open) {
-      lastFocus = document.activeElement as HTMLElement | null;
-      overlay.removeAttribute('inert');
-      overlay.setAttribute('aria-hidden', 'false');
-      requestAnimationFrame(() => {
-        const f = focusables();
-        (f[0] ?? overlay).focus();
-      });
-      escHandler = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') emit('open-change', false);
-      };
-      document.addEventListener('keydown', escHandler);
-    } else {
-      overlay.setAttribute('inert', '');
-      overlay.setAttribute('aria-hidden', 'true');
-      lastFocus?.focus?.();
-    }
-  },
-  { immediate: true },
-);
+function applyOpen(open: boolean) {
+  const overlay = overlayRef.value;
+  if (!overlay) return;
+  if (open) {
+    lastFocus = document.activeElement as HTMLElement | null;
+    overlay.removeAttribute('inert');
+    overlay.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(() => {
+      const f = focusables();
+      (f[0] ?? overlay).focus();
+    });
+    escHandler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') emit('open-change', false);
+    };
+    document.addEventListener('keydown', escHandler);
+  } else {
+    overlay.setAttribute('inert', '');
+    overlay.setAttribute('aria-hidden', 'true');
+    lastFocus?.focus?.();
+  }
+}
+
+watch(() => props.open, applyOpen, { immediate: true });
+// immediate 回调在模板 ref 绑定时执行（此时 overlayRef 仍为 null），故挂载后需再同步一次初始关闭态
+onMounted(() => applyOpen(props.open));
 
 onBeforeUnmount(() => {
   if (escHandler) document.removeEventListener('keydown', escHandler);

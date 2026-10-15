@@ -33,9 +33,9 @@ export function Toast(props: ToastProps) {
       style={resolve(props.style)}
     >
       {resolve(props.icon) != null && (
-        <span class="ui-icon">{() => resolve(props.icon)}</span>
+        <span class="ui-icon">{resolve(props.icon)}</span>
       )}
-      {() => resolve(props.children) ?? resolve(props.content)}
+      {resolve(props.children) ?? resolve(props.content)}
     </div>
   );
 }

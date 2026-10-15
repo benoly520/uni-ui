@@ -19,6 +19,9 @@ const props = withDefaults(
     size: 'md',
     disabled: false,
     defaultChecked: false,
+    // 显式给 checked 一个 default，避免 Vue 的 Boolean prop 兜底把「未传」规范成 false
+    // 从而误判为受控模式、让 defaultChecked 永久失效
+    checked: undefined,
   },
 );
 
@@ -26,7 +29,7 @@ const emit = defineEmits<{
   (e: 'change', checked: boolean): void;
 }>();
 
-const isControlled = computed(() => props.checked != null);
+const isControlled = computed(() => props.checked !== undefined);
 const inner = ref<boolean>(props.defaultChecked);
 const on = computed(() => (isControlled.value ? (props.checked as boolean) : inner.value));
 

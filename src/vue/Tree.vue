@@ -14,11 +14,14 @@ const props = withDefaults(
     expandedKeys?: string[];
     /** 受控：勾选节点 key 列表 */
     checkedKeys?: string[];
+    /** 无障碍标签（默认「树」，与 React / Plain 端一致） */
+    'aria-label'?: string;
   }>(),
   {
     checkable: true,
     defaultExpandedKeys: () => [],
     defaultCheckedKeys: () => [],
+    'aria-label': '树',
   },
 );
 
@@ -74,10 +77,20 @@ function toggleCheck(key: string) {
 }
 
 defineExpose({ expandedKeys: expanded, checkedKeys: checked });
+
+/**
+ * 无障碍标签：默认「树」（与 React / Plain 端一致）。
+ * 注意：类型式 defineProps 里的带连字符键在运行时可能被 camelize，
+ * 因此两种写法都读一次。
+ */
+const ariaLabel = computed(() => {
+  const p = props as Record<string, any>;
+  return p['aria-label'] ?? p.ariaLabel ?? '树';
+});
 </script>
 
 <template>
-  <div class="ui-tree" role="tree">
+  <div class="ui-tree" role="tree" :aria-label="ariaLabel">
     <ul class="ui-tree-children">
       <TreeNode
         v-for="node in data"

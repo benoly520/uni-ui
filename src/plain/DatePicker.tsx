@@ -1,5 +1,5 @@
 import { resolve, signal } from 'plain';
-import { cx } from './_shared';
+import { cx, boolAttr } from './_shared';
 import { IconCalendar, IconCaret } from './icons';
 import type { MaybeGetter } from './_shared';
 
@@ -91,7 +91,10 @@ export function DatePicker(props: DatePickerProps) {
     }
   };
   const titleText = () => `${view().getFullYear()}年${view().getMonth() + 1}月`;
+  /** 触发器 / 面板的无障碍文案（与 React / Vue 端一致） */
+  const popAria = () => (range() ? '选择日期区间' : '选择日期');
 
+  /** 网格单元：仅前置补位 + 当月日期（与 React / Vue 端一致，不补尾部整行） */
   const cells = () => {
     const ym = view();
     const year = ym.getFullYear();
@@ -100,20 +103,21 @@ export function DatePicker(props: DatePickerProps) {
     const lead = (first.getDay() + 6) % 7;
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const prevDays = new Date(year, month, 0).getDate();
-    const arr: { d: Date; out: boolean }[] = [];
-    for (let i = 0; i < lead; i++)
-      arr.push({ d: new Date(year, month - 1, prevDays - lead + 1 + i), out: true });
-    for (let d = 1; d <= daysInMonth; d++) arr.push({ d: new Date(year, month, d), out: false });
-    const total = Math.ceil(arr.length / 7) * 7;
-    for (let i = arr.length; i < total; i++)
-      arr.push({ d: new Date(year, month + 1, i - arr.length + 1), out: true });
+    const arr: { d: Date; out: boolean; label: number }[] = [];
+    for (let i = 0; i < lead; i++) {
+      const day = prevDays - lead + 1 + i;
+      arr.push({ d: new Date(year, month - 1, day), out: true, label: day });
+    }
+    for (let d = 1; d <= daysInMonth; d++)
+      arr.push({ d: new Date(year, month, d), out: false, label: d });
     return arr;
   };
 
   // 说明：renderCell 被当作「子组件」，入参 c 视为 props，属性读取用 resolve(c.x)。
-  const renderCell = (c: { d: Date; out: boolean }) => {
+  const renderCell = (c: { d: Date; out: boolean; label: number }) => {
     const d = () => resolve(c.d);
     const out = () => resolve(c.out);
+    const label = () => resolve(c.label);
     const v = () => fmt(d());
     const today = () => fmt(new Date());
     const isToday = () => v() === today();
@@ -124,20 +128,32 @@ export function DatePicker(props: DatePickerProps) {
       if (!range()) return false;
       const s = (sel() as any[])[0];
       const e = (sel() as any[])[1];
-      return s && e && parse(s)! <= d() && d() <= parse(e)!;
+      // 仅区间内部（不含起止端点）加 in-range，与 React / Vue 端一致
+      return !!s && !!e && parse(s)! < d() && d() < parse(e)!;
     };
-    const cls = () =>
-      cx(
+    // 单日模式：命中当前值即选中（区间模式下 isStart/isEnd 才生效）
+    const isSingle = () => !range() && (get() as string) === v();
+    const cls = () => {
+      if (out()) return 'dp-cell is-out';
+      return cx(
         'dp-cell',
-        out() && 'is-out',
         isToday() && 'is-today',
+        isSingle() && 'is-selected',
         isStart() && 'is-selected is-start',
         isEnd() && 'is-selected is-end',
         inRange() && 'in-range',
       );
+    };
     return (
-      <div class={cls()} data-date={v()} onClick={() => pick(d())}>
-        {'' + d().getDate()}
+      <div
+        class={cls()}
+        data-date={out() ? undefined : v()}
+        data-disabled={out() ? '1' : undefined}
+        onClick={() => {
+          if (!out()) pick(d());
+        }}
+      >
+        {'' + label()}
       </div>
     );
   };
@@ -150,10 +166,11 @@ export function DatePicker(props: DatePickerProps) {
       style={resolve(props.style)}
     >
       <button
+        type="button"
         class="ui-datepicker-trigger ui-input"
         aria-haspopup="dialog"
-        aria-expanded={open()}
-        aria-label={ariaLabel()}
+        aria-expanded={open() ? 'true' : 'false'}
+        aria-label={ariaLabel() || popAria()}
         onClick={(e: MouseEvent) => {
           e.stopPropagation();
           if (!open()) {
@@ -168,16 +185,17 @@ export function DatePicker(props: DatePickerProps) {
         <span class="ui-icon">
           <IconCalendar />
         </span>
-        <span class="dp-text">{() => triggerText()}</span>
+        <span class="dp-text">{triggerText()}</span>
       </button>
       <div
         class="ui-datepicker-pop"
         role="dialog"
-        aria-label={ariaLabel() || '日期选择'}
-        hidden={!open()}
+        aria-label={popAria()}
+        hidden={boolAttr(!open())}
       >
         <div class="dp-head">
           <button
+            type="button"
             class="dp-nav"
             data-nav="prev"
             aria-label="上个月"
@@ -187,8 +205,9 @@ export function DatePicker(props: DatePickerProps) {
               <IconCaret />
             </span>
           </button>
-          <span class="dp-title">{() => titleText()}</span>
+          <span class="dp-title">{titleText()}</span>
           <button
+            type="button"
             class="dp-nav"
             data-nav="next"
             aria-label="下个月"
@@ -209,6 +228,7 @@ export function DatePicker(props: DatePickerProps) {
         </div>
         <div class="dp-foot">
           <button
+            type="button"
             class="ui-btn ui-btn--ghost ui-size-sm"
             data-act="today"
             onClick={() => {
@@ -220,6 +240,7 @@ export function DatePicker(props: DatePickerProps) {
             今天
           </button>
           <button
+            type="button"
             class="ui-btn ui-btn--primary ui-size-sm"
             data-act="clear"
             onClick={() => {

@@ -92,14 +92,14 @@ export const reactDocs: Record<string, DemoCase[]> = {
     {
       title: '尺寸与胶囊',
       desc: 'size 提供 lg/md/sm/xs 四档；pill 叠加任意变体形成胶囊按钮。',
-      code: `<Button size="lg" variant="primary">大</Button>\n<Button variant="primary">中</Button>\n<Button size="sm" variant="primary">小</Button>\n<Button size="xs" variant="primary">超小</Button>\n<Button pill variant="glass">胶囊</Button>`,
+      code: `<Button size="lg" variant="primary">大</Button>\n<Button variant="primary">中</Button>\n<Button size="sm" variant="primary">小</Button>\n<Button size="xs" variant="primary">超小</Button>\n<Button pill>胶囊</Button>`,
       Comp: () => (
         <div className="demo-row">
           <Button size="lg" variant="primary">大</Button>
           <Button variant="primary">中</Button>
           <Button size="sm" variant="primary">小</Button>
           <Button size="xs" variant="primary">超小</Button>
-          <Button pill variant="glass">胶囊</Button>
+          <Button pill>胶囊</Button>
         </div>
       ),
     },
@@ -526,11 +526,11 @@ export const reactDocs: Record<string, DemoCase[]> = {
     {
       title: '提示变体',
       desc: 'variant=invert 反转色；surface 跟随主题表面并带毛玻璃。默认 placement=top。',
-      code: `<Tooltip content="这是一条提示"><Button>悬停查看</Button></Tooltip>\n<Tooltip content="跟随主题表面" variant="surface"><Button variant="glass">surface</Button></Tooltip>`,
+      code: `<Tooltip content="这是一条提示"><Button>悬停查看</Button></Tooltip>\n<Tooltip content="跟随主题表面" variant="surface"><Button variant="outline">surface</Button></Tooltip>`,
       Comp: () => (
         <div className="demo-row">
           <Tooltip content="这是一条提示"><Button>悬停查看</Button></Tooltip>
-          <Tooltip content="跟随主题表面" variant="surface"><Button variant="glass">surface</Button></Tooltip>
+          <Tooltip content="跟随主题表面" variant="surface"><Button variant="outline">surface</Button></Tooltip>
         </div>
       ),
     },
@@ -608,7 +608,7 @@ export const reactDocs: Record<string, DemoCase[]> = {
               targetRef={target}
               items={[
                 { key: 'edit', label: '编辑' },
-                { key: 'copy', label: '复制' },
+                { key: 'copy', label: '复制', shortcut: '⌘C' },
                 { key: 'del', label: '删除', danger: true },
               ]}
               onSelect={(k) => toast(`执行：${k}`)}
@@ -662,7 +662,7 @@ export const reactDocs: Record<string, DemoCase[]> = {
       Comp: () => (
         <div className="demo-row">
           <Button onClick={() => toast('操作成功')}>默认 Toast</Button>
-          <Button variant="glass" onClick={() => toast('正在保存…', { duration: 0 })}>常驻 Toast</Button>
+          <Button variant="outline" onClick={() => toast('正在保存…', { duration: 0 })}>常驻 Toast</Button>
         </div>
       ),
     },
@@ -676,7 +676,7 @@ export const reactDocs: Record<string, DemoCase[]> = {
       Comp: () => (
         <div className="demo-row">
           <Button onClick={() => showMessage('数据已更新', 'success')}>success</Button>
-          <Button variant="glass" onClick={() => showMessage('请求失败', 'danger')}>danger</Button>
+          <Button variant="outline" onClick={() => showMessage('请求失败', 'danger')}>danger</Button>
         </div>
       ),
     },

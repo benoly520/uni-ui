@@ -1,5 +1,5 @@
 import { resolve } from 'plain';
-import { cx } from './_shared';
+import { cx, mergeStyle } from './_shared';
 import type { MaybeGetter, Renderable } from './_shared';
 
 export type AvatarTone = 'brand' | 'danger' | 'success' | 'warning' | 'info';
@@ -35,23 +35,27 @@ export function Avatar(props: AvatarProps) {
       id={resolve(props.id)}
       class={cx('ui-avatar', resolve(props.className))}
       aria-label={resolve(props['aria-label'])}
-      style={() => {
-        const px = sizePx();
-        const base: any = {
-          width: px + 'px',
-          height: px + 'px',
-          fontSize: Math.round(px * 0.4) + 'px',
+      style={mergeStyle(
+        {
+          width: sizePx() + 'px',
+          height: sizePx() + 'px',
+          fontSize: Math.round(sizePx() * 0.4) + 'px',
           background: 'var(--ui-color-' + tone() + ')',
-        };
-        const extra = resolve(props.style);
-        return { ...base, ...(typeof extra === 'string' ? {} : extra || {}) };
-      }}
+        },
+        resolve(props.style),
+      )}
     >
       {resolve(props.src) ? (
         <img
           class="ui-avatar-img"
           src={resolve(props.src)}
           alt={resolve(props.alt) ?? ''}
+          style={{
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%',
+            objectFit: 'cover',
+          }}
         />
       ) : (
         <>

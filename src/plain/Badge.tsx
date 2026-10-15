@@ -1,5 +1,5 @@
 import { resolve } from 'plain';
-import { cx } from './_shared';
+import { cx, mergeStyle } from './_shared';
 import type { MaybeGetter, Renderable } from './_shared';
 
 export type BadgeTone = 'brand' | 'danger' | 'success' | 'warning' | 'info';
@@ -38,17 +38,27 @@ export function Badge(props: BadgeProps) {
     <span
       id={resolve(props.id)}
       class={cx('ui-badge', resolve(props.className))}
-      style={() => {
-        const st = resolve(props.style);
-        return {
-          background: 'var(--ui-color-' + tone() + '-soft)',
-          color: 'var(--ui-color-' + tone() + ')',
-          ...(st && typeof st === 'object' ? st : {}),
+      style={mergeStyle(
+        {
+          background: 'var(--ui-color-' + tone() + '-soft, var(--ui-color-brand-soft))',
+          color: 'var(--ui-color-' + tone() + ', var(--ui-color-brand))',
           display: hidden() ? 'none' : '',
-        };
-      }}
+        },
+        resolve(props.style),
+      )}
     >
-      {dot() && <span class="ui-badge-dot"></span>}
+      {dot() && (
+        <span
+          class="ui-badge-dot"
+          style={{
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            background: 'currentColor',
+            flex: 'none',
+          }}
+        ></span>
+      )}
       {content()}
     </span>
   );

@@ -13,43 +13,43 @@ export interface BadgeProps {
   children?: Renderable | (() => Renderable);
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 /**
  * Badge · 徽标（基础）
- * count 超过 max 截断为 `max+`；dot 渲染状态圆点；count 为 0 且非 showZero 返回空片段。
+ * count 超过 max 截断为 `max+`；dot 渲染状态圆点；count 为 0 且非 showZero 渲染空片段。
  */
 export function Badge(props: BadgeProps) {
-  const {
-    tone = 'brand',
-    dot = false,
-    count,
-    max = 99,
-    showZero = false,
-    children,
-    className,
-    style,
-    ...rest
-  } = props;
-  const c = resolve(count);
-  if (c != null && c === 0 && !resolve(showZero)) return document.createDocumentFragment();
-  const maxVal = resolve(max) ?? 99;
-  const st = resolve(style);
-  const content =
-    c != null ? (c > maxVal ? maxVal + '+' : '' + c) : resolve(children);
+  const tone = () => resolve(props.tone) ?? 'brand';
+  const dot = () => resolve(props.dot) ?? false;
+  const maxVal = () => resolve(props.max) ?? 99;
+  const showZero = () => resolve(props.showZero) ?? false;
+  const countVal = () => resolve(props.count);
+  const hidden = () => {
+    const c = countVal();
+    return c != null && c === 0 && !showZero();
+  };
+  const content = () => {
+    const c = countVal();
+    return c != null ? (c > maxVal() ? maxVal() + '+' : '' + c) : resolve(props.children);
+  };
   return (
     <span
-      {...rest}
-      class={cx('ui-badge', resolve(className))}
-      style={{
-        background: 'var(--ui-color-' + resolve(tone) + '-soft)',
-        color: 'var(--ui-color-' + resolve(tone) + ')',
-        ...(st && typeof st === 'object' ? st : {}),
+      id={resolve(props.id)}
+      class={cx('ui-badge', resolve(props.className))}
+      style={() => {
+        const st = resolve(props.style);
+        return {
+          background: 'var(--ui-color-' + tone() + '-soft)',
+          color: 'var(--ui-color-' + tone() + ')',
+          ...(st && typeof st === 'object' ? st : {}),
+          display: hidden() ? 'none' : '',
+        };
       }}
     >
-      {resolve(dot) && <span class="ui-badge-dot"></span>}
-      {content}
+      {dot() && <span class="ui-badge-dot"></span>}
+      {content()}
     </span>
   );
 }

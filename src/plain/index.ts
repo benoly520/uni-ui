@@ -11,7 +11,7 @@ export { ContextMenu, type ContextMenuProps, type ContextMenuItem } from './Cont
 export { DataTable, type DataTableProps, type DataTableColumn } from './DataTable';
 export { DatePicker, type DatePickerProps, type DatePickerValue } from './DatePicker';
 export { Dialog, type DialogProps } from './Dialog';
-export { Drawer, type DrawerProps, type DrawerSide } from './Drawer';
+export { Drawer, type DrawerProps, type DrawerPlacement } from './Drawer';
 export { Empty, type EmptyProps } from './Empty';
 export { Form, type FormProps, type FormRule, type FormField } from './Form';
 export { Input, type InputProps, type InputSize } from './Input';

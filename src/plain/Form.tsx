@@ -24,7 +24,7 @@ export interface FormProps {
   onSubmit?: (values: Record<string, string>) => void;
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 function validateField(field: FormField, value: string): string {
@@ -40,14 +40,15 @@ function validateField(field: FormField, value: string): string {
 
 /**
  * Form · 表单栅格 + 字段校验（数据表单组）
- * - label/control 布局、错误态 .ui-form-item--error（行）+ .ui-input--error（红边）
- * - 提交时逐字段校验，通过则 onSubmit(values)
+ * label/control 布局、错误态；提交时逐字段校验，通过则 onSubmit(values)。
  */
 export function Form(props: FormProps) {
-  const { fields, grid = true, submitText = '提交', onSubmit, className, style, ...rest } = props;
+  const fieldsArr = () => resolve(props.fields) || [];
+  const grid = () => resolve(props.grid) ?? true;
+  const submitText = () => resolve(props.submitText) ?? '提交';
 
   const initValues = () =>
-    Object.fromEntries((resolve(fields) as FormField[]).map((f) => [f.name, f.defaultValue ?? '']));
+    Object.fromEntries(fieldsArr().map((f) => [f.name, f.defaultValue ?? '']));
   const values = signal<Record<string, string>>(initValues());
   const errors = signal<Record<string, string>>({});
 
@@ -59,16 +60,16 @@ export function Form(props: FormProps) {
   const handleSubmit = (e: Event) => {
     e.preventDefault();
     const nextErrors: Record<string, string> = {};
-    for (const f of resolve(fields) as FormField[]) {
+    for (const f of fieldsArr()) {
       const msg = validateField(f, values()[f.name] ?? '');
       if (msg) nextErrors[f.name] = msg;
     }
     errors.set(nextErrors);
-    if (Object.keys(nextErrors).length === 0) onSubmit?.(values());
+    if (Object.keys(nextErrors).length === 0) props.onSubmit?.(values());
   };
 
   const rowMap = () =>
-    (resolve(fields) as FormField[]).map((f) => {
+    fieldsArr().map((f) => {
       const err = () => errors()[f.name];
       return (
         <div class={cx('ui-form-row', err() && 'ui-form-item--error')}>
@@ -93,16 +94,16 @@ export function Form(props: FormProps) {
 
   return (
     <form
-      {...rest}
-      class={cx('ui-form', resolve(className))}
-      style={resolve(style)}
-      novalidate
+      id={resolve(props.id)}
+      class={cx('ui-form', resolve(props.className))}
+      style={resolve(props.style)}
+      noValidate
       onSubmit={handleSubmit}
     >
-      {resolve(grid) ? <div class="ui-form-grid">{rowMap()}</div> : rowMap()}
+      {grid() ? <div class="ui-form-grid">{rowMap()}</div> : rowMap()}
       <div class="row">
         <button type="submit" class="ui-btn ui-btn--primary">
-          {() => resolve(submitText)}
+          {() => submitText()}
         </button>
       </div>
     </form>

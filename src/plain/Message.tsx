@@ -15,35 +15,28 @@ export interface MessageProps {
   children?: MaybeGetter<Renderable>;
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 /**
  * Message · 内联通知条（反馈组）
- * - 根 ui-message + ui-message--{type}；role=status aria-live=polite
- * - 固定结构：.dot（语义色圆点）+ .msg-text（正文）
- * - 命令式入口见 message.ts（挂 body）
+ * 根 ui-message + ui-message--{type}；role=status aria-live=polite。
+ * 固定结构：.dot（语义色圆点）+ .msg-text（正文）。
+ * 命令式入口见 message.ts（挂 body）。
  */
 export function Message(props: MessageProps) {
-  const {
-    show = false,
-    type = 'info',
-    content,
-    children,
-    className,
-    style,
-    ...rest
-  } = props;
+  const show = () => resolve(props.show) ?? false;
+  const type = () => resolve(props.type) ?? 'info';
   return (
     <div
-      {...rest}
-      class={cx('ui-message', `ui-message--${resolve(type)}`, resolve(show) && 'ui-message.show', resolve(className))}
+      id={resolve(props.id)}
+      class={cx('ui-message', 'ui-message--' + type(), show() && 'ui-message.show', resolve(props.className))}
       role="status"
       aria-live="polite"
-      style={resolve(style)}
+      style={resolve(props.style)}
     >
       <span class="dot" />
-      <span class="msg-text">{() => (resolve(children) ?? resolve(content))}</span>
+      <span class="msg-text">{() => resolve(props.children) ?? resolve(props.content)}</span>
     </div>
   );
 }

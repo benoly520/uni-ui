@@ -24,40 +24,36 @@ export interface TabsProps {
   ariaLabel?: MaybeGetter<string>;
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 /**
  * Tabs · 标签切换（浮层导航组）
- * - 标签过多横向滚动：左右箭头 is-visible + scrollBy；scroll 实时刷新
- * - role=tablist/tab/tabpanel、aria-selected、roving tabindex、方向键切换
- * - 受控/非受控双模式；不携带样式，全部走 theme.css
+ * 标签过多横向滚动：左右箭头 is-visible + scrollBy；scroll 实时刷新。
+ * role=tablist/tab/tabpanel、aria-selected、roving tabindex、方向键切换。
+ * 受控/非受控双模式。
  */
 export function Tabs(props: TabsProps) {
-  const {
-    items,
-    value,
-    defaultValue,
-    onChange,
-    ariaLabel = '标签页',
-    className,
-    style,
-    ...rest
-  } = props;
-
-  const isControlled = value != null;
+  const itemsArr = () => resolve(props.items) || [];
+  const isControlled = () => resolve(props.value) != null;
   const inner = signal<string>(
-    (resolve(defaultValue) as string) ?? (resolve(items) as TabItem[])[0]?.key ?? '',
+    (resolve(props.defaultValue) as string) ?? itemsArr()[0]?.key ?? '',
   );
-  const selected = () => (isControlled ? (resolve(value) as string) : inner());
+  const selected = () => (isControlled() ? (resolve(props.value) as string) : inner());
+  const ariaLabel = () => resolve(props.ariaLabel) ?? '标签页';
 
   const select = (key: string) => {
-    if (!isControlled) inner.set(key);
-    onChange?.(key);
+    if (!isControlled()) inner.set(key);
+    props.onChange?.(key);
   };
 
+  let scrollerEl: HTMLElement | null = null;
+  const refScroller = (el: HTMLElement) => {
+    scrollerEl = el;
+  };
   const onScroll = (e: Event) => {
-    const scroller = e.currentTarget as HTMLElement;
+    const scroller = (e.currentTarget as HTMLElement) || scrollerEl;
+    if (!scroller) return;
     const max = scroller.scrollWidth - scroller.clientWidth;
     const x = scroller.scrollLeft;
     const left = scroller.parentElement?.querySelector(
@@ -69,11 +65,9 @@ export function Tabs(props: TabsProps) {
     left?.classList.toggle('is-visible', x > 1);
     right?.classList.toggle('is-visible', x < max - 1);
   };
-
-  // 初始化箭头可见态
+  // 初始化箭头可见态（一次性，无泄漏）
   requestAnimationFrame(() => {
-    const scroller = document.querySelector('.ui-tabs-scroll') as HTMLElement | null;
-    if (scroller) onScroll({ currentTarget: scroller } as unknown as Event);
+    if (scrollerEl) onScroll({ currentTarget: scrollerEl } as unknown as Event);
   });
 
   // 选中项滚动入视
@@ -86,7 +80,7 @@ export function Tabs(props: TabsProps) {
   });
 
   const onKeyDown = (e: KeyboardEvent) => {
-    const tabs = resolve(items) as TabItem[];
+    const tabs = itemsArr();
     const i = tabs.findIndex((t) => t.key === selected());
     if (i < 0) return;
     let n = -1;
@@ -96,17 +90,17 @@ export function Tabs(props: TabsProps) {
     else if (e.key === 'End') n = tabs.length - 1;
     else return;
     e.preventDefault();
-    const key = tabs[n].key;
-    select(key);
+    const k = tabs[n].key;
+    select(k);
     requestAnimationFrame(() => {
-      const el = document.querySelector(`#tab-${CSS.escape(key)}`) as HTMLElement | null;
+      const el = document.querySelector(`#tab-${CSS.escape(k)}`) as HTMLElement | null;
       el?.focus();
     });
   };
 
   const scrollByStep = (dir: -1 | 1) => {
     requestAnimationFrame(() => {
-      const scroller = document.querySelector('.ui-tabs-scroll') as HTMLElement | null;
+      const scroller = scrollerEl;
       if (!scroller) return;
       const step = Math.max(80, scroller.clientWidth * 0.8);
       scroller.scrollBy({ left: dir * step, behavior: 'smooth' });
@@ -115,16 +109,20 @@ export function Tabs(props: TabsProps) {
 
   return (
     <>
-      <div class={cx('ui-tabs-wrap', resolve(className))} style={resolve(style)} {...rest}>
+      <div
+        id={resolve(props.id)}
+        class={cx('ui-tabs-wrap', resolve(props.className))}
+        style={resolve(props.style)}
+      >
         <button
           class="ui-tabs-arrow ui-tabs-arrow--left"
           aria-label="向左滚动标签"
           type="button"
           onClick={() => scrollByStep(-1)}
         />
-        <div class="ui-tabs-scroll" onScroll={onScroll}>
-          <div class="ui-tabs" role="tablist" aria-label={resolve(ariaLabel)} onKeyDown={onKeyDown}>
-            {(resolve(items) as TabItem[]).map((it) => {
+        <div class="ui-tabs-scroll" ref={refScroller} onScroll={onScroll}>
+          <div class="ui-tabs" role="tablist" aria-label={ariaLabel()} onKeyDown={onKeyDown}>
+            {itemsArr().map((it) => {
               const active = () => it.key === selected();
               return (
                 <button
@@ -148,7 +146,7 @@ export function Tabs(props: TabsProps) {
           onClick={() => scrollByStep(1)}
         />
       </div>
-      {(resolve(items) as TabItem[]).map((it) => {
+      {itemsArr().map((it) => {
         const active = () => it.key === selected();
         return (
           <div

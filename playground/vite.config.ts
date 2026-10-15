@@ -2,8 +2,8 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'node:path';
-// Plain 框架编译器（本地源码构建的 dist）：将 .tsx 编译为「直接构建 DOM」的代码
-import plainPlugin from '../../plain-framework/dist/vite/index.js';
+// Plain 框架编译器（本地通过 link: 依赖解析，免去先发版）。
+import plainPlugin from 'plain/vite';
 
 // 单包根目录（uni-ui 仓库根）：playground 通过 alias 直接消费「源码」，
 // 免去先 build 库即可热更调试；同时演示真实消费路径 uni-ui/react、uni-ui/vue、uni-ui/plain、uni-ui/theme.css。
@@ -29,10 +29,7 @@ export default defineConfig({
       'uni-ui/vue': resolve(root, 'src/vue/index.ts'),
       'uni-ui/plain': resolve(root, 'src/plain/index.ts'),
       'uni-ui/theme.css': resolve(root, 'theme.css'),
-      // plain 框架运行时 / 编译器 / vite 插件（指向本地构建产物）
-      'plain': resolve(plainRoot, 'dist/runtime/index.js'),
-      'plain/vite': resolve(plainRoot, 'dist/vite/index.js'),
-      'plain/compiler': resolve(plainRoot, 'dist/compiler/index.js'),
+      // plain 框架通过 devDependencies 的 link: 依赖解析，无需手写 alias
       // 强制单实例：避免 playground 自身与库源码各引一份 react / vue（多实例会导致 hook 失效）
       // 依赖实际装在 playground 自身的 node_modules（pnpm workspace 下仓库根没有 node_modules）
       react: resolve(__dirname, 'node_modules/react'),

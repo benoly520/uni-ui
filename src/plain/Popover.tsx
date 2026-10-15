@@ -19,41 +19,27 @@ export interface PopoverProps {
   style?: MaybeGetter<string | Record<string, string>>;
   /** 触发元素 */
   children?: MaybeGetter<Renderable>;
-  [key: string]: any;
 }
 
 let popSeq = 0;
 
 /**
  * Popover · 可交互悬浮资料卡（浮层导航组）
- * - hover / focus 弹出；点击触发元素亦可切换；面板内按钮可点
- * - 外部点击 / Esc 关闭；受控 / 非受控双模式
- * - 不携带样式，全部走 theme.css
+ * hover / focus 弹出；点击触发元素亦可切换；面板内按钮可点。
+ * 外部点击 / Esc 关闭；受控 / 非受控双模式。
+ * 焦点跟随改用 ref 注入 focusin/focusout（新框架无 onFocusIn/Out），并回收监听。
  */
 export function Popover(props: PopoverProps) {
-  const {
-    content,
-    open,
-    defaultOpen = false,
-    onOpenChange,
-    ariaLabel = 'Popover',
-    id,
-    className,
-    style,
-    children,
-    ...rest
-  } = props;
-
-  const isControlled = open != null;
-  const inner = signal<boolean>(!!resolve(defaultOpen));
-  const shown = () => (isControlled ? !!resolve(open) : inner());
-  const popId = id || `pop-${++popSeq}`;
+  const isControlled = () => resolve(props.open) != null;
+  const inner = signal<boolean>(!!(resolve(props.defaultOpen) ?? false));
+  const shown = () => (isControlled() ? !!resolve(props.open) : inner());
+  const popId = props.id || 'pop-' + ++popSeq;
+  const ariaLabel = () => resolve(props.ariaLabel) ?? 'Popover';
 
   const setOpen = (v: boolean) => {
-    if (!isControlled) inner.set(v);
-    onOpenChange?.(v);
+    if (!isControlled()) inner.set(v);
+    props.onOpenChange?.(v);
   };
-
   let hideTimer: number | undefined;
   const show = () => {
     if (hideTimer) window.clearTimeout(hideTimer);
@@ -64,52 +50,61 @@ export function Popover(props: PopoverProps) {
     hideTimer = window.setTimeout(() => setOpen(false), 120);
   };
 
-  const syncTrigger = () => {
-    const root = document.getElementById(popId)?.parentElement;
-    const trigger = root?.firstElementChild as HTMLElement | null;
-    if (!trigger) return;
-    trigger.setAttribute('aria-controls', popId);
-    trigger.setAttribute('aria-expanded', shown() ? 'true' : 'false');
-    if (!(trigger as any).__popBound) {
-      (trigger as any).__popBound = true;
-      trigger.addEventListener('click', () => setOpen(!shown()));
+  let rootEl: HTMLElement | null = null;
+  const refCb = (el: HTMLElement) => {
+    rootEl = el;
+    const trigger = el.firstElementChild as HTMLElement | null;
+    if (trigger) {
+      trigger.setAttribute('aria-controls', popId);
+      const onClick = () => setOpen(!shown());
+      const onFocusIn = () => show();
+      const onFocusOut = (e: FocusEvent) => {
+        if (el.contains(e.relatedTarget as Node)) return;
+        hide();
+      };
+      trigger.addEventListener('click', onClick);
+      el.addEventListener('focusin', onFocusIn);
+      el.addEventListener('focusout', onFocusOut);
+      return () => {
+        trigger.removeEventListener('click', onClick);
+        el.removeEventListener('focusin', onFocusIn);
+        el.removeEventListener('focusout', onFocusOut);
+        rootEl = null;
+      };
     }
+    return () => {
+      rootEl = null;
+    };
   };
-  // 挂载后注入一次；open 变化后响应式同步
-  requestAnimationFrame(syncTrigger);
-  effect(syncTrigger);
+  // open 变化后响应式同步触发元素的 aria-expanded
+  effect(() => {
+    const trigger = rootEl?.firstElementChild as HTMLElement | null;
+    if (trigger) trigger.setAttribute('aria-expanded', shown() ? 'true' : 'false');
+  });
 
   return (
     <div
-      {...rest}
-      class={cx('ui-popover', resolve(className))}
-      style={resolve(style)}
+      class={cx('ui-popover', resolve(props.className))}
+      style={resolve(props.style)}
       onMouseEnter={show}
       onMouseLeave={hide}
-      onFocusIn={show}
-      onFocusOut={(e: FocusEvent) => {
-        if ((e.currentTarget as HTMLElement).contains(e.relatedTarget as Node)) return;
-        hide();
-      }}
       onKeyDown={(e: KeyboardEvent) => {
         if (e.key === 'Escape' && shown()) {
           setOpen(false);
-          const t = document
-            .getElementById(popId)
-            ?.parentElement?.firstElementChild as HTMLElement | null;
-          t?.focus?.();
+          (rootEl?.firstElementChild as HTMLElement | null)?.focus?.();
         }
       }}
+      ref={refCb}
     >
-      {resolve(children)}
+      {resolve(props.children)}
       <div
         class="ui-popover-panel"
         id={popId}
         role="dialog"
-        aria-label={resolve(ariaLabel)}
+        aria-label={ariaLabel()}
         hidden={!shown()}
       >
-        {() => resolve(content)}
+        {() => resolve(props.content)}
       </div>
     </div>
   );

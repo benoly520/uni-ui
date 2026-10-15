@@ -20,7 +20,6 @@ export interface InputProps {
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
   'aria-label'?: MaybeGetter<string>;
-  [key: string]: any;
 }
 
 /**
@@ -28,60 +27,60 @@ export interface InputProps {
  * 受控/非受控；error 加 --error 类与 aria-invalid；前后缀包入 .ui-input-wrap。
  */
 export function Input(props: InputProps) {
-  const {
-    value,
-    defaultValue,
-    onChange,
-    size = 'md',
-    disabled = false,
-    error = false,
-    placeholder,
-    type = 'text',
-    name,
-    id,
-    prefix,
-    suffix,
-    className,
-    style,
-    'aria-label': ariaLabel,
-    ...rest
-  } = props;
-  const isControlled = value != null;
+  const isControlled = () => resolve(props.value) != null;
+  const size = () => resolve(props.size) ?? 'md';
+  const disabled = () => resolve(props.disabled) ?? false;
+  const error = () => resolve(props.error) ?? false;
   const inner = signal<string>(
-    value != null ? String(resolve(value)) : defaultValue != null ? String(resolve(defaultValue)) : '',
+    resolve(props.value) != null
+      ? String(resolve(props.value))
+      : resolve(props.defaultValue) != null
+        ? String(resolve(props.defaultValue))
+        : '',
   );
+  const cur = () => (isControlled() ? String(resolve(props.value)) : inner());
 
-  const renderInput = () => (
-    <input
-      class={cx(
-        'ui-input',
-        resolve(size) !== 'md' && 'ui-size-' + resolve(size),
-        resolve(error) && 'ui-input--error',
-      )}
-      type={resolve(type)}
-      value={isControlled ? String(resolve(value)) : inner()}
-      placeholder={resolve(placeholder)}
-      name={resolve(name)}
-      id={resolve(id)}
-      disabled={resolve(disabled)}
-      aria-invalid={resolve(error) || undefined}
-      aria-label={resolve(ariaLabel)}
-      onInput={(e: Event) => {
-        const v = (e.target as HTMLInputElement).value;
-        if (!isControlled) inner.set(v);
-        onChange?.(v, e);
-      }}
-    />
-  );
-
-  const p = resolve(prefix);
-  const s = resolve(suffix);
-  if (p == null && s == null) return renderInput();
+  const prefix = () => resolve(props.prefix);
+  const suffix = () => resolve(props.suffix);
+  const showWrap = () => prefix() != null || suffix() != null;
+  const onInput = (e: Event) => {
+    const v = (e.target as HTMLInputElement).value;
+    if (!isControlled()) inner.set(v);
+    props.onChange?.(v, e);
+  };
   return (
-    <span {...rest} class="ui-input-wrap" style={resolve(style)}>
-      {p != null && <span class="ui-icon" aria-hidden="true">{p}</span>}
-      {renderInput()}
-      {s != null && <span class="ui-icon" aria-hidden="true">{s}</span>}
-    </span>
+    <>
+      {showWrap() ? (
+        <span class="ui-input-wrap" style={resolve(props.style)}>
+          {prefix() != null && <span class="ui-icon" aria-hidden="true">{prefix()}</span>}
+          <input
+            class={cx('ui-input', size() !== 'md' && 'ui-size-' + size(), error() && 'ui-input--error')}
+            type={resolve(props.type) ?? 'text'}
+            value={cur()}
+            placeholder={resolve(props.placeholder)}
+            name={resolve(props.name)}
+            id={resolve(props.id)}
+            disabled={disabled()}
+            aria-invalid={error() || undefined}
+            aria-label={resolve(props['aria-label'])}
+            onInput={onInput}
+          />
+          {suffix() != null && <span class="ui-icon" aria-hidden="true">{suffix()}</span>}
+        </span>
+      ) : (
+        <input
+          class={cx('ui-input', size() !== 'md' && 'ui-size-' + size(), error() && 'ui-input--error')}
+          type={resolve(props.type) ?? 'text'}
+          value={cur()}
+          placeholder={resolve(props.placeholder)}
+          name={resolve(props.name)}
+          id={resolve(props.id)}
+          disabled={disabled()}
+          aria-invalid={error() || undefined}
+          aria-label={resolve(props['aria-label'])}
+          onInput={onInput}
+        />
+      )}
+    </>
   );
 }

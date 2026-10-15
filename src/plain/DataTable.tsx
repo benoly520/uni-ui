@@ -38,7 +38,7 @@ export interface DataTableProps {
   onSelect?: (keys: string[]) => void;
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 function sortRows(
@@ -71,50 +71,33 @@ function sortRows(
 
 /**
  * DataTable · 数据表（数据表单组）
- * - 紧凑 / 列排序 / 可选行多选冻结首列
- * - 受控/非受控排序与选择；排序与选中不改原 data
+ * 紧凑 / 列排序 / 可选行多选 / 冻结首列；受控 / 非受控排序与选择，不改原 data。
  */
 export function DataTable(props: DataTableProps) {
-  const {
-    columns,
-    data,
-    compact = false,
-    selectable = false,
-    rowKey = 'id',
-    sortKey,
-    sortDir,
-    defaultSortKey,
-    defaultSortDir = 'asc',
-    selectedKeys,
-    onSort,
-    onSelect,
-    className,
-    style,
-    ...rest
-  } = props;
-
-  const isSortControlled = sortKey != null;
+  const compact = () => resolve(props.compact) ?? false;
+  const selectable = () => resolve(props.selectable) ?? false;
+  const rowKey = () => resolve(props.rowKey) ?? 'id';
+  const isSortControlled = () => resolve(props.sortKey) != null;
   const sortInner = signal<{ key?: string; dir: 'asc' | 'desc' }>({
-    key: resolve(defaultSortKey),
-    dir: (resolve(defaultSortDir) as 'asc' | 'desc') || 'asc',
+    key: resolve(props.defaultSortKey),
+    dir: (resolve(props.defaultSortDir) as 'asc' | 'desc') || 'asc',
   });
   const curSort = (): { key?: string; dir: 'asc' | 'desc' } =>
-    isSortControlled
-      ? { key: resolve(sortKey), dir: (resolve(sortDir) as 'asc' | 'desc') || 'asc' }
+    isSortControlled()
+      ? { key: resolve(props.sortKey), dir: (resolve(props.sortDir) as 'asc' | 'desc') || 'asc' }
       : sortInner();
-
-  const isSelControlled = selectedKeys != null;
+  const isSelControlled = () => resolve(props.selectedKeys) != null;
   const selInner = signal<string[]>([]);
   const selected = (): string[] =>
-    isSelControlled ? (resolve(selectedKeys) as string[]) : selInner();
+    isSelControlled() ? (resolve(props.selectedKeys) as string[]) : selInner();
   const selectedSet = () => new Set(selected());
 
-  const dataRows = () => resolve(data) as Record<string, any>[];
-
+  const dataRows = () => resolve(props.data) as Record<string, any>[];
+  const columnsArr = () => resolve(props.columns) as DataTableColumn[];
   const displayed = () => {
     const s = curSort();
     if (!s.key) return dataRows();
-    const col = (resolve(columns) as DataTableColumn[]).find((c) => c.key === s.key);
+    const col = columnsArr().find((c) => c.key === s.key);
     return sortRows(dataRows(), s.key, s.dir, !!col?.numeric);
   };
 
@@ -124,13 +107,13 @@ export function DataTable(props: DataTableProps) {
     const isSorted = cur.key === col.key;
     const asc = !isSorted || cur.dir === 'desc';
     const nextDir: 'asc' | 'desc' = asc ? 'asc' : 'desc';
-    if (!isSortControlled) sortInner.set({ key: col.key, dir: nextDir });
-    onSort?.(col.key, nextDir);
+    if (!isSortControlled()) sortInner.set({ key: col.key, dir: nextDir });
+    props.onSort?.(col.key, nextDir);
   };
 
   const commitSel = (next: string[]) => {
-    if (!isSelControlled) selInner.set(next);
-    onSelect?.(next);
+    if (!isSelControlled()) selInner.set(next);
+    props.onSelect?.(next);
   };
   const toggleRow = (key: string) => {
     const s = selectedSet();
@@ -139,33 +122,33 @@ export function DataTable(props: DataTableProps) {
   };
   const allChecked = () => {
     const d = displayed();
-    return d.length > 0 && d.every((r) => selectedSet().has(r[resolve(rowKey)]));
+    return d.length > 0 && d.every((r) => selectedSet().has(r[rowKey()]));
   };
   const toggleAll = () => {
     if (allChecked()) {
-      const removeKeys = new Set(displayed().map((r) => r[resolve(rowKey)]));
+      const removeKeys = new Set(displayed().map((r) => r[rowKey()]));
       commitSel(selected().filter((k) => !removeKeys.has(k)));
     } else {
-      const add = displayed().map((r) => r[resolve(rowKey)]);
+      const add = displayed().map((r) => r[rowKey()]);
       commitSel(Array.from(new Set([...selected(), ...add])));
     }
   };
 
   return (
     <div
-      {...rest}
+      id={resolve(props.id)}
       class={cx(
         'ui-table',
-        resolve(compact) && 'ui-table--compact',
-        resolve(selectable) && 'ui-table--selectable',
-        resolve(className),
+        compact() && 'ui-table--compact',
+        selectable() && 'ui-table--selectable',
+        resolve(props.className),
       )}
-      style={resolve(style)}
+      style={resolve(props.style)}
     >
       <table>
         <thead>
           <tr>
-            {resolve(selectable) && (
+            {selectable() && (
               <th class="col-check">
                 <input
                   type="checkbox"
@@ -176,7 +159,7 @@ export function DataTable(props: DataTableProps) {
                 />
               </th>
             )}
-            {(resolve(columns) as DataTableColumn[]).map((col) => {
+            {columnsArr().map((col) => {
               const isSorted = () => curSort().key === col.key;
               return (
                 <th
@@ -199,19 +182,18 @@ export function DataTable(props: DataTableProps) {
         </thead>
         <tbody>
           {displayed().map((row, ri) => {
-            const key = row[resolve(rowKey)] as string;
+            const key = row[rowKey()] as string;
             const isSel = () => selectedSet().has(key);
             return (
               <tr
                 class={cx(isSel() && 'is-selected')}
                 aria-selected={isSel() || undefined}
                 onClick={(e: MouseEvent) => {
-                  if (resolve(selectable) && (e.target as HTMLElement).closest('.col-check'))
-                    return;
-                  if (resolve(selectable)) toggleRow(key);
+                  if (selectable() && (e.target as HTMLElement).closest('.col-check')) return;
+                  if (selectable()) toggleRow(key);
                 }}
               >
-                {resolve(selectable) && (
+                {selectable() && (
                   <td class="col-check">
                     <input
                       type="checkbox"
@@ -223,7 +205,7 @@ export function DataTable(props: DataTableProps) {
                     />
                   </td>
                 )}
-                {(resolve(columns) as DataTableColumn[]).map((col) => (
+                {columnsArr().map((col) => (
                   <td
                     class={cx(col.sticky && 'sticky-col', col.numeric && 'ui-num')}
                     data-num={col.numeric || undefined}

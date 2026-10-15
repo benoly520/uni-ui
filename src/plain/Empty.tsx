@@ -8,7 +8,7 @@ export interface EmptyProps {
   children?: Renderable | (() => Renderable);
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 /**
@@ -16,14 +16,19 @@ export interface EmptyProps {
  * 默认图标用 <i data-lucide="table">；可传 description / icon / 操作区 children。
  */
 export function Empty(props: EmptyProps) {
-  const { description, icon, children, className, style, ...rest } = props;
   return (
-    <div {...rest} class={cx('ui-empty', resolve(className))} style={resolve(style)}>
+    <div
+      id={resolve(props.id)}
+      class={cx('ui-empty', resolve(props.className))}
+      style={resolve(props.style)}
+    >
       <span class="ico ui-icon">
-        {resolve(icon) != null ? resolve(icon) : <i data-lucide="table"></i>}
+        {resolve(props.icon) != null ? resolve(props.icon) : <i data-lucide="table"></i>}
       </span>
-      {resolve(description) != null && <span class="ui-label">{resolve(description)}</span>}
-      {resolve(children)}
+      {resolve(props.description) != null && (
+        <span class="ui-label">{resolve(props.description)}</span>
+      )}
+      {resolve(props.children)}
     </div>
   );
 }

@@ -17,52 +17,52 @@ export interface AccordionProps {
   onChange?: (keys: string[]) => void;
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 let accSeq = 0;
 
 /**
  * Accordion · 手风琴（基础）
- * 多组可同时展开；面板 maxHeight 用 effect + rAF 测量（plain JSX 无 ref）。
+ * 多组可同时展开；面板 maxHeight 用 effect + rAF 测量。
+ * 用 ref 抓取根节点定位面板，消除旧实现在文档上按 id 查询的做法。
  */
 export function Accordion(props: AccordionProps) {
-  const {
-    items,
-    activeKeys,
-    defaultActiveKeys,
-    onChange,
-    className,
-    style,
-    ...rest
-  } = props;
+  const itemsArr = () => resolve(props.items) || [];
+  const isControlled = () => resolve(props.activeKeys) != null;
   const uid = 'acc-' + ++accSeq;
-  const isControlled = activeKeys != null;
   const inner = signal<string[]>(
-    defaultActiveKeys != null ? [...(resolve(defaultActiveKeys) as string[])] : [],
+    props.defaultActiveKeys != null ? [...(resolve(props.defaultActiveKeys) as string[])] : [],
   );
   const openSet = () =>
-    new Set(isControlled ? (resolve(activeKeys) as string[]) || [] : inner());
+    new Set(isControlled() ? (resolve(props.activeKeys) as string[]) || [] : inner());
 
   const toggle = (key: string) => {
     const set = new Set(openSet());
     if (set.has(key)) set.delete(key);
     else set.add(key);
-    if (!isControlled) inner.set([...set]);
-    onChange?.([...set]);
+    if (!isControlled()) inner.set([...set]);
+    props.onChange?.([...set]);
   };
 
-  const arr = resolve(items) || [];
+  let accEl: HTMLElement | null = null;
+  const refRoot = (el: HTMLElement) => {
+    accEl = el;
+  };
+
   return (
-    <div {...rest} id={uid} class={cx('ui-accordion', resolve(className))} style={resolve(style)}>
-      {arr.map((git) => {
-        const item = git;
+    <div
+      id={resolve(props.id) || uid}
+      ref={refRoot}
+      class={cx('ui-accordion', resolve(props.className))}
+      style={resolve(props.style)}
+    >
+      {itemsArr().map((item) => {
         const isOpen = () => openSet().has(item.key);
         effect(() => {
           const open = isOpen();
           requestAnimationFrame(() => {
-            const root = document.getElementById(uid);
-            const panel = root?.querySelector(
+            const panel = accEl?.querySelector(
               '[data-key="' + item.key + '"] .ui-accordion-panel',
             ) as HTMLElement | null;
             if (panel) panel.style.maxHeight = open ? panel.scrollHeight + 'px' : '0px';

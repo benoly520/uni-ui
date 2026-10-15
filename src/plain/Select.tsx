@@ -20,7 +20,7 @@ export interface SelectProps {
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
   'aria-label'?: MaybeGetter<string>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 /**
@@ -28,49 +28,41 @@ export interface SelectProps {
  * 单/多选；可搜索过滤；受控/非受控；点击外部 / Esc 关闭。
  */
 export function Select(props: SelectProps) {
-  const {
-    options,
-    value,
-    defaultValue,
-    multiple = false,
-    searchable = false,
-    placeholder = '请选择',
-    onChange,
-    className,
-    style,
-    'aria-label': ariaLabel,
-    ...rest
-  } = props;
-  const isControlled = value != null;
   const toArr = (v: any): string[] => (v == null ? [] : Array.isArray(v) ? [...v] : [v]);
+  const isControlled = () => resolve(props.value) != null;
   const inner = signal<string[]>(
-    isControlled ? toArr(resolve(value)) : defaultValue != null ? toArr(resolve(defaultValue)) : [],
+    isControlled()
+      ? toArr(resolve(props.value))
+      : resolve(props.defaultValue) != null
+        ? toArr(resolve(props.defaultValue))
+        : [],
   );
-  const selected = () => (isControlled ? toArr(resolve(value)) : inner());
+  const selected = () => (isControlled() ? toArr(resolve(props.value)) : inner());
   const open = signal(false);
   const query = signal('');
-  const isMulti = () => !!resolve(multiple);
-  const dataMultiple = () => (isMulti() ? '' : undefined);
+  const isMulti = () => !!resolve(props.multiple);
+  const searchable = () => resolve(props.searchable) ?? false;
+  const placeholder = () => resolve(props.placeholder) ?? '请选择';
+  const ariaLabel = () => resolve(props['aria-label']);
 
+  const opts = () => resolve(props.options) || [];
   const labelText = () => {
     const sel = selected();
-    const opts = resolve(options) || [];
-    if (!sel.length) return resolve(placeholder);
+    const o = opts() || [];
+    if (!sel.length) return placeholder();
     const labels = sel
-      .map((v) => ((opts.find((o) => o.value === v) as SelectOption) || ({} as any)).label)
+      .map((v) => ((o.find((x) => x.value === v) as SelectOption) || ({} as any)).label)
       .filter(Boolean);
-    return isMulti() ? labels.join('、') : labels[0] ?? resolve(placeholder);
+    return isMulti() ? labels.join('、') : labels[0] ?? placeholder();
   };
-
   const filtered = () => {
     const q = query().toLowerCase();
-    const opts = resolve(options) || [];
-    if (!resolve(searchable) || !q) return opts;
-    return opts.filter(
-      (o) => o.label.toLowerCase().includes(q) || o.value.toLowerCase().includes(q),
+    const o = opts() || [];
+    if (!searchable() || !q) return o;
+    return o.filter(
+      (x) => x.label.toLowerCase().includes(q) || x.value.toLowerCase().includes(q),
     );
   };
-
   const onOptionClick = (o: SelectOption) => {
     if (o.disabled) return;
     if (isMulti()) {
@@ -78,24 +70,24 @@ export function Select(props: SelectProps) {
       if (set.has(o.value)) set.delete(o.value);
       else set.add(o.value);
       const next = [...set];
-      if (!isControlled) inner.set(next);
-      const opts = (resolve(options) || []).filter((x) => next.includes(x.value));
-      onChange?.(next, opts);
+      if (!isControlled()) inner.set(next);
+      const selOpts = (opts() || []).filter((x) => next.includes(x.value));
+      props.onChange?.(next, selOpts);
     } else {
       const next = [o.value];
-      if (!isControlled) inner.set(next);
-      onChange?.(o.value, o);
+      if (!isControlled()) inner.set(next);
+      props.onChange?.(o.value, o);
       open.set(false);
     }
   };
 
   return (
     <div
-      {...rest}
-      class={cx('ui-select', open() && 'open', resolve(className))}
-      data-multiple={dataMultiple()}
-      aria-label={resolve(ariaLabel)}
-      style={resolve(style)}
+      id={resolve(props.id)}
+      class={cx('ui-select', open() && 'open', resolve(props.className))}
+      data-multiple={isMulti() ? '' : undefined}
+      aria-label={ariaLabel()}
+      style={resolve(props.style)}
     >
       <button
         class="ui-select-trigger"
@@ -113,7 +105,7 @@ export function Select(props: SelectProps) {
       </button>
       {open() ? (
         <div class="ui-select-menu" role="listbox">
-          {resolve(searchable) && (
+          {searchable() && (
             <input
               class="ui-select-search"
               placeholder="搜索…"
@@ -124,13 +116,12 @@ export function Select(props: SelectProps) {
           {filtered().map((git) => {
             const o = git;
             const isSel = () => selected().includes(o.value);
-            const ariaSelected = () => (isSel() ? 'true' : 'false');
             return (
               <div
                 class={cx(isMulti() && 'multi', isSel() && 'is-selected')}
                 role="option"
                 data-val={o.value}
-                aria-selected={ariaSelected()}
+                aria-selected={isSel() ? 'true' : 'false'}
                 onClick={(e: MouseEvent) => {
                   e.stopPropagation();
                   onOptionClick(o);

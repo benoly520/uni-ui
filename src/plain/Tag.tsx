@@ -12,11 +12,11 @@ export interface TagProps {
   onClose?: () => void;
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
+  id?: MaybeGetter<string>;
   children?: Renderable | (() => Renderable);
-  [key: string]: any;
 }
 
-/** 合并 color 覆盖 + 透传 style */
+/** 合并 color 覆盖 + 透传 style（作为 JSX 属性表达式，编译器自动按依赖重跑） */
 function tagStyle(color: any, style: any): any {
   if (color) return { color, borderColor: color, ...(style || {}) };
   return style;
@@ -27,32 +27,28 @@ function tagStyle(color: any, style: any): any {
  * 语义类型 brand/up/down/default；closable 渲染关闭按钮；color 覆盖 type 配色。
  */
 export function Tag(props: TagProps) {
-  const {
-    type = 'default',
-    closable = false,
-    color,
-    icon,
-    onClose,
-    className,
-    style,
-    children,
-    ...rest
-  } = props;
+  const type = () => resolve(props.type) ?? 'default';
+  const closable = () => resolve(props.closable) ?? false;
   return (
     <span
-      {...rest}
+      id={resolve(props.id)}
       class={cx(
         'ui-tag',
-        resolve(type) !== 'default' && 'ui-tag--' + resolve(type),
-        resolve(closable) && 'ui-tag--closable',
-        resolve(className),
+        type() !== 'default' && 'ui-tag--' + type(),
+        closable() && 'ui-tag--closable',
+        resolve(props.className),
       )}
-      style={tagStyle(resolve(color), resolve(style))}
+      style={tagStyle(resolve(props.color), resolve(props.style))}
     >
-      {resolve(icon) != null && <span class="ui-icon">{resolve(icon)}</span>}
-      {resolve(children)}
-      {resolve(closable) && (
-        <button type="button" class="ui-tag-close" aria-label="关闭" onClick={() => onClose?.()}>
+      {resolve(props.icon) != null && <span class="ui-icon">{resolve(props.icon)}</span>}
+      {resolve(props.children)}
+      {closable() && (
+        <button
+          type="button"
+          class="ui-tag-close"
+          aria-label="关闭"
+          onClick={() => props.onClose?.()}
+        >
           ×
         </button>
       )}

@@ -12,7 +12,7 @@ export interface PaginationProps {
   'aria-label'?: MaybeGetter<string>;
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 function range(start: number, end: number): number[] {
@@ -41,49 +41,50 @@ function getPages(current: number, totalPages: number, sibling: number): (number
 
 /**
  * Pagination · 分页（导航）
- * 受控/非受控；超出时显示省略号（1 … left..right … total）。
+ * 受控 / 非受控；超出时显示省略号（1 … left..right … total）。
  */
 export function Pagination(props: PaginationProps) {
-  const {
-    total,
-    pageSize = 10,
-    page,
-    defaultPage = 1,
-    onChange,
-    siblingCount = 1,
-    'aria-label': ariaLabel = '分页',
-    className,
-    style,
-    ...rest
-  } = props;
-  const isControlled = page != null;
-  const inner = signal<number>(Number(resolve(defaultPage)));
-  const cur = () => (isControlled ? Number(resolve(page)) : inner());
+  const isControlled = () => resolve(props.page) != null;
+  const inner = signal<number>(Number(resolve(props.defaultPage) ?? 1));
+  const cur = () => (isControlled() ? Number(resolve(props.page)) : inner());
   const totalPages = () =>
-    Math.max(1, Math.ceil(Number(resolve(total)) / Number(resolve(pageSize))));
+    Math.max(1, Math.ceil(Number(resolve(props.total)) / Number(resolve(props.pageSize) ?? 10)));
+  const sibling = () => Number(resolve(props.siblingCount) ?? 1);
+  const ariaLabel = () => resolve(props['aria-label']) ?? '分页';
+
   const go = (p: number) => {
     const tp = totalPages();
     const next = Math.min(tp, Math.max(1, p));
     if (next === cur()) return;
-    if (!isControlled) inner.set(next);
-    onChange?.(next);
+    if (!isControlled()) inner.set(next);
+    props.onChange?.(next);
   };
   return (
     <nav
-      {...rest}
-      class={cx('ui-pagination', resolve(className))}
+      id={resolve(props.id)}
+      class={cx('ui-pagination', resolve(props.className))}
       role="navigation"
-      aria-label={resolve(ariaLabel)}
-      style={resolve(style)}
+      aria-label={ariaLabel()}
+      style={resolve(props.style)}
     >
-      <button aria-label="上一页" data-prev={true} disabled={cur() <= 1} onClick={() => go(cur() - 1)}>
+      <button
+        aria-label="上一页"
+        data-prev={true}
+        disabled={cur() <= 1}
+        onClick={() => go(cur() - 1)}
+      >
         ‹
       </button>
-      {getPages(cur(), totalPages(), Number(resolve(siblingCount))).map((git) => {
+      {getPages(cur(), totalPages(), sibling()).map((git) => {
         const it = git;
         if (String(it) === '...')
           return (
-            <button class="ui-pagination--ellipsis" type="button" disabled={true} aria-label="更多页">
+            <button
+              class="ui-pagination--ellipsis"
+              type="button"
+              disabled={true}
+              aria-label="更多页"
+            >
               …
             </button>
           );
@@ -100,7 +101,12 @@ export function Pagination(props: PaginationProps) {
           </button>
         );
       })}
-      <button aria-label="下一页" data-next={true} disabled={cur() >= totalPages()} onClick={() => go(cur() + 1)}>
+      <button
+        aria-label="下一页"
+        data-next={true}
+        disabled={cur() >= totalPages()}
+        onClick={() => go(cur() + 1)}
+      >
         ›
       </button>
     </nav>

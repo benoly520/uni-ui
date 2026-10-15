@@ -11,7 +11,7 @@ export interface SkeletonProps {
   active?: MaybeGetter<boolean>;
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 function toSize(v: any): string | undefined {
@@ -23,19 +23,19 @@ function toSize(v: any): string | undefined {
  * 形状 text/circle/rect；尺寸数字转 px；active 控制微光动画（data-active 标记）。
  */
 export function Skeleton(props: SkeletonProps) {
-  const { shape = 'rect', width, height, active = true, className, style, ...rest } = props;
-  const activeAttr = () => (resolve(active) ? 'true' : 'false');
+  const shape = () => resolve(props.shape) ?? 'rect';
+  const active = () => resolve(props.active) ?? true;
   return (
     <div
-      {...rest}
-      class={cx('ui-skeleton', resolve(className))}
+      id={resolve(props.id)}
+      class={cx('ui-skeleton', resolve(props.className))}
       role="presentation"
-      data-active={activeAttr()}
+      data-active={active() ? 'true' : 'false'}
       style={() => {
-        const shp = resolve(shape);
+        const shp = shape();
         const s: any = {};
-        const w = toSize(resolve(width));
-        const h = toSize(resolve(height));
+        const w = toSize(resolve(props.width));
+        const h = toSize(resolve(props.height));
         if (shp === 'circle') {
           s.width = w ?? h ?? '40px';
           s.height = h ?? w ?? '40px';
@@ -48,7 +48,7 @@ export function Skeleton(props: SkeletonProps) {
           if (w) s.width = w;
           if (h) s.height = h;
         }
-        const extra = resolve(style);
+        const extra = resolve(props.style);
         return { ...s, ...(typeof extra === 'string' ? {} : extra || {}) };
       }}
     ></div>

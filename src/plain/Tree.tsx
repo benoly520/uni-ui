@@ -22,7 +22,7 @@ export interface TreeProps {
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
   'aria-label'?: MaybeGetter<string>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 function allParentKeys(nodes: any[], acc: string[] = []): string[] {
@@ -40,42 +40,30 @@ function allParentKeys(nodes: any[], acc: string[] = []): string[] {
  * 层级展示 / 勾选；展开、勾选均支持受控与默认态；勾选不触发折叠。
  */
 export function Tree(props: TreeProps) {
-  const {
-    data,
-    checkable = true,
-    defaultExpandedKeys,
-    defaultCheckedKeys,
-    expandedKeys,
-    checkedKeys,
-    onExpand,
-    onCheck,
-    className,
-    style,
-    'aria-label': ariaLabel = '树',
-    ...rest
-  } = props;
+  const checkable = () => resolve(props.checkable) ?? true;
+  // 受控 / 非受控模式在挂载时确定（与 React 一致：prop != null 即为受控）
+  const expControlled = resolve(props.expandedKeys) != null;
+  const chkControlled = resolve(props.checkedKeys) != null;
 
-  const expControlled = expandedKeys != null;
   const expInner = signal<string[]>(
     expControlled
-      ? [...(resolve(expandedKeys) as string[])]
-      : defaultExpandedKeys != null
-        ? [...(resolve(defaultExpandedKeys) as string[])]
-        : allParentKeys(resolve(data) as TreeData[]),
+      ? [...(resolve(props.expandedKeys) as string[])]
+      : props.defaultExpandedKeys != null
+        ? [...(resolve(props.defaultExpandedKeys) as string[])]
+        : allParentKeys(resolve(props.data) as TreeData[]),
   );
   const expSet = () =>
-    new Set(expControlled ? (resolve(expandedKeys) as string[]) || [] : expInner());
+    new Set(expControlled ? (resolve(props.expandedKeys) as string[]) || [] : expInner());
 
-  const chkControlled = checkedKeys != null;
   const chkInner = signal<string[]>(
     chkControlled
-      ? [...(resolve(checkedKeys) as string[])]
-      : defaultCheckedKeys != null
-        ? [...(resolve(defaultCheckedKeys) as string[])]
+      ? [...(resolve(props.checkedKeys) as string[])]
+      : props.defaultCheckedKeys != null
+        ? [...(resolve(props.defaultCheckedKeys) as string[])]
         : [],
   );
   const chkSet = () =>
-    new Set(chkControlled ? (resolve(checkedKeys) as string[]) || [] : chkInner());
+    new Set(chkControlled ? (resolve(props.checkedKeys) as string[]) || [] : chkInner());
 
   const toggleExpand = (node: TreeData) => {
     const set = new Set(expSet());
@@ -83,7 +71,7 @@ export function Tree(props: TreeProps) {
     if (wasOpen) set.delete(node.key);
     else set.add(node.key);
     if (!expControlled) expInner.set([...set]);
-    onExpand?.([...set], { key: node.key, expanded: !wasOpen });
+    props.onExpand?.([...set], { key: node.key, expanded: !wasOpen });
   };
   const toggleCheck = (node: TreeData) => {
     const set = new Set(chkSet());
@@ -91,17 +79,23 @@ export function Tree(props: TreeProps) {
     if (wasOn) set.delete(node.key);
     else set.add(node.key);
     if (!chkControlled) chkInner.set([...set]);
-    onCheck?.([...set], { key: node.key, checked: !wasOn });
+    props.onCheck?.([...set], { key: node.key, checked: !wasOn });
   };
 
+  // 说明：renderNode 是被当作「子组件」对待的（命名函数返回 JSX），其入参 node
+  // 被视为 props，故所有属性读取都用 resolve(node.x)（同组件 props 的读法）。
   const renderNode = (node: TreeData) => {
-    const hasChildren = !!(node.children && node.children.length);
-    const isOpen = () => expSet().has(node.key);
-    const isOn = () => chkSet().has(node.key);
-    const ariaExpanded = () => (!hasChildren ? undefined : isOpen() ? 'true' : 'false');
+    const label = () => resolve(node.label);
+    const key = () => resolve(node.key);
+    const count = () => resolve(node.count);
+    const children = () => resolve(node.children);
+    const hasChildren = () => !!(children() && children()!.length);
+    const isOpen = () => expSet().has(key());
+    const isOn = () => chkSet().has(key());
+    const ariaExpanded = () => (!hasChildren() ? undefined : isOpen() ? 'true' : 'false');
     return (
       <li
-        class={cx('ui-tree-node', !hasChildren && 'ui-tree-leaf', !isOpen() && 'is-collapsed')}
+        class={cx('ui-tree-node', !hasChildren() && 'ui-tree-leaf', !isOpen() && 'is-collapsed')}
         role="treeitem"
         aria-expanded={ariaExpanded()}
       >
@@ -109,50 +103,52 @@ export function Tree(props: TreeProps) {
           class="ui-tree-row"
           onClick={(e: MouseEvent) => {
             if ((e.target as HTMLElement).closest('.ui-tree-check')) return;
-            if (hasChildren) toggleExpand(node);
+            if (hasChildren()) toggleExpand(node);
           }}
         >
           <span
             class="ui-tree-caret ui-icon"
             onClick={(e: MouseEvent) => {
               e.stopPropagation();
-              if (hasChildren) toggleExpand(node);
+              if (hasChildren()) toggleExpand(node);
             }}
           >
             <IconCaret />
           </span>
-          {resolve(checkable) && (
+          {checkable() && (
             <input
               class="ui-tree-check"
               type="checkbox"
               checked={isOn()}
-              aria-label={'选择 ' + node.label}
+              aria-label={'选择 ' + label()}
               onClick={(e: MouseEvent) => e.stopPropagation()}
               onChange={() => toggleCheck(node)}
             />
           )}
-          <span class="ui-tree-label">{node.label}</span>
-          {node.count != null && <span class="ui-tree-count">{'' + node.count}</span>}
+          <span class="ui-tree-label">{label()}</span>
+          {count() != null && <span class="ui-tree-count">{'' + count()}</span>}
         </div>
-        {hasChildren && isOpen() && (
+        {hasChildren() && isOpen() && (
           <ul class="ui-tree-children">
-            {(node.children || []).map((gc) => renderNode(gc))}
+            {(children() || []).map((gc) => renderNode(gc))}
           </ul>
         )}
       </li>
     );
   };
 
+  const ariaLabel = () => resolve(props['aria-label']) ?? '树';
+
   return (
     <div
-      {...rest}
-      class={cx('ui-tree', resolve(className))}
+      id={resolve(props.id)}
+      class={cx('ui-tree', resolve(props.className))}
       role="tree"
-      aria-label={resolve(ariaLabel)}
-      style={resolve(style)}
+      aria-label={ariaLabel()}
+      style={resolve(props.style)}
     >
       <ul class="ui-tree-children">
-        {(resolve(data) as TreeData[]).map((gn) => renderNode(gn))}
+        {(resolve(props.data) as TreeData[]).map((gn) => renderNode(gn))}
       </ul>
     </div>
   );

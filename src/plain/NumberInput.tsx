@@ -1,6 +1,6 @@
 import { resolve, signal } from 'plain';
 import { cx } from './_shared';
-import type { MaybeGetter, Renderable } from './_shared';
+import type { MaybeGetter } from './_shared';
 
 export interface NumberInputProps {
   min?: MaybeGetter<number>;
@@ -15,7 +15,7 @@ export interface NumberInputProps {
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
   'aria-label'?: MaybeGetter<string>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 function escapeRe(s: string): string {
@@ -27,31 +27,24 @@ function escapeRe(s: string): string {
  * 千分位 + 定点格式化；支持前缀/后缀符号；步进、失焦、回车提交均做 [min,max] 钳制。
  */
 export function NumberInput(props: NumberInputProps) {
-  const {
-    min = -Infinity,
-    max = Infinity,
-    step = 1,
-    precision = 0,
-    prefix,
-    suffix,
-    value,
-    defaultValue = 0,
-    onChange,
-    className,
-    style,
-    'aria-label': ariaLabel,
-    ...rest
-  } = props;
-  const isControlled = value != null;
+  const min = () => resolve(props.min) ?? -Infinity;
+  const max = () => resolve(props.max) ?? Infinity;
+  const step = () => resolve(props.step) ?? 1;
+  const precision = () => resolve(props.precision) ?? 0;
+  const prefix = () => resolve(props.prefix);
+  const suffix = () => resolve(props.suffix);
+  const isControlled = () => resolve(props.value) != null;
   const inner = signal<number>(
-    value != null ? Number(resolve(value)) : Number(resolve(defaultValue)),
+    resolve(props.value) != null
+      ? Number(resolve(props.value))
+      : Number(resolve(props.defaultValue) ?? 0),
   );
   const draft = signal<string | null>(null);
 
-  const clamp = (n: number) => Math.min(Number(resolve(max)), Math.max(Number(resolve(min)), n));
+  const clamp = (n: number) => Math.min(Number(max()), Math.max(Number(min()), n));
   const parse = (s: string): number | null => {
-    const pp = resolve(prefix) ?? '';
-    const ss = resolve(suffix) ?? '';
+    const pp = prefix() ?? '';
+    const ss = suffix() ?? '';
     const cleaned = String(s)
       .replace(new RegExp(escapeRe(pp) + '|' + escapeRe(ss), 'g'), '')
       .replace(/,/g, '')
@@ -61,43 +54,42 @@ export function NumberInput(props: NumberInputProps) {
   };
   const commit = (n: number) => {
     const c = clamp(n);
-    if (!isControlled) inner.set(c);
-    onChange?.(c);
+    if (!isControlled()) inner.set(c);
+    props.onChange?.(c);
     draft.set(null);
   };
   const display = () =>
     draft() != null
       ? (draft() as string)
-      : (resolve(prefix) ?? '') +
+      : (prefix() ?? '') +
         inner().toLocaleString('en-US', {
-          minimumFractionDigits: Number(resolve(precision)),
-          maximumFractionDigits: Number(resolve(precision)),
+          minimumFractionDigits: Number(precision()),
+          maximumFractionDigits: Number(precision()),
         }) +
-        (resolve(suffix) ?? '');
+        (suffix() ?? '');
 
-  const stepBy = (dir: number) => commit(clamp(inner() + dir * Number(resolve(step))));
-  const p = resolve(prefix);
-  const s = resolve(suffix);
+  const stepBy = (dir: number) => commit(clamp(inner() + dir * Number(step())));
+
   const dataNum = (v: any) => String(v);
 
   return (
     <div
-      {...rest}
-      class={cx('ui-number', resolve(className))}
-      data-min={dataNum(resolve(min))}
-      data-max={dataNum(resolve(max))}
-      data-step={dataNum(resolve(step))}
-      data-precision={dataNum(resolve(precision))}
-      data-prefix={p ?? ''}
-      data-suffix={s ?? ''}
-      aria-label={resolve(ariaLabel)}
-      style={resolve(style)}
+      id={resolve(props.id)}
+      class={cx('ui-number', resolve(props.className))}
+      data-min={dataNum(min())}
+      data-max={dataNum(max())}
+      data-step={dataNum(step())}
+      data-precision={dataNum(precision())}
+      data-prefix={prefix() ?? ''}
+      data-suffix={suffix() ?? ''}
+      aria-label={resolve(props['aria-label'])}
+      style={resolve(props.style)}
     >
-      {p != null && <span class="ui-number-prefix">{p}</span>}
+      {prefix() != null && <span class="ui-number-prefix">{prefix()}</span>}
       <input
         class="ui-number-input"
         inputMode="decimal"
-        aria-label={resolve(ariaLabel)}
+        aria-label={resolve(props['aria-label'])}
         value={display()}
         onInput={(e: Event) => draft.set((e.target as HTMLInputElement).value)}
         onBlur={(e: Event) => {
@@ -109,7 +101,7 @@ export function NumberInput(props: NumberInputProps) {
           if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
         }}
       />
-      {s != null && <span class="ui-number-suffix">{s}</span>}
+      {suffix() != null && <span class="ui-number-suffix">{suffix()}</span>}
       <button class="ui-number-step" data-step="down" aria-label="减少" onClick={() => stepBy(-1)}>
         −
       </button>

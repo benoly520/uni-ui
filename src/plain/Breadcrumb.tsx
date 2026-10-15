@@ -13,7 +13,7 @@ export interface BreadcrumbProps {
   'aria-label'?: MaybeGetter<string>;
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 /**
@@ -21,25 +21,19 @@ export interface BreadcrumbProps {
  * 末项标记为当前页（span.current + aria-current）；其余为链接 + 分隔符。
  */
 export function Breadcrumb(props: BreadcrumbProps) {
-  const {
-    items,
-    separator = '/',
-    'aria-label': ariaLabel = '路径导航',
-    className,
-    style,
-    ...rest
-  } = props;
-  const arr = resolve(items) || [];
+  const separator = () => resolve(props.separator) ?? '/';
+  const ariaLabel = () => resolve(props['aria-label']) ?? '路径导航';
+  const itemsArr = () => resolve(props.items) || [];
   return (
     <nav
-      {...rest}
-      class={cx('ui-breadcrumb', resolve(className))}
-      aria-label={resolve(ariaLabel)}
-      style={resolve(style)}
+      id={resolve(props.id)}
+      class={cx('ui-breadcrumb', resolve(props.className))}
+      aria-label={ariaLabel()}
+      style={resolve(props.style)}
     >
-      {arr.map((git, i) => {
+      {itemsArr().map((git, i) => {
         const it = git;
-        const last = i === arr.length - 1;
+        const last = i === itemsArr().length - 1;
         return last ? (
           <span class="current" aria-current="page">
             {it.label}
@@ -47,7 +41,7 @@ export function Breadcrumb(props: BreadcrumbProps) {
         ) : (
           <>
             {it.href ? <a href={it.href}>{it.label}</a> : <span>{it.label}</span>}
-            <span class="sep">{resolve(separator)}</span>
+            <span class="sep">{separator()}</span>
           </>
         );
       })}

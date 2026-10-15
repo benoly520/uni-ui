@@ -20,5 +20,5 @@
     "rootDir": "src",
     "types": ["react", "react-dom", "vite/client"]
   },
-  "include": ["src", "env.d.ts"]
+  "include": ["src/react", "src/vue", "src/utils", "env.d.ts"]
 }

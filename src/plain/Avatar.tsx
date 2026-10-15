@@ -15,7 +15,7 @@ export interface AvatarProps {
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
   'aria-label'?: MaybeGetter<string>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 const SIZE_PX: Record<string, number> = { xs: 24, sm: 28, md: 32, lg: 40 };
@@ -25,43 +25,39 @@ const SIZE_PX: Record<string, number> = { xs: 24, sm: 28, md: 32, lg: 40 };
  * 来源优先级 src > icon > text；尺寸 xs/sm/md/lg 或数字像素，文字字号按比例缩放。
  */
 export function Avatar(props: AvatarProps) {
-  const {
-    src,
-    alt = '',
-    text,
-    icon,
-    size = 'md',
-    tone = 'brand',
-    className,
-    style,
-    'aria-label': ariaLabel,
-    ...rest
-  } = props;
-  const sz = resolve(size);
-  const px = typeof sz === 'number' ? sz : SIZE_PX[sz] ?? 32;
-  const s = resolve(src);
+  const tone = () => resolve(props.tone) ?? 'brand';
+  const sizePx = () => {
+    const sz = resolve(props.size) ?? 'md';
+    return typeof sz === 'number' ? sz : SIZE_PX[sz] ?? 32;
+  };
   return (
     <span
-      {...rest}
-      class={cx('ui-avatar', resolve(className))}
-      aria-label={resolve(ariaLabel)}
+      id={resolve(props.id)}
+      class={cx('ui-avatar', resolve(props.className))}
+      aria-label={resolve(props['aria-label'])}
       style={() => {
+        const px = sizePx();
         const base: any = {
           width: px + 'px',
           height: px + 'px',
           fontSize: Math.round(px * 0.4) + 'px',
-          background: 'var(--ui-color-' + resolve(tone) + ')',
+          background: 'var(--ui-color-' + tone() + ')',
         };
-        const extra = resolve(style);
+        const extra = resolve(props.style);
         return { ...base, ...(typeof extra === 'string' ? {} : extra || {}) };
       }}
     >
-      {s ? (
-        <img class="ui-avatar-img" src={s} alt={resolve(alt)} />
+      {resolve(props.src) ? (
+        <img
+          class="ui-avatar-img"
+          src={resolve(props.src)}
+          alt={resolve(props.alt) ?? ''}
+        />
       ) : (
         <>
-          {resolve(icon) != null && <span class="ui-icon">{resolve(icon)}</span>}
-          {resolve(text) != null && document.createTextNode(String(resolve(text)))}
+          {resolve(props.icon) != null && <span class="ui-icon">{resolve(props.icon)}</span>}
+          {resolve(props.text) != null &&
+            document.createTextNode(String(resolve(props.text)))}
         </>
       )}
     </span>

@@ -31,51 +31,40 @@ export interface ContextMenuProps {
   'aria-label'?: MaybeGetter<string>;
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 /**
  * ContextMenu · 右键菜单（标的一行操作）
- * - 右键光标处弹出（近视口边缘翻转）、点项执行、外部/Esc 关闭、危险项红 hover
- * - 受控 open + 命令式 items；不携带样式，全部走 theme.css
+ * 右键光标处弹出（近视口边缘翻转）、点项执行、外部/Esc 关闭、危险项红 hover。
+ * 受控 open + 命令式 items。文档级监听在 ref 清理里回收，消除旧实现的监听器泄漏。
  */
 export function ContextMenu(props: ContextMenuProps) {
-  const {
-    items,
-    target,
-    open,
-    defaultOpen = false,
-    onOpenChange,
-    onSelect,
-    'aria-label': ariaLabel = '操作菜单',
-    className,
-    style,
-    ...rest
-  } = props;
-
-  const isControlled = open != null;
-  const inner = signal<boolean>(!!resolve(defaultOpen));
-  const shown = () => (isControlled ? !!resolve(open) : inner());
+  const items = () => resolve(props.items) || [];
+  const isControlled = () => resolve(props.open) != null;
+  const inner = signal<boolean>(!!(resolve(props.defaultOpen) ?? false));
+  const shown = () => (isControlled() ? !!resolve(props.open) : inner());
   const pos = signal<{ x: number; y: number }>({ x: 0, y: 0 });
+  const ariaLabel = () => resolve(props['aria-label']) ?? '操作菜单';
 
   const setOpen = (v: boolean) => {
-    if (!isControlled) inner.set(v);
-    onOpenChange?.(v);
+    if (!isControlled()) inner.set(v);
+    props.onOpenChange?.(v);
   };
   const close = () => setOpen(false);
-  const openAt = () => setOpen(true);
 
   const getTarget = (): HTMLElement | null => {
-    const t = resolve(target) as any;
+    const t = resolve(props.target) as any;
     if (!t) return null;
     if (t.current) return t.current as HTMLElement;
     if (typeof t === 'function') return t();
     return t as HTMLElement;
   };
 
+  let rootEl: HTMLElement | null = null;
   const fixEdge = () => {
     requestAnimationFrame(() => {
-      const menu = document.querySelector('.ui-contextmenu.is-open') as HTMLElement | null;
+      const menu = rootEl;
       if (!menu) return;
       const r = menu.getBoundingClientRect();
       const p = pos();
@@ -90,40 +79,53 @@ export function ContextMenu(props: ContextMenuProps) {
     if (shown()) fixEdge();
   });
 
-  requestAnimationFrame(() => {
-    const t = getTarget();
-    if (t && t.addEventListener) {
-      t.addEventListener('contextmenu', (e: MouseEvent) => {
-        e.preventDefault();
-        pos.set({ x: e.clientX, y: e.clientY });
-        openAt();
-      });
-    }
-    document.addEventListener('mousedown', onDoc);
-    document.addEventListener('keydown', onKey);
-  });
-
   const onDoc = (e: MouseEvent) => {
     if (!shown()) return;
-    const menus = Array.from(
-      document.querySelectorAll('.ui-contextmenu.is-open'),
-    ) as HTMLElement[];
-    if (menus.some((m) => m.contains(e.target as Node))) return;
+    if (rootEl && rootEl.contains(e.target as Node)) return;
     close();
   };
   const onKey = (e: KeyboardEvent) => {
     if (e.key === 'Escape' && shown()) close();
   };
 
+  const refCb = (el: HTMLElement) => {
+    rootEl = el;
+    const t = getTarget();
+    if (t && t.addEventListener) {
+      const onCtx = (e: MouseEvent) => {
+        e.preventDefault();
+        pos.set({ x: e.clientX, y: e.clientY });
+        setOpen(true);
+      };
+      t.addEventListener('contextmenu', onCtx);
+      document.addEventListener('mousedown', onDoc);
+      document.addEventListener('keydown', onKey);
+      return () => {
+        t.removeEventListener('contextmenu', onCtx);
+        document.removeEventListener('mousedown', onDoc);
+        document.removeEventListener('keydown', onKey);
+        rootEl = null;
+      };
+    }
+    return () => {
+      rootEl = null;
+    };
+  };
+
   return (
     <div
-      {...rest}
-      class={cx('ui-contextmenu', shown() && 'is-open', resolve(className))}
+      id={resolve(props.id)}
+      ref={refCb}
+      class={cx('ui-contextmenu', shown() && 'is-open', resolve(props.className))}
       role="menu"
-      aria-label={resolve(ariaLabel)}
-      style={() => ({ left: `${pos().x}px`, top: `${pos().y}px`, ...(resolve(style) as any) })}
+      aria-label={ariaLabel()}
+      style={() => ({
+        left: pos().x + 'px',
+        top: pos().y + 'px',
+        ...(resolve(props.style) as any),
+      })}
     >
-      {(resolve(items) as ContextMenuItem[]).map((it) =>
+      {items().map((it) =>
         it.separator ? (
           <div class="ui-contextmenu-sep" />
         ) : (
@@ -132,14 +134,12 @@ export function ContextMenu(props: ContextMenuProps) {
             role="menuitem"
             data-key={it.key}
             onClick={() => {
-              onSelect?.(it.key);
+              props.onSelect?.(it.key);
               close();
             }}
           >
             <span>{() => resolve(it.label)}</span>
-            {it.shortcut != null && (
-              <span class="ui-contextmenu-shortcut">{it.shortcut}</span>
-            )}
+            {it.shortcut != null && <span class="ui-contextmenu-shortcut">{it.shortcut}</span>}
           </div>
         ),
       )}

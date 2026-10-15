@@ -23,7 +23,7 @@ export interface SearchProps {
   onSelect?: (option: SearchOption) => void;
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 /**
@@ -31,28 +31,21 @@ export interface SearchProps {
  * 带联想列表；支持键盘上下导航、回车确认；点击外部 / Esc 关闭建议。
  */
 export function Search(props: SearchProps) {
-  const {
-    options,
-    value,
-    defaultValue,
-    placeholder = '搜索…',
-    onChange,
-    onSelect,
-    className,
-    style,
-    ...rest
-  } = props;
-  const isControlled = value != null;
+  const isControlled = () => resolve(props.value) != null;
   const inner = signal<string>(
-    value != null ? String(resolve(value)) : defaultValue != null ? String(resolve(defaultValue)) : '',
+    resolve(props.value) != null
+      ? String(resolve(props.value))
+      : resolve(props.defaultValue) != null
+        ? String(resolve(props.defaultValue))
+        : '',
   );
-  const cur = () => (isControlled ? String(resolve(value)) : inner());
+  const cur = () => (isControlled() ? String(resolve(props.value)) : inner());
   const open = signal(false);
   const active = signal(0);
 
   const visible = () => {
     const q = cur().toLowerCase();
-    const opts = (resolve(options) as SearchOption[]) || [];
+    const opts = (resolve(props.options) as SearchOption[]) || [];
     if (!q) return opts;
     return opts.filter(
       (o) => o.label.toLowerCase().includes(q) || (o.code || '').toLowerCase().includes(q),
@@ -60,8 +53,8 @@ export function Search(props: SearchProps) {
   };
 
   const select = (o: SearchOption) => {
-    onSelect?.(o);
-    if (!isControlled) inner.set(o.label);
+    props.onSelect?.(o);
+    if (!isControlled()) inner.set(o.label);
     open.set(false);
   };
 
@@ -83,16 +76,16 @@ export function Search(props: SearchProps) {
 
   return (
     <div
-      {...rest}
-      class={cx('ui-search', open() && 'open', resolve(className))}
-      style={resolve(style)}
+      id={resolve(props.id)}
+      class={cx('ui-search', open() && 'open', resolve(props.className))}
+      style={resolve(props.style)}
     >
       <span class="ico ui-icon">
         <IconSearch />
       </span>
       <input
         class="ui-search-input"
-        placeholder={resolve(placeholder)}
+        placeholder={resolve(props.placeholder) ?? '搜索…'}
         aria-label="全局搜索"
         value={cur()}
         onFocus={() => {
@@ -101,8 +94,8 @@ export function Search(props: SearchProps) {
         }}
         onInput={(e: Event) => {
           const v = (e.target as HTMLInputElement).value;
-          if (!isControlled) inner.set(v);
-          onChange?.(v);
+          if (!isControlled()) inner.set(v);
+          props.onChange?.(v);
           open.set(true);
           active.set(0);
         }}

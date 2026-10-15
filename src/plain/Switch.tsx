@@ -13,7 +13,7 @@ export interface SwitchProps {
   label?: MaybeGetter<string>;
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 /**
@@ -21,35 +21,26 @@ export interface SwitchProps {
  * 受控/非受控双模式；aria-checked 为状态真理源（CSS 据此移动滑块）。
  */
 export function Switch(props: SwitchProps) {
-  const {
-    checked,
-    defaultChecked = false,
-    onChange,
-    size = 'md',
-    disabled = false,
-    label,
-    className,
-    style,
-    ...rest
-  } = props;
-  const isControlled = checked != null;
-  const inner = signal<boolean>(!!resolve(defaultChecked));
-  const on = () => (isControlled ? !!resolve(checked) : inner());
+  const isControlled = () => resolve(props.checked) != null;
+  const size = () => resolve(props.size) ?? 'md';
+  const disabled = () => resolve(props.disabled) ?? false;
+  const inner = signal<boolean>(!!(resolve(props.defaultChecked) ?? false));
+  const on = () => (isControlled() ? !!resolve(props.checked) : inner());
   return (
     <button
-      {...rest}
+      id={resolve(props.id)}
       type="button"
       role="switch"
-      class={cx('ui-switch', resolve(size) !== 'md' && 'ui-size-' + resolve(size), resolve(className))}
+      class={cx('ui-switch', size() !== 'md' && 'ui-size-' + size(), resolve(props.className))}
       aria-checked={on()}
-      aria-label={resolve(label)}
-      disabled={resolve(disabled)}
-      style={resolve(style)}
+      aria-label={resolve(props.label)}
+      disabled={disabled()}
+      style={resolve(props.style)}
       onClick={() => {
-        if (resolve(disabled)) return;
+        if (disabled()) return;
         const next = !on();
-        if (!isControlled) inner.set(next);
-        onChange?.(next);
+        if (!isControlled()) inner.set(next);
+        props.onChange?.(next);
       }}
     ></button>
   );

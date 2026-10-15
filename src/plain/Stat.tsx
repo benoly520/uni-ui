@@ -13,7 +13,7 @@ export interface StatProps {
   trend?: MaybeGetter<StatTrend>;
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 /**
@@ -21,24 +21,33 @@ export interface StatProps {
  * 主值等宽数字（ui-num）；涨跌着色跟随 trend（up/down/muted）。
  */
 export function Stat(props: StatProps) {
-  const { label, value, prefix, suffix, delta, trend, className, style, ...rest } = props;
+  const label = () => resolve(props.label);
+  const value = () => resolve(props.value);
+  const prefix = () => resolve(props.prefix);
+  const suffix = () => resolve(props.suffix);
+  const delta = () => resolve(props.delta);
+  const trend = () => resolve(props.trend);
   return (
-    <div {...rest} class={cx('ui-stat', resolve(className))} style={resolve(style)}>
-      {resolve(label) != null && <span class="label">{String(resolve(label))}</span>}
-      {resolve(value) != null && (
+    <div
+      id={resolve(props.id)}
+      class={cx('ui-stat', resolve(props.className))}
+      style={resolve(props.style)}
+    >
+      {label() != null && <span class="label">{String(label())}</span>}
+      {value() != null && (
         <span
-          class={cx('value', 'ui-num', resolve(trend) && 'ui-num--' + resolve(trend))}
-          data-num={resolve(trend)}
+          class={cx('value', 'ui-num', trend() && 'ui-num--' + trend())}
+          data-num={trend()}
         >
-          {'' + resolve(prefix) + resolve(value) + resolve(suffix)}
+          {'' + prefix() + value() + suffix()}
         </span>
       )}
-      {resolve(delta) != null && (
+      {delta() != null && (
         <span
-          class={cx('delta', 'ui-num', resolve(trend) && 'ui-num--' + resolve(trend))}
-          data-num={resolve(trend)}
+          class={cx('delta', 'ui-num', trend() && 'ui-num--' + trend())}
+          data-num={trend()}
         >
-          {String(resolve(delta))}
+          {String(delta())}
         </span>
       )}
     </div>

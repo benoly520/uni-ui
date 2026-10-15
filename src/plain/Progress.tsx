@@ -8,7 +8,7 @@ export interface ProgressProps {
   indeterminate?: MaybeGetter<boolean>;
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 /**
@@ -16,26 +16,24 @@ export interface ProgressProps {
  * 确定值按 value/max 计算百分比宽度；indeterminate 为不确定态（无具体进度）。
  */
 export function Progress(props: ProgressProps) {
-  const { value = 0, max = 100, indeterminate = false, className, style, ...rest } = props;
-  const ariaNow = () => (resolve(indeterminate) ? undefined : resolve(value));
+  const value = () => resolve(props.value) ?? 0;
+  const max = () => resolve(props.max) ?? 100;
+  const indeterminate = () => resolve(props.indeterminate) ?? false;
+  const ariaNow = () => (indeterminate() ? undefined : value());
   return (
     <div
-      {...rest}
-      class={cx('ui-progress', resolve(indeterminate) && 'ui-progress--indeterminate', resolve(className))}
+      id={resolve(props.id)}
+      class={cx('ui-progress', indeterminate() && 'ui-progress--indeterminate', resolve(props.className))}
       role="progressbar"
       aria-valuemin={0}
-      aria-valuemax={resolve(max)}
+      aria-valuemax={max()}
       aria-valuenow={ariaNow()}
-      style={resolve(style)}
+      style={resolve(props.style)}
     >
       <span
         style={() => {
-          const ind = resolve(indeterminate);
-          if (ind) return {} as Record<string, string | number>;
-          const pct = Math.max(
-            0,
-            Math.min(100, (Number(resolve(value)) / Number(resolve(max))) * 100),
-          );
+          if (indeterminate()) return {};
+          const pct = Math.max(0, Math.min(100, (Number(value()) / Number(max())) * 100));
           return { width: pct + '%' };
         }}
       ></span>

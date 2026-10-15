@@ -28,45 +28,31 @@ export interface TooltipProps {
   style?: MaybeGetter<string | Record<string, string>>;
   /** 触发元素（建议可聚焦节点，如 button） */
   children?: MaybeGetter<Renderable>;
-  [key: string]: any;
 }
 
 let tipSeq = 0;
 
 /**
  * Tooltip · 悬浮提示（浮层导航组）
- * - 默认 invert 反转色；hover / focus 显示；Esc 关闭并归还焦点；外部点击关闭
- * - ARIA：气泡 role=tooltip + id；触发元素 aria-describedby 指向该 id
- * - 受控 / 非受控双模式；不携带任何样式，全部走 theme.css
+ * 默认 invert 反转色；hover / focus 显示；Esc 关闭并归还焦点；外部点击关闭。
+ * ARIA：气泡 role=tooltip + id；触发元素 aria-describedby 指向该 id。
+ * 焦点跟随改用 ref 注入 focusin/focusout（新框架无 onFocusIn/Out），并回收监听。
  */
 export function Tooltip(props: TooltipProps) {
-  const {
-    content,
-    variant = 'invert',
-    placement = 'top',
-    open,
-    defaultOpen = false,
-    onOpenChange,
-    delay = 0,
-    disabled = false,
-    id,
-    className,
-    style,
-    children,
-    ...rest
-  } = props;
-
-  const isControlled = open != null;
-  const inner = signal<boolean>(!!resolve(defaultOpen));
-  const shown = () => (isControlled ? !!resolve(open) : inner());
-  const tipId = id || `tip-${++tipSeq}`;
+  const variant = () => resolve(props.variant) ?? 'invert';
+  const placement = () => resolve(props.placement) ?? 'top';
+  const isControlled = () => resolve(props.open) != null;
+  const inner = signal<boolean>(!!(resolve(props.defaultOpen) ?? false));
+  const shown = () => (isControlled() ? !!resolve(props.open) : inner());
+  const delay = () => resolve(props.delay) ?? 0;
+  const disabled = () => resolve(props.disabled) ?? false;
+  const tipId = props.id || 'tip-' + ++tipSeq;
 
   const setOpen = (v: boolean) => {
-    if (resolve(disabled)) return;
-    if (!isControlled) inner.set(v);
-    onOpenChange?.(v);
+    if (disabled()) return;
+    if (!isControlled()) inner.set(v);
+    props.onOpenChange?.(v);
   };
-
   let showTimer: number | undefined;
   let hideTimer: number | undefined;
   const clearTimers = () => {
@@ -74,54 +60,61 @@ export function Tooltip(props: TooltipProps) {
     if (hideTimer) window.clearTimeout(hideTimer);
   };
   const show = () => {
-    if (resolve(disabled)) return;
+    if (disabled()) return;
     clearTimers();
-    showTimer = window.setTimeout(() => setOpen(true), Number(resolve(delay)));
+    showTimer = window.setTimeout(() => setOpen(true), Number(delay()));
   };
   const hide = () => {
     clearTimers();
     hideTimer = window.setTimeout(() => setOpen(false), 120);
   };
 
-  // 给触发元素注入 aria-describedby（容器挂载后触发元素才存在）
-  requestAnimationFrame(() => {
-    const root = document.getElementById(tipId)?.parentElement;
-    const trigger = root?.firstElementChild as HTMLElement | null;
-    if (trigger && !trigger.hasAttribute('aria-describedby')) {
+  let rootEl: HTMLElement | null = null;
+  const refCb = (el: HTMLElement) => {
+    rootEl = el;
+    const trigger = el.firstElementChild as HTMLElement | null;
+    if (trigger) {
       trigger.setAttribute('aria-describedby', tipId);
+      const onFocusIn = () => show();
+      const onFocusOut = (e: FocusEvent) => {
+        if (el.contains(e.relatedTarget as Node)) return;
+        hide();
+      };
+      el.addEventListener('focusin', onFocusIn);
+      el.addEventListener('focusout', onFocusOut);
+      return () => {
+        el.removeEventListener('focusin', onFocusIn);
+        el.removeEventListener('focusout', onFocusOut);
+        rootEl = null;
+      };
     }
-  });
+    return () => {
+      rootEl = null;
+    };
+  };
 
   return (
     <span
-      {...rest}
       class={cx(
         'ui-tip',
-        resolve(variant) === 'surface' && 'ui-tip--surface',
-        resolve(placement) !== 'top' && `ui-tip--${resolve(placement)}`,
+        variant() === 'surface' && 'ui-tip--surface',
+        placement() !== 'top' && 'ui-tip--' + placement(),
         shown() && 'is-open',
       )}
-      style={resolve(style)}
+      style={resolve(props.style)}
       onMouseEnter={show}
       onMouseLeave={hide}
-      onFocusIn={show}
-      onFocusOut={(e: FocusEvent) => {
-        if ((e.currentTarget as HTMLElement).contains(e.relatedTarget as Node)) return;
-        hide();
-      }}
       onKeyDown={(e: KeyboardEvent) => {
         if (e.key === 'Escape' && shown()) {
           setOpen(false);
-          const t = document
-            .getElementById(tipId)
-            ?.parentElement?.firstElementChild as HTMLElement | null;
-          t?.focus?.();
+          (rootEl?.firstElementChild as HTMLElement | null)?.focus?.();
         }
       }}
+      ref={refCb}
     >
-      {resolve(children)}
+      {resolve(props.children)}
       <span class="bubble" role="tooltip" id={tipId} aria-hidden={!shown()}>
-        {() => resolve(content)}
+        {() => resolve(props.content)}
       </span>
     </span>
   );

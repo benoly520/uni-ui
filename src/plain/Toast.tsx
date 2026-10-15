@@ -13,37 +13,29 @@ export interface ToastProps {
   children?: MaybeGetter<Renderable>;
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
-  [key: string]: any;
+  id?: MaybeGetter<string>;
 }
 
 /**
  * Toast · 轻提示（反馈组）
- * - 根 ui-toast + ui-glass 毛玻璃；role=status aria-live=polite
- * - icon 包入 .ui-icon；content 为文本/节点，children 可覆盖
- * - 命令式入口见 toast.ts（挂 body）
+ * 根 ui-toast + ui-glass 毛玻璃；role=status aria-live=polite。
+ * icon 包入 .ui-icon；content 为文本/节点，children 可覆盖。
+ * 命令式入口见 toast.ts（挂 body）。
  */
 export function Toast(props: ToastProps) {
-  const {
-    show = false,
-    content,
-    icon,
-    children,
-    className,
-    style,
-    ...rest
-  } = props;
+  const show = () => resolve(props.show) ?? false;
   return (
     <div
-      {...rest}
-      class={cx('ui-toast', 'ui-glass', resolve(show) && 'ui-toast.show', resolve(className))}
+      id={resolve(props.id)}
+      class={cx('ui-toast', 'ui-glass', show() && 'ui-toast.show', resolve(props.className))}
       role="status"
       aria-live="polite"
-      style={resolve(style)}
+      style={resolve(props.style)}
     >
-      {resolve(icon) != null && (
-        <span class="ui-icon">{() => resolve(icon)}</span>
+      {resolve(props.icon) != null && (
+        <span class="ui-icon">{() => resolve(props.icon)}</span>
       )}
-      {() => (resolve(children) ?? resolve(content))}
+      {() => resolve(props.children) ?? resolve(props.content)}
     </div>
   );
 }

@@ -30,10 +30,13 @@
       "import": "./dist/vue/*.js"
     },
     "./plain": {
-      "types": "./src/plain/index.ts",
-      "import": "./src/plain/index.ts"
+      "types": "./dist/plain/index.d.ts",
+      "import": "./dist/plain.js"
     },
-    "./plain/*": "./src/plain/*",
+    "./plain/*": {
+      "types": "./dist/plain/*.d.ts",
+      "import": "./dist/plain/*.js"
+    },
     "./theme.css": "./theme.css",
     "./theme": "./theme.css"
   },
@@ -42,18 +45,22 @@
   "types": "./dist/react/index.d.ts",
   "scripts": {
     "dev": "vite",
-    "build": "rm -rf dist && vite build && pnpm run types",
-    "build:modules": "rm -rf dist && UNI_UI_MODULES=1 vite build && pnpm run types",
+    "build": "rm -rf dist && vite build && pnpm run types && pnpm run types:plain",
+    "build:modules": "rm -rf dist && UNI_UI_MODULES=1 vite build && pnpm run types && pnpm run types:plain",
     "types": "vue-tsc -p tsconfig.json --emitDeclarationOnly --outDir dist",
+    "types:plain": "tsc -p tsconfig.plain.json",
     "typecheck": "vue-tsc -p tsconfig.json --noEmit",
+    "typecheck:plain": "tsc --noEmit -p tsconfig.plain.json",
     "test": "vitest run"
   },
   "peerDependencies": {
+    "plain": "^0.3.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "vue": "^3.4.0"
   },
   "devDependencies": {
+    "plain": "link:../plain-framework",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-vue": "^5.1.0",

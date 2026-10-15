@@ -152,9 +152,9 @@ export const reactDocs: Record<string, DemoCase[]> = {
       code: `<Badge tone="brand" count={9} />\n<Badge tone="danger" count={120} />\n<Badge tone="success" dot />`,
       Comp: () => (
         <div className="demo-row">
-          <Badge tone="brand" count={9}><Avatar name="A" /></Badge>
-          <Badge tone="danger" count={120}><Avatar name="B" /></Badge>
-          <Badge tone="success" dot><Avatar name="C" /></Badge>
+          <Badge tone="brand" count={9}><Avatar text="A" /></Badge>
+          <Badge tone="danger" count={120}><Avatar text="B" /></Badge>
+          <Badge tone="success" dot><Avatar text="C" /></Badge>
         </div>
       ),
     },
@@ -175,11 +175,11 @@ export const reactDocs: Record<string, DemoCase[]> = {
     {
       title: '文字 / 图片 / 图标',
       desc: 'text 取首字生成底色头像；src 优先渲染图片；icon 渲染图标头像。',
-      code: `<Avatar name="茅台" tone="brand" />\n<Avatar name="宁" tone="success" />\n<Avatar icon={<span>★</span>} tone="warning" />\n<Avatar src="https://i.pravatar.cc/80?img=12" />`,
+      code: `<Avatar text="茅台" tone="brand" />\n<Avatar text="宁" tone="success" />\n<Avatar icon={<span>★</span>} tone="warning" />\n<Avatar src="https://i.pravatar.cc/80?img=12" />`,
       Comp: () => (
         <div className="demo-row">
-          <Avatar name="茅台" tone="brand" />
-          <Avatar name="宁" tone="success" />
+          <Avatar text="茅台" tone="brand" />
+          <Avatar text="宁" tone="success" />
           <Avatar icon={<span>★</span>} tone="warning" />
           <Avatar src="https://i.pravatar.cc/80?img=12" />
         </div>
@@ -188,13 +188,13 @@ export const reactDocs: Record<string, DemoCase[]> = {
     {
       title: '尺寸档位',
       desc: 'size 支持 xs/sm/md/lg 预设，也接受数字自定义像素。',
-      code: `<Avatar size="xs" name="A" />\n<Avatar size="sm" name="B" />\n<Avatar size="md" name="C" />\n<Avatar size="lg" name="D" />`,
+      code: `<Avatar size="xs" text="A" />\n<Avatar size="sm" text="B" />\n<Avatar size="md" text="C" />\n<Avatar size="lg" text="D" />`,
       Comp: () => (
         <div className="demo-row">
-          <Avatar size="xs" name="A" />
-          <Avatar size="sm" name="B" />
-          <Avatar size="md" name="C" />
-          <Avatar size="lg" name="D" />
+          <Avatar size="xs" text="A" />
+          <Avatar size="sm" text="B" />
+          <Avatar size="md" text="C" />
+          <Avatar size="lg" text="D" />
         </div>
       ),
     },
@@ -450,10 +450,10 @@ export const reactDocs: Record<string, DemoCase[]> = {
     {
       title: '空状态占位',
       desc: 'description 提供文案，children 作为操作区（如「新建」按钮）。',
-      code: `<Empty text="暂无自选标的">\n  <Button variant="primary">添加自选</Button>\n</Empty>`,
+      code: `<Empty description="暂无自选标的">\n  <Button variant="primary">添加自选</Button>\n</Empty>`,
       Comp: () => (
         <div className="demo-row">
-          <Empty text="暂无自选标的">
+          <Empty description="暂无自选标的">
             <Button variant="primary">添加自选</Button>
           </Empty>
         </div>

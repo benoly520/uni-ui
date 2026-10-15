@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'node:path';
 // Plain 框架编译器（本地通过 link: 依赖解析，免去先发版）。
-import plainPlugin from 'plain/vite';
+import plain from 'plain/vite';
 
 // 单包根目录（uni-ui 仓库根）：playground 通过 alias 直接消费「源码」，
 // 免去先 build 库即可热更调试；同时演示真实消费路径 uni-ui/react、uni-ui/vue、uni-ui/plain、uni-ui/theme.css。
@@ -14,7 +14,7 @@ export default defineConfig({
   plugins: [
     // plain 必须在最前（enforce: pre）：先把 plain 的 .tsx 编译为直 DOM 代码，
     // 避免被 react 插件再次按 JSX 处理。仅匹配 plain 源码与 plain-demos。
-    plainPlugin({
+    plain({
       include: /(\/src\/plain\/|plain-demos\.[jt]sx?$)/,
       rpc: false,
     }),

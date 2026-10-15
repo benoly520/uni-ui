@@ -9,12 +9,12 @@
     "preview": "vite preview --port 5180"
   },
   "dependencies": {
+    "plain": "link:../../plain-framework",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "vue": "^3.4.0"
   },
   "devDependencies": {
-    "plain": "link:../../plain-framework",
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^4.3.4",

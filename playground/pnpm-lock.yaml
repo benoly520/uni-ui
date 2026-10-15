@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      plain:
+        specifier: link:../../plain-framework
+        version: link:../../plain-framework
       react:
         specifier: ^18.3.1
         version: 18.3.1

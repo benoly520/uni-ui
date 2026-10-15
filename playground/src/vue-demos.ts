@@ -139,7 +139,7 @@ export const vueDocs: Record<string, DemoCase[]> = {
 
   Badge: [
     {
-      code: `<Badge tone="brand" :count="9"><Avatar name="A" /></Badge>\n<Badge tone="danger" :count="120"><Avatar name="B" /></Badge>\n<Badge tone="success" dot><Avatar name="C" /></Badge>`,
+      code: `<Badge tone="brand" :count="9"><Avatar text="A" /></Badge>\n<Badge tone="danger" :count="120"><Avatar text="B" /></Badge>\n<Badge tone="success" dot><Avatar text="C" /></Badge>`,
       Comp: S(() => () =>
         h('div', { class: 'demo-row' }, [
           h(Badge, { tone: 'brand', count: 9 }, { default: () => h(Avatar, { name: 'A' }) }),
@@ -161,7 +161,7 @@ export const vueDocs: Record<string, DemoCase[]> = {
 
   Avatar: [
     {
-      code: `<Avatar name="茅台" tone="brand" />\n<Avatar name="宁" tone="success" />\n<Avatar :icon="() => '★'" tone="warning" />\n<Avatar src="https://i.pravatar.cc/80?img=12" />`,
+      code: `<Avatar text="茅台" tone="brand" />\n<Avatar text="宁" tone="success" />\n<Avatar :icon="() => '★'" tone="warning" />\n<Avatar src="https://i.pravatar.cc/80?img=12" />`,
       Comp: S(() => () =>
         h('div', { class: 'demo-row' }, [
           h(Avatar, { name: '茅台', tone: 'brand' }),
@@ -172,7 +172,7 @@ export const vueDocs: Record<string, DemoCase[]> = {
       ),
     },
     {
-      code: `<Avatar size="xs" name="A" />\n<Avatar size="sm" name="B" />\n<Avatar size="md" name="C" />\n<Avatar size="lg" name="D" />`,
+      code: `<Avatar size="xs" text="A" />\n<Avatar size="sm" text="B" />\n<Avatar size="md" text="C" />\n<Avatar size="lg" text="D" />`,
       Comp: S(() => () =>
         h('div', { class: 'demo-row' }, [
           h(Avatar, { size: 'xs', name: 'A' }),
@@ -390,7 +390,7 @@ export const vueDocs: Record<string, DemoCase[]> = {
 
   Empty: [
     {
-      code: `<Empty text="暂无自选标的">\n  <Button variant="primary">添加自选</Button>\n</Empty>`,
+      code: `<Empty description="暂无自选标的">\n  <Button variant="primary">添加自选</Button>\n</Empty>`,
       Comp: S(() => () =>
         h('div', { class: 'demo-row' }, [
           h(Empty, { text: '暂无自选标的' }, { default: () => h(Button, { variant: 'primary' }, '添加自选') }),

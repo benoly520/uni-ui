@@ -81,9 +81,31 @@ export function Select(props: SelectProps) {
     }
   };
 
+  // 根节点用于「点击外部关闭」判定；document 监听在 ref 清理里回收，避免泄漏。
+  let rootEl: HTMLElement | null = null;
+  const onDocClick = (e: MouseEvent) => {
+    if (!open()) return;
+    if (rootEl && rootEl.contains(e.target as Node)) return;
+    open.set(false);
+  };
+  const onDocKey = (e: KeyboardEvent) => {
+    if (e.key === 'Escape' && open()) open.set(false);
+  };
+  const refRoot = (el: HTMLElement) => {
+    rootEl = el;
+    document.addEventListener('click', onDocClick);
+    document.addEventListener('keydown', onDocKey);
+    return () => {
+      document.removeEventListener('click', onDocClick);
+      document.removeEventListener('keydown', onDocKey);
+      rootEl = null;
+    };
+  };
+
   return (
     <div
       id={resolve(props.id)}
+      ref={refRoot}
       class={cx('ui-select', open() && 'open', resolve(props.className))}
       data-multiple={isMulti() || undefined}
       aria-label={ariaLabel()}

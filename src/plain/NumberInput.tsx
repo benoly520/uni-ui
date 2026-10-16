@@ -40,6 +40,9 @@ export function NumberInput(props: NumberInputProps) {
       : Number(resolve(props.defaultValue) ?? 0),
   );
   const draft = signal<string | null>(null);
+  // 受控时一切读数以 props.value 为准：受控分支 commit() 不写 inner，
+  // 若 display()/stepBy() 仍读 inner() 会永远停在挂载时的初值（受控形同虚设）。
+  const current = () => (isControlled() ? Number(resolve(props.value)) : inner());
 
   const clamp = (n: number) => Math.min(Number(max()), Math.max(Number(min()), n));
   const parse = (s: string): number | null => {
@@ -62,13 +65,13 @@ export function NumberInput(props: NumberInputProps) {
     draft() != null
       ? (draft() as string)
       : (prefix() ?? '') +
-        inner().toLocaleString('en-US', {
+        current().toLocaleString('en-US', {
           minimumFractionDigits: Number(precision()),
           maximumFractionDigits: Number(precision()),
         }) +
         (suffix() ?? '');
 
-  const stepBy = (dir: number) => commit(clamp(inner() + dir * Number(step())));
+  const stepBy = (dir: number) => commit(clamp(current() + dir * Number(step())));
 
   const dataNum = (v: any) => String(v);
 
@@ -104,7 +107,7 @@ export function NumberInput(props: NumberInputProps) {
         onBlur={(e: Event) => {
           const v = parse((e.target as HTMLInputElement).value);
           if (v != null) commit(v);
-          else if (draft() != null) commit(inner());
+          else if (draft() != null) commit(current());
         }}
         onKeyDown={(e: KeyboardEvent) => {
           if (e.key === 'Enter') (e.target as HTMLInputElement).blur();

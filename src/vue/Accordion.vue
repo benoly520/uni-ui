@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue';
+import { IconCaret } from './icons';
 
 interface AccordionItemData {
   key: string;
@@ -71,7 +72,7 @@ watch(
         <span>{{ item.title }}</span>
         <span v-if="item.badge != null" class="ui-accordion-badge">{{ item.badge }}</span>
         <span class="ui-accordion-caret ui-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6" /></svg>
+          <IconCaret :stroke-width="2.4" />
         </span>
       </button>
       <div

@@ -8,6 +8,7 @@ import React, {
   type CSSProperties,
 } from 'react';
 import { cx } from '../utils/cx';
+import { IconCaret, IconCheck } from './icons';
 
 export interface SelectOption {
   label: string;
@@ -30,17 +31,6 @@ export interface SelectProps {
   className?: string;
   style?: CSSProperties;
 }
-
-const Chevron = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M6 9l6 6 6-6" />
-  </svg>
-);
-const Check = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 6L9 17l-5-5" />
-  </svg>
-);
 
 /**
  * Select · 下拉选择（数据表单组）
@@ -166,7 +156,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       >
         {labelText}
         <span className="caret ui-icon">
-          <Chevron />
+          <IconCaret />
         </span>
       </button>
       <div className="ui-select-menu" role="listbox">
@@ -191,7 +181,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             {opt.label}
             {multiple && (
               <span className="check ui-icon">
-                <Check />
+                <IconCheck strokeWidth={2.4} />
               </span>
             )}
           </div>

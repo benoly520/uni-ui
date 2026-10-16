@@ -22,7 +22,7 @@
 
 | 场景 | DOM |
 |---|---|
-| 输入框 | `<div class="ui-search"><span class="ico ui-icon"><i data-lucide="search"></i></span><input class="ui-search-input" placeholder="搜股票 / 基金 / 研报…" aria-label="全局搜索" /><div class="ui-search-suggest" role="listbox"><div class="opt" role="option"><span>贵州茅台 <span class="ui-tag ui-tag--up">白酒</span></span><span class="code">600519</span></div>…</div></div>` |
+| 输入框 | `<div class="ui-search"><span class="ico ui-icon">{SVG:search@2}</span><input class="ui-search-input" placeholder="搜股票 / 基金 / 研报…" aria-label="全局搜索" /><div class="ui-search-suggest" role="listbox"><div class="opt" role="option"><span>贵州茅台 <span class="ui-tag ui-tag--up">白酒</span></span><span class="code">600519</span></div>…</div></div>` |
 | 高亮项 | `<div class="opt active" role="option">…</div>` |
 | 打开态 | 根加 `.open` |
 

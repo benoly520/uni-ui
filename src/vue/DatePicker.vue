@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch, onBeforeUnmount } from 'vue';
+import { IconCalendar, IconChevronLeft, IconChevronRight } from './icons';
 
 type DatePickerValue = string | [string, string] | null;
 
@@ -192,20 +193,18 @@ onBeforeUnmount(() => {
       @click.stop="toggle"
     >
       <span class="ui-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="4" width="18" height="17" rx="2" /><path d="M3 9h18M8 2v4M16 2v4" />
-        </svg>
+        <IconCalendar />
       </span>
       <span class="dp-text">{{ triggerText }}</span>
     </button>
     <div class="ui-datepicker-pop" role="dialog" :aria-label="popAria" :hidden="!open">
       <div class="dp-head">
         <button type="button" class="dp-nav" data-nav="prev" aria-label="上个月" @click="view = new Date(view.getFullYear(), view.getMonth() - 1, 1)">
-          <span class="ui-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6" /></svg></span>
+          <span class="ui-icon"><IconChevronLeft :stroke-width="2.4" /></span>
         </button>
         <span class="dp-title">{{ view.getFullYear() }}年{{ view.getMonth() + 1 }}月</span>
         <button type="button" class="dp-nav" data-nav="next" aria-label="下个月" @click="view = new Date(view.getFullYear(), view.getMonth() + 1, 1)">
-          <span class="ui-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6" /></svg></span>
+          <span class="ui-icon"><IconChevronRight :stroke-width="2.4" /></span>
         </button>
       </div>
       <div class="dp-week"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>

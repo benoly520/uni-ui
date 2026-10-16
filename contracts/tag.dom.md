@@ -20,7 +20,7 @@
 | brand（§1203） | `<span class="ui-tag ui-tag--brand">沪深300</span>` |
 | up（§1204） | `<span class="ui-tag ui-tag--up">增持</span>` |
 | down（§1205） | `<span class="ui-tag ui-tag--down">减持</span>` |
-| 带图标 | `<span class="ui-tag ui-tag--brand"><span class="ui-icon"><i data-lucide="tag"></i></span>标签</span>` |
+| 带图标 | `<span class="ui-tag ui-tag--brand"><span class="ui-icon">{icon}</span>标签</span>` |
 | 可关闭 | `<span class="ui-tag ui-tag--closable"> removable <button type="button" class="ui-tag-close" aria-label="关闭" style="…"><span aria-hidden="true">×</span></button></span>` |
 
 ## 约束

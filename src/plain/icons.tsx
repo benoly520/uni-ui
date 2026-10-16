@@ -1,19 +1,27 @@
 /**
- * 内联 SVG 图标（24×24 / currentColor）。包在 .ui-icon 内使用，保证与 React/Vue 视觉结构一致。
- * 新框架禁止 JSX 属性展开（PLAIN_E1008），故用 Svg 辅助组件承载公共 svg 属性，避免逐图标重复。
+ * 内联 SVG 图标（24×24 viewBox / currentColor），供库内 plain 组件使用。
+ * - 形状与描边档位必须与 React（src/react/icons.tsx）/ Vue（src/vue/icons.ts）逐字一致；
+ * - 尺寸**不写在 svg 上**：`.ui-icon` 容器走 `--ui-icon-size`，Steps 的无包裹用法走
+ *   theme.css 的 `.ui-step-dot svg`。这样三端 DOM 才能完全对齐；
+ * - 新框架禁止 JSX 属性展开（PLAIN_E1008），故用 Svg 辅助组件承载公共 svg 属性，避免逐图标重复。
  */
 import { resolve } from 'plain';
-import type { Renderable } from './_shared';
+import type { MaybeGetter, Renderable } from './_shared';
 
-function Svg(props: { children?: Renderable | (() => Renderable) }) {
+/** 图标公共 props */
+export interface IconProps {
+  /** 描边宽度；缺省 2（lucide 标准），特殊档位由调用处显式传入 */
+  strokeWidth?: MaybeGetter<number>;
+}
+
+/** 公共 svg 宿主：固定 24×24 viewBox / currentColor / 圆角描边，只有描边宽度可变 */
+function Svg(props: IconProps & { children?: Renderable | (() => Renderable) }) {
   return (
     <svg
-      width="24"
-      height="24"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      stroke-width="2"
+      stroke-width={resolve(props.strokeWidth) ?? 2}
       stroke-linecap="round"
       stroke-linejoin="round"
     >
@@ -22,54 +30,70 @@ function Svg(props: { children?: Renderable | (() => Renderable) }) {
   );
 }
 
-export function IconCaret() {
+/** chevron-down：Select 下拉箭头 / Tree 展开 / Accordion caret */
+export function IconCaret(props: IconProps) {
   return (
-    <Svg>
-      <polyline points="6 9 12 15 18 9"></polyline>
+    <Svg strokeWidth={resolve(props.strokeWidth)}>
+      <path d="M6 9l6 6 6-6"></path>
     </Svg>
   );
 }
 
-export function IconCheck() {
+/** check：Select 多选勾选 / Steps 已完成 */
+export function IconCheck(props: IconProps) {
   return (
-    <Svg>
-      <polyline points="20 6 9 17 4 12"></polyline>
+    <Svg strokeWidth={resolve(props.strokeWidth)}>
+      <path d="M20 6L9 17l-5-5"></path>
     </Svg>
   );
 }
 
-export function IconChevronLeft() {
+/** chevron-left：DatePicker 上一月 */
+export function IconChevronLeft(props: IconProps) {
   return (
-    <Svg>
-      <polyline points="15 18 9 12 15 6"></polyline>
+    <Svg strokeWidth={resolve(props.strokeWidth)}>
+      <path d="M15 18l-6-6 6-6"></path>
     </Svg>
   );
 }
 
-export function IconChevronRight() {
+/** chevron-right：DatePicker 下一月 */
+export function IconChevronRight(props: IconProps) {
   return (
-    <Svg>
-      <polyline points="9 18 15 12 9 6"></polyline>
+    <Svg strokeWidth={resolve(props.strokeWidth)}>
+      <path d="M9 18l6-6-6-6"></path>
     </Svg>
   );
 }
 
-export function IconSearch() {
+/** search：Search 前缀 */
+export function IconSearch(props: IconProps) {
   return (
-    <Svg>
-      <circle cx="11" cy="11" r="8"></circle>
-      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    <Svg strokeWidth={resolve(props.strokeWidth)}>
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="M21 21l-4.3-4.3"></path>
     </Svg>
   );
 }
 
-export function IconCalendar() {
+/** calendar：DatePicker 触发钮 */
+export function IconCalendar(props: IconProps) {
   return (
-    <Svg>
-      <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-      <line x1="16" y1="2" x2="16" y2="6"></line>
-      <line x1="8" y1="2" x2="8" y2="6"></line>
-      <line x1="3" y1="10" x2="21" y2="10"></line>
+    <Svg strokeWidth={resolve(props.strokeWidth)}>
+      <rect x="3" y="4" width="18" height="17" rx="2"></rect>
+      <path d="M3 9h18M8 2v4M16 2v4"></path>
+    </Svg>
+  );
+}
+
+/** table：Empty 默认占位（路径取自 vendor/lucide.min.js v1.51.0） */
+export function IconTable(props: IconProps) {
+  return (
+    <Svg strokeWidth={resolve(props.strokeWidth)}>
+      <path d="M12 3v18"></path>
+      <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+      <path d="M3 9h18"></path>
+      <path d="M3 15h18"></path>
     </Svg>
   );
 }

@@ -18,4 +18,6 @@
 - 操作插槽内的按钮按 Button 规范可达（Tab / Enter / Space）。
 
 ## 图标默认
-- 未传 `icon` 时渲染 `table` 占位（`<i data-lucide="table">`），与预览 §1232 一致；真实工程传入图标组件（lucide-react / lucide-vue-next）覆盖。
+- 未传 `icon` 时渲染**内置内联 SVG**（等价 lucide `table`，24×24 + `currentColor`，路径取自 `vendor/lucide.min.js` v1.51.0），不依赖任何图标库运行时。
+- 与预览 §1232 的关系：预览源码写 `<i data-lucide="table">` 占位、由 `createIcons()` 运行时替换为同一图形；组件直接静态产出该图形，故**最终 DOM 视觉一致**。
+- 覆盖：真实工程可传入任意 24×24 + `currentColor` 节点（lucide-react / lucide-vue-next / 自有 SVG）。

@@ -152,7 +152,7 @@ export function Select(props: SelectProps) {
               {o.label}
               {isMulti() && (
                 <span class="check ui-icon">
-                  <IconCheck />
+                  <IconCheck strokeWidth={2.4} />
                 </span>
               )}
             </div>

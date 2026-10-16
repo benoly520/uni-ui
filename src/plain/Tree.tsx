@@ -113,7 +113,7 @@ export function Tree(props: TreeProps) {
               if (hasChildren()) toggleExpand(node);
             }}
           >
-            <IconCaret />
+            <IconCaret strokeWidth={2.4} />
           </span>
           {checkable() && (
             <input

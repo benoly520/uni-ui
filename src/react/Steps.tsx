@@ -5,6 +5,7 @@ import React, {
   type ReactNode,
 } from 'react';
 import { cx } from '../utils/cx';
+import { IconCheck } from './icons';
 
 export interface StepItem {
   /** 步骤标题 */
@@ -27,12 +28,6 @@ export interface StepsProps {
   className?: string;
   style?: CSSProperties;
 }
-
-const Check = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 6L9 17l-5-5" />
-  </svg>
-);
 
 /**
  * Steps · 流程向导（回测流程）
@@ -77,7 +72,7 @@ export const Steps = forwardRef<HTMLDivElement, StepsProps>(function Steps(
         data-step={i}
         onClick={clickable ? () => go(i) : undefined}
       >
-        <span className="ui-step-dot">{isDone ? <Check /> : i + 1}</span>
+        <span className="ui-step-dot">{isDone ? <IconCheck strokeWidth={3} /> : i + 1}</span>
         <span className="ui-step-text">
           <span className="ui-step-title">{s.title}</span>
           {s.desc != null && <span className="ui-step-desc">{s.desc}</span>}

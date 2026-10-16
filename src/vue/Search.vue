@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch, onBeforeUnmount } from 'vue';
+import { IconSearch } from './icons';
 
 interface SearchTag {
   text: string;
@@ -88,10 +89,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
 <template>
   <div ref="rootRef" class="ui-search" :class="open && 'open'">
     <span class="ico ui-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="7" />
-        <path d="M21 21l-4.3-4.3" />
-      </svg>
+      <IconSearch />
     </span>
     <input
       class="ui-search-input"

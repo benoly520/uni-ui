@@ -17,7 +17,7 @@
 |---|---|
 | 预览角落态（§1615） | `<div class="ui-toast ui-glass" role="status" aria-live="polite"><span class="ui-icon">✓</span><span>操作已保存</span></div>` |
 | 显示态 | `<div class="ui-toast ui-glass show" role="status" aria-live="polite"><span>保存成功</span></div>` |
-| 带图标 | `<div class="ui-toast ui-glass" role="status" aria-live="polite"><span class="ui-icon"><i data-lucide="check"></i></span><span>已提交</span></div>` |
+| 带图标 | `<div class="ui-toast ui-glass" role="status" aria-live="polite"><span class="ui-icon">{icon}</span><span>已提交</span></div>` |
 
 ## 命令式挂载
 - `toast('保存成功')` → 在 `document.body` 末追加单例容器，内部渲染上面的 `<div class="ui-toast ui-glass">`；`show` 为 `true` 时追加**独立的** `show` 类。

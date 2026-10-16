@@ -24,8 +24,8 @@
 
 | 场景 | DOM |
 |---|---|
-| 单选触发 | `<div class="ui-select"><button class="ui-select-trigger" aria-haspopup="listbox" aria-expanded="false">白酒<span class="caret ui-icon"><i data-lucide="chevron-down"></i></span></button><div class="ui-select-menu" role="listbox"><div class="ui-select-option" role="option" data-val="白酒" aria-selected="true">白酒</div>…</div></div>` |
-| 多选触发 | `<div class="ui-select" data-multiple><button class="ui-select-trigger" …>贵州茅台、宁德时代<span class="caret …"></span></button><div class="ui-select-menu" role="listbox"><input class="ui-select-search" placeholder="搜索标的…"/><div class="ui-select-option multi" role="option" data-val="贵州茅台" aria-selected="true">贵州茅台<span class="check ui-icon"><i data-lucide="check"></i></span></div>…</div></div>` |
+| 单选触发 | `<div class="ui-select"><button class="ui-select-trigger" aria-haspopup="listbox" aria-expanded="false">白酒<span class="caret ui-icon">{SVG:chevron-down@2}</span></button><div class="ui-select-menu" role="listbox"><div class="ui-select-option" role="option" data-val="白酒" aria-selected="true">白酒</div>…</div></div>` |
+| 多选触发 | `<div class="ui-select" data-multiple><button class="ui-select-trigger" …>贵州茅台、宁德时代<span class="caret …"></span></button><div class="ui-select-menu" role="listbox"><input class="ui-select-search" placeholder="搜索标的…"/><div class="ui-select-option multi" role="option" data-val="贵州茅台" aria-selected="true">贵州茅台<span class="check ui-icon">{SVG:check@2.4}</span></div>…</div></div>` |
 | 打开态 | 根加 `.open`；trigger `aria-expanded="true"` |
 
 ## 约束

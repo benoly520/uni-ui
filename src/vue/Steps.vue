@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { IconCheck } from './icons';
 
 interface StepItem {
   title: unknown;
@@ -49,7 +50,7 @@ function go(i: number) {
         @click="clickable ? go(i) : undefined"
       >
         <span class="ui-step-dot">
-          <svg v-if="i < cur" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+          <IconCheck v-if="i < cur" :stroke-width="3" />
           <template v-else>{{ i + 1 }}</template>
         </span>
         <span class="ui-step-text">

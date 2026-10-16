@@ -8,6 +8,7 @@ import React, {
   type CSSProperties,
 } from 'react';
 import { cx } from '../utils/cx';
+import { IconSearch } from './icons';
 
 export interface SearchTag {
   text: string;
@@ -30,13 +31,6 @@ export interface SearchProps {
   className?: string;
   style?: CSSProperties;
 }
-
-const SearchIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="11" cy="11" r="7" />
-    <path d="M21 21l-4.3-4.3" />
-  </svg>
-);
 
 /**
  * Search · 搜索框（数据表单组）
@@ -137,7 +131,7 @@ export const Search = forwardRef<HTMLDivElement, SearchProps>(function Search(
       style={style}
     >
       <span className="ico ui-icon">
-        <SearchIcon />
+        <IconSearch />
       </span>
       <input
         className="ui-search-input"

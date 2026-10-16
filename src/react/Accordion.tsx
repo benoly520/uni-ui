@@ -9,6 +9,7 @@ import React, {
   type ReactNode,
 } from 'react';
 import { cx } from '../utils/cx';
+import { IconCaret } from './icons';
 
 export interface AccordionItemData {
   /** 唯一标识（受控/非受控状态键） */
@@ -33,12 +34,6 @@ export interface AccordionProps {
   className?: string;
   style?: CSSProperties;
 }
-
-const Caret = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M6 9l6 6 6-6" />
-  </svg>
-);
 
 const AccordionItemView = ({
   item,
@@ -66,7 +61,7 @@ const AccordionItemView = ({
         <span>{item.title}</span>
         {item.badge != null && <span className="ui-accordion-badge">{item.badge}</span>}
         <span className="ui-accordion-caret ui-icon">
-          <Caret />
+          <IconCaret strokeWidth={2.4} />
         </span>
       </button>
       <div className="ui-accordion-panel" ref={panelRef}>

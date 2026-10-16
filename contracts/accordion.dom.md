@@ -10,7 +10,7 @@
     <button class="ui-accordion-header" type="button" aria-expanded="true|false">
       <span>行情面</span>
       [<span class="ui-accordion-badge">3</span>]
-      <span class="ui-accordion-caret ui-icon"><i data-lucide="chevron-down"></i></span>
+      <span class="ui-accordion-caret ui-icon">{SVG:chevron-down@2.4}</span>
     </button>
     <div class="ui-accordion-panel">
       <div class="ui-accordion-panel-inner">

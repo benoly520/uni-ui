@@ -7,7 +7,7 @@
 ```html
 <div class="ui-steps">
   <div class="ui-step is-done is-clickable" data-step="0">
-    <span class="ui-step-dot"><svg viewBox="0 0 24 24" ...><!-- check --></svg></span>
+    <span class="ui-step-dot">{SVG:check@3}</span>
     <span class="ui-step-text"><span class="ui-step-title">配置参数</span><span class="ui-step-desc">选股 + 区间</span></span>
   </div>
   <span class="ui-step-line"></span>
@@ -29,7 +29,8 @@
 - 步之间插入 `ui-step-line`（最后一步后无 line）。
 
 ## 圆点内容
-- `is-done`：渲染 24×24 `currentColor` check SVG（对齐预览 lucide `check`，组件内联以保证双框架零运行时一致）。
+- `is-done`：渲染内置 `{SVG:check@3}`（24×24 `currentColor` 内联 SVG，对齐预览 lucide `check`，三端零运行时一致；记法见 `icon.md`）。
+- 该 svg 不包在 `.ui-icon` 内，尺寸由 theme.css 的 `.ui-step-dot svg { width:24px; height:24px }` 给出（svg 自身不写 width/height，使 React / Vue / Plain 三端 DOM 逐字一致）。
 - 其余：渲染序号数字 `j+1` 文本。
 
 ## 约束

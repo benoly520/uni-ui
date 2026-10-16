@@ -6,6 +6,7 @@ import React, {
   type CSSProperties,
 } from 'react';
 import { cx } from '../utils/cx';
+import { IconCaret } from './icons';
 
 export interface TreeData {
   /** 唯一键，受控/非受控状态都以它为标识 */
@@ -47,12 +48,6 @@ function parentKeys(nodes: TreeData[], acc: string[] = []): string[] {
   }
   return acc;
 }
-
-const Chevron = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M6 9l6 6 6-6" />
-  </svg>
-);
 
 /**
  * Tree · 行业/板块层级树（金融筛选骨架组件）
@@ -143,7 +138,7 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(function Tree(
               if (hasChildren) toggleExpand(node.key);
             }}
           >
-            <Chevron />
+            <IconCaret strokeWidth={2.4} />
           </span>
           {checkable && (
             <input

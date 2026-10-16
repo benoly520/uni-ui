@@ -1,6 +1,6 @@
 import { resolve, signal } from 'plain';
 import { cx, boolAttr } from './_shared';
-import { IconCalendar, IconCaret } from './icons';
+import { IconCalendar, IconChevronLeft, IconChevronRight } from './icons';
 import type { MaybeGetter } from './_shared';
 
 export type DatePickerValue = string | [string, string] | null;
@@ -204,7 +204,7 @@ export function DatePicker(props: DatePickerProps) {
             onClick={() => view.set(new Date(view().getFullYear(), view().getMonth() - 1, 1))}
           >
             <span class="ui-icon">
-              <IconCaret />
+              <IconChevronLeft strokeWidth={2.4} />
             </span>
           </button>
           <span class="dp-title">{titleText()}</span>
@@ -216,7 +216,7 @@ export function DatePicker(props: DatePickerProps) {
             onClick={() => view.set(new Date(view().getFullYear(), view().getMonth() + 1, 1))}
           >
             <span class="ui-icon">
-              <IconCaret />
+              <IconChevronRight strokeWidth={2.4} />
             </span>
           </button>
         </div>

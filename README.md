@@ -1,15 +1,15 @@
 # uni-ui
 
-同时支持 **React 18** 与 **Vue 3** 的 PC 端 Web 组件库，首应用为金融投研工具。
+同时支持 **React 18** / **Vue 3** / **Plain** 三端的 PC 端 Web 组件库，首应用为金融投研工具。
 
-设计语言：macOS 毛玻璃质感、紧凑密度、默认暗色、七色品牌色、rem 单位。视觉全部来自共享设计系统 `theme.css`，组件文件零样式，保证双框架 DOM 与类名完全一致。
+设计语言：macOS 毛玻璃质感、紧凑密度、默认暗色、七色品牌色、rem 单位。视觉全部来自共享设计系统 `theme.css`，组件文件零样式，保证三端 DOM 与类名完全一致。
 
 ## 特性
 
-- **单包双框架**：`uni-ui/react`、`uni-ui/vue` 两个子路径，React / Vue 外置为 peer 依赖。
-- **37 个组件**：基础输入、展示、导航、浮层、数据、反馈全品类，含金融增强（NumberInput / DatePicker / Stat / Tree / Slider / DataTable / Search）。
-- **契约四件套**：每个组件配套 `contracts/<name>.{api,behavior,dom}.md`，作为双框架实现的唯一事实来源。
-- **图标**：接入 lucide（本地 vendor，2126 图标）。
+- **单包三端**：`uni-ui/react`、`uni-ui/vue`、`uni-ui/plain` 三个子路径；React / Vue / Plain 均外置为 peer 依赖。
+- **32 个组件**：基础输入、展示、导航、浮层、数据、反馈全品类，含金融增强（NumberInput / DatePicker / Stat / Tree / Slider / DataTable / Search）。
+- **契约四件套**：每个组件配套 `contracts/<name>.{api,behavior,dom}.md`，作为三端实现的唯一事实来源。
+- **图标**：不内置图标库。组件只内置少量「状态驱动」的内联 SVG（caret / check / search / calendar / table），其余图标由使用方经 `icon` 插槽传入；设计预览用本地 `vendor/lucide.min.js`（2126 图标，不随包发布），边界与快照记法见 `contracts/icon.md`。
 
 ## 快速开始
 
@@ -27,8 +27,10 @@ import { Tree } from 'uni-ui/vue';
 
 ```ts
 import { toast, showMessage } from 'uni-ui/react';
-toast.success('已保存');
-showMessage({ type: 'success', content: '已保存' });
+toast('已保存');                        // 默认 2400ms 后自动关闭
+toast('已提交', { duration: 3000 });    // 可指定时长（0 = 常驻）
+showMessage('已保存', 'success');       // success | warning | info | danger
+showMessage('保存失败', 'danger', 4000);
 ```
 
 ## 文档
@@ -39,7 +41,7 @@ showMessage({ type: 'success', content: '已保存' });
 
 ## 本地预览（Playground）
 
-双框架并排演示，从库源码真实消费路径运行：
+三端并排演示，从库源码真实消费路径运行：
 
 ```bash
 cd playground
@@ -59,5 +61,5 @@ pnpm run typecheck          # vue-tsc 全量类型检查（0 error）
 ## 约定
 
 - 组件文件不写任何 scoped / 运行时 CSS；视觉复用 `theme.css` 已有 class。
-- React / Vue 产出完全一致的标签、class、层级（DOM 一致是双框架铁律）。
+- React / Vue / Plain 产出完全一致的标签、class、层级（DOM 一致是三端铁律）。
 - 构建工具：Vite 5 + Rollup（详见架构文档 §17.36 对比分析）。

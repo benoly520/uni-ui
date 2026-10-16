@@ -682,6 +682,9 @@ input[type="range"] { width: 100%; min-width: 0; }
 .ui-steps { display: flex; align-items: flex-start; }
 .ui-step { display: flex; align-items: center; flex: 1; }
 .ui-step-dot { width: 28px; height: 28px; flex: none; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; border: 2px solid var(--ui-border); color: var(--ui-text-muted); background: var(--ui-bg-elevated); transition: all var(--ui-dur-base) var(--ui-ease); }
+/* 圆点内的 check SVG：此处的图标不包在 .ui-icon 内，尺寸由本规则给出
+   （图标 svg 自身不写 width/height，以保证 React / Vue / Plain 三端 DOM 逐字一致） */
+.ui-step-dot svg { width: 24px; height: 24px; display: block; }
 .ui-step-icon { width: 1em; height: 1em; display: inline-block; }
 .ui-step-text { margin-left: 8px; display: flex; flex-direction: column; line-height: 1.2; }
 .ui-step-title { font-size: 13px; font-weight: 600; color: var(--ui-text-muted); }

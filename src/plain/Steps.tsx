@@ -73,7 +73,7 @@ export function Steps(props: StepsProps) {
             }}
           >
             <span class="ui-step-dot">
-              {git.index < cur() ? <IconCheck /> : '' + (git.index + 1)}
+              {git.index < cur() ? <IconCheck strokeWidth={3} /> : '' + (git.index + 1)}
             </span>
             <span class="ui-step-text">
               <span class="ui-step-title">{stepsArr()[git.index].title}</span>

@@ -8,6 +8,7 @@ import React, {
   type CSSProperties,
 } from 'react';
 import { cx } from '../utils/cx';
+import { IconCalendar, IconChevronLeft, IconChevronRight } from './icons';
 
 export type DatePickerValue = string | [string, string] | null;
 
@@ -37,23 +38,6 @@ const parse = (s: string): Date => {
 };
 const same = (a: Date | null, b: Date | null) =>
   !!a && !!b && a.getTime() === b.getTime();
-
-const CalendarIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="4" width="18" height="17" rx="2" />
-    <path d="M3 9h18M8 2v4M16 2v4" />
-  </svg>
-);
-const ChevronLeft = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M15 18l-6-6 6-6" />
-  </svg>
-);
-const ChevronRight = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9 18l6-6-6-6" />
-  </svg>
-);
 
 /**
  * DatePicker · 单日 / 日期范围（金融增强）
@@ -234,7 +218,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
           }}
         >
           <span className="ui-icon">
-            <CalendarIcon />
+            <IconCalendar />
           </span>
           <span className="dp-text">{triggerText}</span>
         </button>
@@ -254,7 +238,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
               onClick={() => setView(new Date(view.getFullYear(), view.getMonth() - 1, 1))}
             >
               <span className="ui-icon">
-                <ChevronLeft />
+                <IconChevronLeft strokeWidth={2.4} />
               </span>
             </button>
             <span className="dp-title">
@@ -268,7 +252,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
               onClick={() => setView(new Date(view.getFullYear(), view.getMonth() + 1, 1))}
             >
               <span className="ui-icon">
-                <ChevronRight />
+                <IconChevronRight strokeWidth={2.4} />
               </span>
             </button>
           </div>

@@ -20,7 +20,7 @@
 
 ## 插槽
 - **默认插槽**：文本或任意节点（如 `新建`）。
-- **icon 插槽**：`<span class="ui-icon"><i data-lucide="plus"></i></span>`，置于文本前；尺寸随 `--ui-icon-size`，颜色 `currentColor`。
+- **icon 插槽**：`<span class="ui-icon">{icon}</span>`，置于文本前；节点由使用方传入（组件不感知内容，见 `icon.md`）。尺寸随 `--ui-icon-size`，颜色 `currentColor`。
 
 ## 事件
 - `onClick` / `onclick`：原生 click；`loading` 或 `disabled` 时不触发。

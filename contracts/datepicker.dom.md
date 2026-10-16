@@ -7,14 +7,14 @@
 ```html
 <div class="ui-datepicker" data-range>
   <button class="ui-datepicker-trigger ui-input" type="button" aria-haspopup="dialog" aria-expanded="false">
-    <span class="ui-icon"><!-- 24x24 日历 SVG, stroke=currentColor --></span>
+    <span class="ui-icon">{SVG:calendar@2}</span>
     <span class="dp-text">选择日期区间</span>
   </button>
   <div class="ui-datepicker-pop" role="dialog" aria-label="选择日期区间" hidden>
     <div class="dp-head">
-      <button class="dp-nav" type="button" data-nav="prev" aria-label="上个月"><span class="ui-icon"><!-- chevron-left --></span></button>
+      <button class="dp-nav" type="button" data-nav="prev" aria-label="上个月"><span class="ui-icon">{SVG:chevron-left@2.4}</span></button>
       <span class="dp-title">2026年10月</span>
-      <button class="dp-nav" type="button" data-nav="next" aria-label="下个月"><span class="ui-icon"><!-- chevron-right --></span></button>
+      <button class="dp-nav" type="button" data-nav="next" aria-label="下个月"><span class="ui-icon">{SVG:chevron-right@2.4}</span></button>
     </div>
     <div class="dp-week"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
     <div class="dp-grid">
@@ -50,5 +50,5 @@
 1. class 顺序：根 `ui-datepicker` 必首位；`dp-*` 子元素顺序固定（head → week → grid → foot）。
 2. 周起点固定**周一**（lead = `(first.getDay()+6)%7`），`dp-week` 顺序 一→日。
 3. 弹层 `hidden` 属性控制显隐（CSS `.ui-datepicker-pop[hidden]{display:none}`）。
-4. 图标为内置 24×24 `currentColor` 内联 SVG，非 lucide `<i data-lucide>`。
+4. 图标为内置内联 SVG（`{SVG:calendar@2}` / `{SVG:chevron-left@2.4}` / `{SVG:chevron-right@2.4}`，记法见 `icon.md`），不依赖 lucide 运行时。
 5. 颜色零硬编码（除 #fff 文本对比）：选中底 `var(--ui-color-brand)`，today 描边同，柔光 `var(--ui-color-brand-soft)`。

@@ -6,7 +6,7 @@
 
 ```html
 <button class="ui-btn {variant} [ui-size-*] [ui-btn--pill] [ui-btn--loading]" type="button" [disabled] [aria-busy="true"] [aria-label="..."]>
-  [<span class="ui-icon"><i data-lucide="NAME"></i></span>]
+  [<span class="ui-icon">{icon}</span>]
   [文本或节点]
 </button>
 ```
@@ -20,7 +20,7 @@
 | Ghost | `<button class="ui-btn ui-btn--ghost" type="button">Tooltip</button>` |
 | Outline | `<button class="ui-btn ui-btn--outline" type="button">Outline</button>` |
 | Danger | `<button class="ui-btn ui-btn--danger" type="button">Danger</button>` |
-| 带图标 | `<button class="ui-btn ui-btn--primary" type="button"><span class="ui-icon"><i data-lucide="plus"></i></span>新建</button>` |
+| 带图标 | `<button class="ui-btn ui-btn--primary" type="button"><span class="ui-icon">{icon}</span>新建</button>` |
 | 尺寸 lg | `<button class="ui-btn ui-btn--primary ui-size-lg" type="button">大</button>` |
 | 胶囊 | `<button class="ui-btn ui-btn--primary ui-btn--pill" type="button">胶囊 Primary</button>` |
 | loading | `<button class="ui-btn ui-btn--primary ui-btn--loading" type="button" aria-busy="true">加载</button>` |

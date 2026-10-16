@@ -11,11 +11,11 @@
 | 名称 | 类型 | 默认值 | 对应 class / 属性 | 说明 |
 |---|---|---|---|---|
 | `description` | 节点 | — | 渲染进 `.ui-label` | 空状态描述文案 |
-| `icon` | 节点（24×24 + currentColor） | `table` 占位 | 包入 `.ico.ui-icon` 插槽 | 见 `icon.md`；预览用 `data-lucide="table"`（§1232） |
+| `icon` | 节点（24×24 + currentColor） | 内置 `table` SVG | 包入 `.ico.ui-icon` 插槽 | 见 `icon.md`；默认图形等价 lucide `table`（§1232），零图标库运行时 |
 | `children` | 节点 | — | 操作插槽（按钮等），置于描述下 | 如「新建自选」 |
 
 ## 插槽
-- **icon 插槽**：`<span class="ico ui-icon">{icon}</span>`，默认 `table` 占位图标，可覆盖。
+- **icon 插槽**：`<span class="ico ui-icon">{icon}</span>`；默认渲染内置 `table` 内联 SVG（零图标库运行时），可整段覆盖。
 - **description**：`.ui-label` 文本（中性色）。
 - **默认插槽**：操作区（`ui-empty` 为 flex 列，操作紧随描述）。
 

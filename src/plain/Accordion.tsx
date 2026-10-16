@@ -79,7 +79,7 @@ export function Accordion(props: AccordionProps) {
               <span>{item.title}</span>
               {item.badge != null && <span class="ui-accordion-badge">{item.badge}</span>}
               <span class="ui-accordion-caret ui-icon">
-                <IconCaret />
+                <IconCaret strokeWidth={2.4} />
               </span>
             </button>
             <div class="ui-accordion-panel">

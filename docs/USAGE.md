@@ -64,6 +64,43 @@ import 'uni-ui/theme.css';
 }
 ```
 
+### 3.1 字体（需自行加载）
+
+库**零字体依赖**：`theme.css` 不含任何 `@font-face`，只定义三条字体栈 token：
+
+| token | 默认栈 | 用途 |
+|---|---|---|
+| `--ui-font-display` | `"Cabinet Grotesk", -apple-system, ...` | 标题 / 展示字 |
+| `--ui-font-body` | `"Satoshi", -apple-system, "PingFang SC", ...` | 正文与控件 |
+| `--ui-font-mono` | `"JetBrains Mono", ui-monospace, ...` | 数值与代码 |
+
+应用侧不加载这些字体时，渲染会**静默回落**到系统 sans：macOS 上尚可，Windows / 内网机器上观感会明显偏离设计调性（这是「零依赖」的代价，故必须显式决策）。Playground 的做法是 CDN 引入：
+
+```html
+<!-- Fontshare：展示字 Cabinet Grotesk + 正文 Satoshi -->
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+<link
+  href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&f[]=cabinet-grotesk@700,800&display=swap"
+  rel="stylesheet"
+/>
+<!-- Google Fonts：等宽 JetBrains Mono -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+  rel="stylesheet"
+/>
+```
+
+生产环境建议**自托管**（字体属视觉资产，且部分网络下 CDN 不可达）；不想引入外部字体时，直接覆盖 token 即可，组件无需改动：
+
+```css
+:root {
+  --ui-font-display: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --ui-font-body: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --ui-font-mono: ui-monospace, "SF Mono", Consolas, monospace;
+}
+```
+
 ## 4. 按需引入（可选）
 
 默认发布为单文件 ESM bundle（`uni-ui/react`、`uni-ui/vue`），由使用方打包器 tree-shaking 按需。

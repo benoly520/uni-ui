@@ -61,5 +61,6 @@ pnpm run typecheck          # vue-tsc 全量类型检查（0 error）
 ## 约定
 
 - 组件文件不写任何 scoped / 运行时 CSS；视觉复用 `theme.css` 已有 class。
+- **字体需自行加载（库零字体依赖）**：`theme.css` 不含 `@font-face`，`--ui-font-display` / `--ui-font-body` / `--ui-font-mono` 缺省回落系统字体；要拿到设计调性需应用侧加载 Cabinet Grotesk / Satoshi / JetBrains Mono，或直接覆盖这三个 token（见 [`docs/USAGE.md`](./docs/USAGE.md) §3.1）。
 - React / Vue / Plain 产出完全一致的标签、class、层级（DOM 一致是三端铁律）。
 - 构建工具：Vite 5 + Rollup（详见架构文档 §17.36 对比分析）。

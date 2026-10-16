@@ -40,12 +40,14 @@ const emit = defineEmits<{
 
 const isControlled = computed(() => props.value != null);
 
-// 受控时仅绑定 value；非受控时仅绑定 default-value（写入原生 defaultValue 属性，避免渲染 value 属性）
-const inputBind = computed(() =>
-  isControlled.value
-    ? { value: props.value }
-    : { 'default-value': props.defaultValue },
-);
+// 受控时绑定 value；非受控时绑定原生 DOM property defaultValue。
+// 不能写连字符名 'default-value'：HTML 无该 attribute，Vue 会走 setAttribute 写成无效属性，
+// 而非受控初值必须落到 input.defaultValue 上才生效。
+const inputBind = computed(() => {
+  if (isControlled.value) return { value: props.value };
+  if (props.defaultValue == null) return {};
+  return { defaultValue: props.defaultValue };
+});
 
 const cls = computed(() => [
   'ui-input',

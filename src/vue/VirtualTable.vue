@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 interface VTableColumn {
   key: string;
@@ -54,9 +54,14 @@ function recompute() {
 const windowRows = computed(() => {
   const [s, e] = range.value;
   const out: number[] = [];
-  for (let i = s; i < e; i++) out.push(i);
+  // 以当前 rows 长度兜底：range 可能仍是父级换短数组之前的旧范围
+  const end = Math.min(e, props.rows.length);
+  for (let i = s; i < end; i++) out.push(i);
   return out;
 });
+
+// 父级替换 rows（尤其变短）后即时重算窗口，避免沿用旧 range 渲染越界行
+watch(() => [props.rows.length, props.rowHeight], recompute);
 
 onMounted(recompute);
 </script>

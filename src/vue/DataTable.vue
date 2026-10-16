@@ -165,7 +165,7 @@ function onRowClick(e: MouseEvent, key: string) {
       </thead>
       <tbody>
         <tr
-          v-for="row in displayed"
+          v-for="(row, ri) in displayed"
           :key="row[rowKey]"
           :class="selectedSet.has(row[rowKey]) && 'is-selected'"
           :aria-selected="selectedSet.has(row[rowKey]) || undefined"
@@ -187,7 +187,7 @@ function onRowClick(e: MouseEvent, key: string) {
             :class="[col.sticky && 'sticky-col', col.numeric && 'ui-num']"
             :data-num="col.numeric || undefined"
           >
-            <template v-if="col.render">{{ col.render(row, 0) }}</template>
+            <template v-if="col.render">{{ col.render(row, ri) }}</template>
             <template v-else>{{ row[col.key] }}</template>
           </td>
         </tr>

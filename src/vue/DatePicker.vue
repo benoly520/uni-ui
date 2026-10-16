@@ -29,6 +29,8 @@ const emit = defineEmits<{
 
 const isControlled = computed(() => props.value != null);
 const open = ref(false);
+// 根节点 ref：外部点击判定用自身实例，避免同页多实例时 querySelector 命中第一个
+const rootRef = ref<HTMLElement | null>(null);
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
@@ -161,7 +163,9 @@ let onDoc: ((e: MouseEvent) => void) | null = null;
 watch(open, (o) => {
   if (o) {
     onDoc = (e: MouseEvent) => {
-      const root = document.querySelector('.ui-datepicker');
+      // 必须用自身根节点：querySelector('.ui-datepicker') 恒取页面第一个实例，
+      // 同页多个 DatePicker 时点第 2 个自身的面板会把它误关。
+      const root = rootRef.value;
       if (root && !root.contains(e.target as Node)) open.value = false;
     };
     document.addEventListener('mousedown', onDoc);
@@ -176,7 +180,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="ui-datepicker" :data-range="range ? '' : undefined">
+  <div ref="rootRef" class="ui-datepicker" :data-range="range ? '' : undefined">
     <button
       type="button"
       class="ui-datepicker-trigger ui-input"

@@ -76,6 +76,8 @@ function applyOpen(open: boolean) {
       const f = focusables();
       (f[0] ?? overlay).focus();
     });
+    // 先摘旧监听：immediate 与 onMounted 可能对同一开态调用两次，避免重复累积
+    if (escHandler) document.removeEventListener('keydown', escHandler);
     escHandler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') emit('open-change', false);
     };
@@ -83,6 +85,11 @@ function applyOpen(open: boolean) {
   } else {
     overlay.setAttribute('inert', '');
     overlay.setAttribute('aria-hidden', 'true');
+    // 关闭时同步摘除 Esc 监听，否则反复开合会累积（onBeforeUnmount 只能摘到最后一个引用）
+    if (escHandler) {
+      document.removeEventListener('keydown', escHandler);
+      escHandler = null;
+    }
     lastFocus?.focus?.();
   }
 }

@@ -464,6 +464,10 @@ a { color: var(--ui-color-brand); text-decoration: none; }
 .ui-form { display: flex; flex-direction: column; gap: var(--ui-space-4); }
 .ui-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: var(--ui-space-4); }
 .ui-form-row { display: flex; flex-direction: column; gap: var(--ui-space-2); }
+/* 字段以 <label> 包裹 <input> 建立隐式关联：不依赖 id，同页多实例不会串 label。
+   作用域限定在 .ui-form-row 内，避免影响 Empty 描述 / Drawer 副标题对 .ui-label 的复用。 */
+.ui-form-row > .ui-label { display: flex; flex-direction: column; gap: var(--ui-space-2); }
+.ui-form-row > .ui-label > .ui-input { font-weight: 400; }
 .ui-form-error { color: var(--ui-color-danger); font-size: var(--ui-fs-xs); min-height: 1em; margin-top: 2px; }
 
 /* Pagination — 翻页（P1） */

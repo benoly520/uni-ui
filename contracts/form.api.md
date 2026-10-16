@@ -14,7 +14,7 @@
 | `grid` | `boolean` | `true` | 包 `.ui-form-grid` | 字段栅格布局 |
 | `submitText` | `string` | `'提交'` | 提交按钮文案 | — |
 | `onSubmit` | `(values: Record<string,string>) => void` | — | 校验通过回调 | — |
-| `idPrefix` | `string` | — | 生成 `id` / `label[for]`：`${idPrefix}-${name}` | 同页多个 Form 必须传唯一值，否则同名字段会串 label |
+| `idPrefix` | `string` | — | 生成 `id`：`${idPrefix}-${name}` | 同页多个 Form 建议传唯一值以避免重复 id；label 关联由 `<label>` 包裹 `<input>` 建立，不依赖 id |
 | `className` / `style` | — | — | — | — |
 
 ### FormField

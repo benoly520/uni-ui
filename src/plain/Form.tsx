@@ -81,18 +81,18 @@ export function Form(props: FormProps) {
       const err = () => errors()[f.name];
       return (
         <div class={cx('ui-form-row', err() && 'ui-form-item--error')}>
-          <label class="ui-label" htmlFor={fid(f.name)}>
+          <label class="ui-label">
             {f.label}
+            <input
+              class={cx('ui-input', err() && 'ui-input--error')}
+              id={fid(f.name)}
+              name={f.name}
+              type={f.type ?? 'text'}
+              placeholder={f.placeholder}
+              value={values()[f.name] ?? ''}
+              onChange={(e: Event) => setVal(f.name, e)}
+            />
           </label>
-          <input
-            class={cx('ui-input', err() && 'ui-input--error')}
-            id={fid(f.name)}
-            name={f.name}
-            type={f.type ?? 'text'}
-            placeholder={f.placeholder}
-            value={values()[f.name] ?? ''}
-            onChange={(e: Event) => setVal(f.name, e)}
-          />
           <div class="ui-form-error" data-for={f.name}>
             {err() ?? ''}
           </div>

@@ -93,20 +93,20 @@ export const Form = forwardRef<HTMLFormElement, FormProps>(function Form(
           key={f.name}
           className={cx('ui-form-row', errors[f.name] && 'ui-form-item--error')}
         >
-          <label className="ui-label" htmlFor={fid(f.name)}>
+          <label className="ui-label">
             {f.label}
+            <input
+              className={cx('ui-input', errors[f.name] && 'ui-input--error')}
+              id={fid(f.name)}
+              name={f.name}
+              type={f.type ?? 'text'}
+              placeholder={f.placeholder}
+              value={values[f.name] ?? ''}
+              onChange={(e) =>
+                setValues((prev) => ({ ...prev, [f.name]: e.target.value }))
+              }
+            />
           </label>
-          <input
-            className={cx('ui-input', errors[f.name] && 'ui-input--error')}
-            id={fid(f.name)}
-            name={f.name}
-            type={f.type ?? 'text'}
-            placeholder={f.placeholder}
-            value={values[f.name] ?? ''}
-            onChange={(e) =>
-              setValues((prev) => ({ ...prev, [f.name]: e.target.value }))
-            }
-          />
           <div className="ui-form-error" data-for={f.name}>
             {errors[f.name]}
           </div>

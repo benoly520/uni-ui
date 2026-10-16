@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { reactive, ref, type CSSProperties } from 'vue';
 
 interface FormRule {
   required?: boolean;
@@ -19,8 +19,10 @@ interface FormProps {
   fields: FormField[];
   grid?: boolean;
   submitText?: string;
-  /** id 命名空间前缀：同页多个 Form 必须传唯一值，否则同名字段会串 label */
+  /** id 命名空间前缀：同页多个 Form 必须传唯一值，避免重复 id */
   idPrefix?: string;
+  className?: string;
+  style?: CSSProperties;
 }
 
 const props = withDefaults(defineProps<FormProps>(), {
@@ -62,7 +64,7 @@ function handleSubmit() {
 </script>
 
 <template>
-  <form class="ui-form" novalidate @submit.prevent="handleSubmit">
+  <form class="ui-form" :class="className" :style="style" novalidate @submit.prevent="handleSubmit">
     <div v-if="grid" class="ui-form-grid">
       <div
         v-for="f in fields"
@@ -70,16 +72,18 @@ function handleSubmit() {
         class="ui-form-row"
         :class="errors[f.name] && 'ui-form-item--error'"
       >
-        <label class="ui-label" :for="fid(f.name)">{{ f.label }}</label>
-        <input
-          class="ui-input"
-          :class="errors[f.name] && 'ui-input--error'"
-          :id="fid(f.name)"
-          :name="f.name"
-          :type="f.type ?? 'text'"
-          :placeholder="f.placeholder"
-          v-model="values[f.name]"
-        />
+        <label class="ui-label">
+          {{ f.label }}
+          <input
+            class="ui-input"
+            :class="errors[f.name] && 'ui-input--error'"
+            :id="fid(f.name)"
+            :name="f.name"
+            :type="f.type ?? 'text'"
+            :placeholder="f.placeholder"
+            v-model="values[f.name]"
+          />
+        </label>
         <div class="ui-form-error" :data-for="f.name">{{ errors[f.name] }}</div>
       </div>
     </div>
@@ -90,16 +94,18 @@ function handleSubmit() {
         class="ui-form-row"
         :class="errors[f.name] && 'ui-form-item--error'"
       >
-        <label class="ui-label" :for="fid(f.name)">{{ f.label }}</label>
-        <input
-          class="ui-input"
-          :class="errors[f.name] && 'ui-input--error'"
-          :id="fid(f.name)"
-          :name="f.name"
-          :type="f.type ?? 'text'"
-          :placeholder="f.placeholder"
-          v-model="values[f.name]"
-        />
+        <label class="ui-label">
+          {{ f.label }}
+          <input
+            class="ui-input"
+            :class="errors[f.name] && 'ui-input--error'"
+            :id="fid(f.name)"
+            :name="f.name"
+            :type="f.type ?? 'text'"
+            :placeholder="f.placeholder"
+            v-model="values[f.name]"
+          />
+        </label>
         <div class="ui-form-error" :data-for="f.name">{{ errors[f.name] }}</div>
       </div>
     </template>

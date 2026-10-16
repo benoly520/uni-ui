@@ -41,10 +41,11 @@ export function Search(props: SearchProps) {
   );
   const cur = () => (isControlled() ? String(resolve(props.value)) : inner());
   const open = signal(false);
-  const active = signal(0);
+  // 初值 -1（与 React 一致）：否则聚焦后首次按 ↓ 会直接落到第 2 项
+  const active = signal(-1);
 
   const visible = () => {
-    const q = cur().toLowerCase();
+    const q = cur().trim().toLowerCase();
     const opts = (resolve(props.options) as SearchOption[]) || [];
     if (!q) return opts;
     return opts.filter(
@@ -56,6 +57,7 @@ export function Search(props: SearchProps) {
     props.onSelect?.(o);
     if (!isControlled()) inner.set(o.label);
     open.set(false);
+    active.set(-1);
   };
 
   const handleKey = (e: KeyboardEvent) => {
@@ -71,6 +73,7 @@ export function Search(props: SearchProps) {
       if (o) select(o);
     } else if (e.key === 'Escape') {
       open.set(false);
+      active.set(-1);
     }
   };
 
@@ -90,14 +93,13 @@ export function Search(props: SearchProps) {
         value={cur()}
         onFocus={() => {
           open.set(true);
-          active.set(0);
         }}
         onInput={(e: Event) => {
           const v = (e.target as HTMLInputElement).value;
           if (!isControlled()) inner.set(v);
           props.onChange?.(v);
           open.set(true);
-          active.set(0);
+          active.set(-1);
         }}
         onKeyDown={handleKey}
       />

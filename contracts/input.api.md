@@ -23,6 +23,8 @@
 | `maxLength` | `number` | — | 原生 `maxlength` | 最大长度 |
 | `prefix` | 节点（图标） | — | 包入 `.ui-icon` 插槽 | 前导图标/装饰（adornment sibling） |
 | `suffix` | 节点（图标） | — | 包入 `.ui-icon` 插槽 | 后导图标/装饰（adornment sibling） |
+| `className` | `string` | — | 附加 class | 加在 `<input>` 上（非 `.ui-input-wrap`） |
+| `style` | `CSSProperties` | — | 内联样式 | 加在 `<input>` 上（非 `.ui-input-wrap`） |
 
 ## 插槽
 - **默认**：无（文本输入走 `value`/`defaultValue`）。

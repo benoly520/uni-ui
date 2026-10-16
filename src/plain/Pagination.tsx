@@ -44,7 +44,10 @@ function getPages(current: number, totalPages: number, sibling: number): (number
 export function Pagination(props: PaginationProps) {
   const isControlled = () => resolve(props.page) != null;
   const inner = signal<number>(Number(resolve(props.defaultPage) ?? 1));
-  const cur = () => (isControlled() ? Number(resolve(props.page)) : inner());
+  // 当前页钳制到 [1, totalPages]：越界受控值时否则会出现无 is-active 页码、
+  // 与 React 端（safeCurrent）高亮/禁用态不一致。
+  const cur = () =>
+    Math.min(totalPages(), Math.max(1, isControlled() ? Number(resolve(props.page)) : inner()));
   const totalPages = () =>
     Math.max(1, Math.ceil(Number(resolve(props.total)) / Number(resolve(props.pageSize) ?? 10)));
   const sibling = () => Number(resolve(props.siblingCount) ?? 1);

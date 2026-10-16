@@ -48,11 +48,7 @@ export function Tabs(props: TabsProps) {
   };
 
   let scrollerEl: HTMLElement | null = null;
-  const refScroller = (el: HTMLElement) => {
-    scrollerEl = el;
-  };
-  const onScroll = (e: Event) => {
-    const scroller = (e.currentTarget as HTMLElement) || scrollerEl;
+  const updateArrows = (scroller: HTMLElement | null) => {
     if (!scroller) return;
     const max = scroller.scrollWidth - scroller.clientWidth;
     const x = scroller.scrollLeft;
@@ -65,9 +61,27 @@ export function Tabs(props: TabsProps) {
     left?.classList.toggle('is-visible', x > 1);
     right?.classList.toggle('is-visible', x < max - 1);
   };
-  // 初始化箭头可见态（一次性，无泄漏）
-  requestAnimationFrame(() => {
-    if (scrollerEl) onScroll({ currentTarget: scrollerEl } as unknown as Event);
+  const onScroll = (e: Event) => {
+    updateArrows((e.currentTarget as HTMLElement) || scrollerEl);
+  };
+  const refScroller = (el: HTMLElement) => {
+    scrollerEl = el;
+    // 箭头可见性除滚动外还需跟随容器尺寸变化（窗口缩放 / 布局变化），与 React/Vue 端一致。
+    const refresh = () => updateArrows(el);
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(refresh) : null;
+    ro?.observe(el);
+    window.addEventListener('resize', refresh);
+    requestAnimationFrame(refresh);
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener('resize', refresh);
+      scrollerEl = null;
+    };
+  };
+  // tab 增删后重算箭头可见态（同步期读取以收集依赖）
+  effect(() => {
+    void itemsArr();
+    requestAnimationFrame(() => updateArrows(scrollerEl));
   });
 
   // 选中项滚动入视

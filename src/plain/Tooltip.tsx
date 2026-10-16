@@ -1,4 +1,4 @@
-import { resolve, signal } from 'plain';
+import { resolve, signal, effect } from 'plain';
 import { cx } from './_shared';
 import type { MaybeGetter, Renderable } from './_shared';
 
@@ -70,10 +70,19 @@ export function Tooltip(props: TooltipProps) {
   };
 
   let rootEl: HTMLElement | null = null;
+  let detach: (() => void) | null = null;
   const refCb = (el: HTMLElement) => {
     rootEl = el;
     const trigger = el.firstElementChild as HTMLElement | null;
-    if (trigger) {
+    // 契约 tooltip.behavior.md：disabled 时整条交互链路不挂载
+    //（不写 aria-describedby、不绑 focusin/focusout）。effect 让 disabled 变化时自动重建绑定。
+    effect(() => {
+      const off = disabled();
+      if (detach) {
+        detach();
+        detach = null;
+      }
+      if (off || !trigger) return;
       trigger.setAttribute('aria-describedby', tipId);
       const onFocusIn = () => show();
       const onFocusOut = (e: FocusEvent) => {
@@ -82,13 +91,18 @@ export function Tooltip(props: TooltipProps) {
       };
       el.addEventListener('focusin', onFocusIn);
       el.addEventListener('focusout', onFocusOut);
-      return () => {
+      detach = () => {
+        trigger.removeAttribute('aria-describedby');
         el.removeEventListener('focusin', onFocusIn);
         el.removeEventListener('focusout', onFocusOut);
         rootEl = null;
       };
-    }
+    });
     return () => {
+      if (detach) {
+        detach();
+        detach = null;
+      }
       rootEl = null;
     };
   };

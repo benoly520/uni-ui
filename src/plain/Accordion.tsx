@@ -71,6 +71,7 @@ export function Accordion(props: AccordionProps) {
         return (
           <div class={cx('ui-accordion-item', isOpen() && 'is-open')} data-key={item.key}>
             <button
+              type="button"
               class="ui-accordion-header"
               aria-expanded={isOpen()}
               onClick={() => toggle(item.key)}

@@ -78,14 +78,20 @@ export function Dialog(props: DialogProps) {
     return () => el.removeEventListener('keydown', onKey);
   };
 
+  let lastFocus: HTMLElement | null = null;
   effect(() => {
     const open = isOpen();
     applyInert();
     if (open) {
+      // 记录打开前的焦点元素，关闭时归还（契约 dialog.behavior.md:26）
+      lastFocus = document.activeElement as HTMLElement | null;
       requestAnimationFrame(() => {
         const f = overlayEl?.querySelectorAll<HTMLElement>(FOCUSABLE);
         if (f && f.length) f[0].focus();
       });
+    } else {
+      lastFocus?.focus?.();
+      lastFocus = null;
     }
   });
 
@@ -97,16 +103,17 @@ export function Dialog(props: DialogProps) {
     <div
       id={resolve(props.id)}
       ref={refCb}
-      class={cx('ui-overlay', isOpen() && 'show', resolve(props.className))}
+      class={cx('ui-overlay', isOpen() && 'show')}
       role="presentation"
       aria-hidden={!isOpen()}
-      style={resolve(props.style)}
       onMouseDown={(e: MouseEvent) => {
         if (closeOnOverlay() && e.target === e.currentTarget) setOpen(false);
       }}
     >
       <div
-        class="ui-dialog ui-glass"
+        // 契约 dialog.api.md：className / style 透传到 .ui-dialog 面板（而非遮罩）
+        class={cx('ui-dialog', 'ui-glass', resolve(props.className))}
+        style={resolve(props.style)}
         role="dialog"
         aria-modal="true"
         aria-label={dialogLabel()}

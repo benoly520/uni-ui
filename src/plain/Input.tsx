@@ -15,6 +15,7 @@ export interface InputProps {
   type?: MaybeGetter<string>;
   name?: MaybeGetter<string>;
   id?: MaybeGetter<string>;
+  maxLength?: MaybeGetter<number>;
   prefix?: Renderable | (() => Renderable);
   suffix?: Renderable | (() => Renderable);
   className?: MaybeGetter<string>;
@@ -69,12 +70,19 @@ export function Input(props: InputProps) {
         </span>
       ) : (
         <input
-          class={cx('ui-input', size() !== 'md' && 'ui-size-' + size(), error() && 'ui-input--error')}
+          class={cx(
+            'ui-input',
+            size() !== 'md' && 'ui-size-' + size(),
+            error() && 'ui-input--error',
+            resolve(props.className),
+          )}
+          style={resolve(props.style)}
           type={resolve(props.type) ?? 'text'}
           value={cur()}
           placeholder={resolve(props.placeholder)}
           name={resolve(props.name)}
           id={resolve(props.id)}
+          maxLength={resolve(props.maxLength)}
           disabled={disabled()}
           aria-invalid={error() || undefined}
           aria-label={resolve(props['aria-label'])}

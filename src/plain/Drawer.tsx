@@ -100,10 +100,17 @@ export function Drawer(props: DrawerProps) {
   };
 
   // open 变化时同步 inert，并在打开时把焦点移入面板
+  let lastFocus: HTMLElement | null = null;
   effect(() => {
     const open = isOpen();
     applyInert();
-    if (!open) return;
+    if (!open) {
+      // 关闭时归还焦点（契约 drawer.behavior.md:25）
+      lastFocus?.focus?.();
+      lastFocus = null;
+      return;
+    }
+    lastFocus = document.activeElement as HTMLElement | null;
     requestAnimationFrame(() => {
       const el = overlayEl;
       if (!el) return;
@@ -120,20 +127,22 @@ export function Drawer(props: DrawerProps) {
     <div
       id={resolve(props.id)}
       ref={refCb}
-      class={cx('ui-drawer-overlay', isOpen() && 'show', resolve(props.className))}
+      class={cx('ui-drawer-overlay', isOpen() && 'show')}
       role="presentation"
       aria-hidden={!isOpen()}
-      style={resolve(props.style)}
       onMouseDown={(e: MouseEvent) => {
         if (closeOnOverlay() && e.target === e.currentTarget) setOpen(false);
       }}
     >
       <aside
+        // 契约 drawer.api.md：className / style 透传到 .ui-drawer 面板（而非遮罩）
         class={cx(
           'ui-drawer',
           'ui-glass',
           side() !== 'right' && 'ui-drawer--' + side(),
+          resolve(props.className),
         )}
+        style={resolve(props.style)}
         role="dialog"
         aria-modal="true"
         aria-label={dialogLabel()}

@@ -247,7 +247,8 @@ export function DatePicker(props: DatePickerProps) {
               const empty: any = range() ? [null, null] : null;
               setVal(empty);
               if (range()) rangeSel.set([null, null]);
-              open.set(false);
+              // 契约 datepicker.behavior.md：清除保留弹层，仅复位选中与占位文案（不收起）
+
             }}
           >
             清除

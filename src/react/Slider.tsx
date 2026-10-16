@@ -1,6 +1,7 @@
 import React, {
   forwardRef,
   useCallback,
+  useEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -67,6 +68,9 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(
   );
   const lo = isControlled ? value![0] : inner[0];
   const hi = isControlled ? value![1] : inner[1];
+  // 拖拽期间挂在 document 上的监听：若拖拽未结束组件就被卸载，必须回收，否则泄漏并继续 commit
+  const dragCleanupRef = useRef<(() => void) | null>(null);
+  useEffect(() => () => dragCleanupRef.current?.(), []);
 
   const trackRef = useRef<HTMLDivElement>(null);
   const range = max - min || 1;
@@ -99,12 +103,15 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(
         handle === 0 ? [Math.min(v, hi), hi] : [lo, Math.max(v, lo)];
       commit(next);
     };
-    const up = () => {
+    // up 与卸载清理复用同一函数：一次摘掉 pointermove 与 pointerup
+    const cleanup = () => {
       document.removeEventListener('pointermove', move);
-      document.removeEventListener('pointerup', up);
+      document.removeEventListener('pointerup', cleanup);
+      dragCleanupRef.current = null;
     };
+    dragCleanupRef.current = cleanup;
     document.addEventListener('pointermove', move);
-    document.addEventListener('pointerup', up);
+    document.addEventListener('pointerup', cleanup);
   };
 
   const onKey = (handle: 0 | 1) => (e: ReactKeyboardEvent) => {

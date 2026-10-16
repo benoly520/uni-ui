@@ -54,7 +54,10 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
   const isControlled = openProp != null;
   const [innerOpen, setInnerOpen] = useState(defaultOpen);
   const open = isControlled ? (openProp as boolean) : innerOpen;
-  const popId = id ?? useId();
+  // useId 必须无条件调用（Hook 规则）：不能写成 `id ?? useId()`，
+  // 否则 id 有值时被短路跳过，同实例 id 从无到有会抛 "Rendered more hooks than expected"。
+  const autoId = useId();
+  const popId = id ?? autoId;
   const rootRef = useRef<HTMLDivElement>(null);
   const hideTimer = useRef<number | undefined>(undefined);
 

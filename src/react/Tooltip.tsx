@@ -66,7 +66,10 @@ export const Tooltip = forwardRef<HTMLSpanElement, TooltipProps>(function Toolti
   const isControlled = openProp != null;
   const [innerOpen, setInnerOpen] = useState(defaultOpen);
   const open = isControlled ? (openProp as boolean) : innerOpen;
-  const tipId = id ?? useId();
+  // useId 必须无条件调用（Hook 规则）：不能写成 `id ?? useId()`，
+  // 否则 id 有值时被短路跳过，同实例 id 从无到有会抛 "Rendered more hooks than expected"。
+  const autoId = useId();
+  const tipId = id ?? autoId;
   const hideTimer = useRef<number | undefined>(undefined);
   const showTimer = useRef<number | undefined>(undefined);
 

@@ -19,6 +19,8 @@ interface FormProps {
   fields: FormField[];
   grid?: boolean;
   submitText?: string;
+  /** id 命名空间前缀：同页多个 Form 必须传唯一值，否则同名字段会串 label */
+  idPrefix?: string;
 }
 
 const props = withDefaults(defineProps<FormProps>(), {
@@ -33,6 +35,9 @@ const values = reactive<Record<string, string>>(
   Object.fromEntries(props.fields.map((f) => [f.name, f.defaultValue ?? ''])),
 );
 const errors = ref<Record<string, string>>({});
+
+// 字段 id/for 的命名空间：不传前缀时保持 id === name（与既有契约快照一致）
+const fid = (name: string) => (props.idPrefix ? `${props.idPrefix}-${name}` : name);
 
 function validateField(field: FormField, value: string): string {
   const v = (value ?? '').trim();
@@ -65,11 +70,11 @@ function handleSubmit() {
         class="ui-form-row"
         :class="errors[f.name] && 'ui-form-item--error'"
       >
-        <label class="ui-label" :for="f.name">{{ f.label }}</label>
+        <label class="ui-label" :for="fid(f.name)">{{ f.label }}</label>
         <input
           class="ui-input"
           :class="errors[f.name] && 'ui-input--error'"
-          :id="f.name"
+          :id="fid(f.name)"
           :name="f.name"
           :type="f.type ?? 'text'"
           :placeholder="f.placeholder"
@@ -85,11 +90,11 @@ function handleSubmit() {
         class="ui-form-row"
         :class="errors[f.name] && 'ui-form-item--error'"
       >
-        <label class="ui-label" :for="f.name">{{ f.label }}</label>
+        <label class="ui-label" :for="fid(f.name)">{{ f.label }}</label>
         <input
           class="ui-input"
           :class="errors[f.name] && 'ui-input--error'"
-          :id="f.name"
+          :id="fid(f.name)"
           :name="f.name"
           :type="f.type ?? 'text'"
           :placeholder="f.placeholder"

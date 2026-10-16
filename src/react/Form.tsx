@@ -28,6 +28,8 @@ export interface FormProps {
   grid?: boolean;
   submitText?: string;
   onSubmit?: (values: Record<string, string>) => void;
+  /** id 命名空间前缀：同页多个 Form 必须传唯一值，否则同名字段会串 label */
+  idPrefix?: string;
   className?: string;
   style?: CSSProperties;
 }
@@ -56,6 +58,7 @@ export const Form = forwardRef<HTMLFormElement, FormProps>(function Form(
     grid = true,
     submitText = '提交',
     onSubmit,
+    idPrefix,
     className,
     style,
   },
@@ -65,6 +68,9 @@ export const Form = forwardRef<HTMLFormElement, FormProps>(function Form(
     Object.fromEntries(fields.map((f) => [f.name, f.defaultValue ?? ''])),
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // 字段 id/htmlFor 的命名空间：不传前缀时保持 id === name（与既有契约快照一致）
+  const fid = (name: string) => (idPrefix ? `${idPrefix}-${name}` : name);
 
   const handleSubmit = useCallback(
     (e: FormEvent) => {
@@ -87,12 +93,12 @@ export const Form = forwardRef<HTMLFormElement, FormProps>(function Form(
           key={f.name}
           className={cx('ui-form-row', errors[f.name] && 'ui-form-item--error')}
         >
-          <label className="ui-label" htmlFor={f.name}>
+          <label className="ui-label" htmlFor={fid(f.name)}>
             {f.label}
           </label>
           <input
             className={cx('ui-input', errors[f.name] && 'ui-input--error')}
-            id={f.name}
+            id={fid(f.name)}
             name={f.name}
             type={f.type ?? 'text'}
             placeholder={f.placeholder}

@@ -22,6 +22,8 @@ export interface FormProps {
   grid?: MaybeGetter<boolean>;
   submitText?: MaybeGetter<string>;
   onSubmit?: (values: Record<string, string>) => void;
+  /** id 命名空间前缀：同页多个 Form 必须传唯一值，否则同名字段会串 label */
+  idPrefix?: MaybeGetter<string>;
   className?: MaybeGetter<string>;
   style?: MaybeGetter<string | Record<string, string>>;
   id?: MaybeGetter<string>;
@@ -52,6 +54,12 @@ export function Form(props: FormProps) {
   const values = signal<Record<string, string>>(initValues());
   const errors = signal<Record<string, string>>({});
 
+  // 字段 id/htmlFor 的命名空间：不传前缀时保持 id === name（与既有契约快照一致）
+  const fid = (name: string) => {
+    const p = resolve(props.idPrefix);
+    return p ? p + '-' + name : name;
+  };
+
   const setVal = (name: string, e: Event) => {
     const v = (e.target as HTMLInputElement).value;
     values.set({ ...values(), [name]: v });
@@ -73,12 +81,12 @@ export function Form(props: FormProps) {
       const err = () => errors()[f.name];
       return (
         <div class={cx('ui-form-row', err() && 'ui-form-item--error')}>
-          <label class="ui-label" htmlFor={f.name}>
+          <label class="ui-label" htmlFor={fid(f.name)}>
             {f.label}
           </label>
           <input
             class={cx('ui-input', err() && 'ui-input--error')}
-            id={f.name}
+            id={fid(f.name)}
             name={f.name}
             type={f.type ?? 'text'}
             placeholder={f.placeholder}

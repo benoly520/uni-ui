@@ -32,6 +32,7 @@
 1. 根 `ui-form` 必首位；`grid` 为真时包 `.ui-form-grid`。
 2. 字段行 `.ui-form-row`；错误态加 `.ui-form-item--error`（语义）+ 输入框 `.ui-input--error`（红边，theme.css 实有）。
 3. 错误文案 `.ui-form-error` + `data-for=name`。
-4. `label[for]` 与 `input[id]` 同名；input 用 `.ui-input`（玻璃面）。
-5. 禁止 scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash；全部走 theme.css。
-6. React/Vue 必须产出相同标签、class 顺序、层级与校验逻辑。
+4. `label[for]` 与 `input[id]` 同值；**未传 `idPrefix` 时即为字段 `name`**（快照基准，见上方用例），传 `idPrefix` 时二者同为 `${idPrefix}-${name}`。input 用 `.ui-input`（玻璃面）。
+5. **同页多个 Form 必须传唯一 `idPrefix`**：`id` 需全局唯一，否则同名字段会串 `label`（`label[for]` 只命中文档中第一个匹配 id 的元素）。
+6. 禁止 scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash；全部走 theme.css。
+7. React/Vue 必须产出相同标签、class 顺序、层级与校验逻辑。

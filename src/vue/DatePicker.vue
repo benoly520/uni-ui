@@ -157,6 +157,8 @@ function onToday() {
 function onClear() {
   start.value = null;
   end.value = null;
+  // 契约 datepicker.api.md：清除需回调 onChange（受控下父级据此回灌 value）
+  commit(null, null);
 }
 
 let onDoc: ((e: MouseEvent) => void) | null = null;

@@ -82,7 +82,9 @@ export function DatePicker(props: DatePickerProps) {
     if (!cur[0] || (cur[0] && cur[1])) ns = [v, null];
     else {
       const start = parse(cur[0]);
-      ns = start && d >= start ? [cur[0], v] : [v, null];
+      // 契约 datepicker.behavior.md 状态机：pick(≥start) → 选满；
+      // pick(<start) → end=旧 start、start=新（旧实现丢成 [新, null]，反向选择丢失区间）
+      ns = start && d >= start ? [cur[0], v] : [v, cur[0]];
     }
     rangeSel.set(ns);
     if (ns[0] && ns[1]) {

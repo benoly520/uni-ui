@@ -302,6 +302,8 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
               onClick={() => {
                 setStart(null);
                 setEnd(null);
+                // 契约 datepicker.api.md：清除需回调 onChange（受控下父级据此回灌 value）
+                commit(null, null);
               }}
             >
               清除

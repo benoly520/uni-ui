@@ -23,6 +23,11 @@ export interface ComponentDoc {
   summary: string;
   /** Props / 事件速查表 */
   api: ApiRow[];
+  /**
+   * 页头 import 提示的覆盖文案。
+   * 仅用于「非组件条目」（如 Icon 契约页），缺省按 `import { <id> } from 'uni-ui/react'` 生成。
+   */
+  importHint?: string;
 }
 
 /** 合并后的单个用例：标题 / 说明 + React/Vue/Plain 实时 demo + 可复制代码 */
@@ -249,7 +254,7 @@ export const docs: ComponentDoc[] = [
     summary: '无数据占位，支持自定义描述文案、图标与操作插槽。',
     api: [
       { name: 'description', type: 'ReactNode / string', default: '—', desc: '空状态描述文案' },
-      { name: 'icon', type: 'ReactNode', default: '—', desc: '图标插槽（默认 table 占位）' },
+      { name: 'icon', type: 'ReactNode', default: '内置 table', desc: '图标插槽（默认内置 table 内联 SVG，可覆盖）' },
       { name: 'children / 默认插槽', type: '—', default: '—', desc: '操作区插槽' },
     ],
   },
@@ -461,6 +466,22 @@ export const docs: ComponentDoc[] = [
       { name: 'duration', type: 'number', default: '2600', desc: '自动关闭时长（0=常驻）' },
     ],
   },
+  {
+    id: 'Icon',
+    label: 'Icon 图标',
+    category: '基础',
+    summary: '组件不内置图标库：只内置少量「状态驱动」的内联 SVG，其余图标一律由使用方经 icon 插槽传入。',
+    importHint: '无 Icon 组件导出 · 图标统一经 `icon` 插槽传入，契约见 contracts/icon.md',
+    api: [
+      { name: 'icon', type: 'ReactNode', default: '—', desc: '传节点：<Button icon={<Plus />}>（React）/ 传组件或 VNode，内部以 <component :is="icon" /> 渲染（Vue）' },
+      { name: 'icon（Plain）', type: 'Renderable | (() => Renderable)', default: '—', desc: '传「调用子组件」的结果或返回节点的函数，如 icon={PlusIcon()}' },
+      { name: '插槽契约', type: '—', default: '—', desc: '24×24 viewBox + stroke/fill="currentColor"，零图标库运行时' },
+      { name: '尺寸', type: '—', default: '--ui-icon-size', desc: '由 .ui-icon 容器决定并随 .ui-size-* 档位缩放，svg 自身不写 width/height' },
+      { name: '颜色', type: '—', default: 'currentColor', desc: '继承文字色，无需额外传色值' },
+      { name: '内置图标', type: '—', default: '7 个', desc: 'chevron-down / chevron-left / chevron-right / check / search / calendar / table；状态驱动，不可替换' },
+      { name: '推荐图标库', type: '—', default: 'lucide', desc: 'React 用 lucide-react、Vue 用 lucide-vue-next，务必具名按需导入以免破坏 tree-shaking' },
+    ],
+  },
 ];
 
 /** 左侧分组（与旧结构保持一致，仅保留导航所需） */
@@ -470,6 +491,7 @@ export const categories: { name: string; items: { id: string; label: string }[] 
     { id: 'Tag', label: 'Tag 标签' },
     { id: 'Badge', label: 'Badge 徽标' },
     { id: 'Avatar', label: 'Avatar 头像' },
+    { id: 'Icon', label: 'Icon 图标' },
   ] },
   { name: '输入 Input', items: [
     { id: 'Input', label: 'Input 输入框' },

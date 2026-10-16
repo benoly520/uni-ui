@@ -104,6 +104,53 @@ const PopoverPanel = () => (
   </div>
 );
 
+/** 演示用「自备图标」：24×24 viewBox + currentColor，形状与 lucide `plus` / `star` / `search` 一致 */
+function PlusIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M12 5v14M5 12h14"></path>
+    </svg>
+  );
+}
+
+function StarIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M12 3l2.7 6.3 6.8.6-5.2 4.5 1.6 6.6L12 17.4 6.1 21l1.6-6.6L2.5 9.9l6.8-.6z"></path>
+    </svg>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="M21 21l-4.3-4.3"></path>
+    </svg>
+  );
+}
+
 export const plainDocs: Record<string, PlainCase[]> = {
   Button: [
     {
@@ -227,13 +274,13 @@ export const plainDocs: Record<string, PlainCase[]> = {
   Avatar: [
     {
       title: '文字 / 图片 / 图标',
-      desc: 'text 取首字生成底色头像；src 优先渲染图片；icon 渲染图标头像。',
-      code: `<Avatar text="茅台" tone="brand" />\n<Avatar text="宁" tone="success" />\n<Avatar icon="★" tone="warning" />\n<Avatar src="https://i.pravatar.cc/80?img=12" />`,
+      desc: 'text 取首字生成底色头像；src 优先渲染图片；icon 渲染自备图标头像（24×24 + currentColor）。',
+      code: `<Avatar text="茅台" tone="brand" />\n<Avatar text="宁" tone="success" />\n<Avatar icon={StarIcon()} tone="warning" />\n<Avatar src="https://i.pravatar.cc/80?img=12" />`,
       Comp: () => (
         <div class="demo-row">
           <Avatar text="茅台" tone="brand" />
           <Avatar text="宁" tone="success" />
-          <Avatar icon="★" tone="warning" />
+          <Avatar icon={StarIcon()} tone="warning" />
           <Avatar src="https://i.pravatar.cc/80?img=12" />
         </div>
       ),
@@ -271,11 +318,11 @@ export const plainDocs: Record<string, PlainCase[]> = {
     },
     {
       title: '前后缀装饰',
-      desc: 'prefix / suffix 注入前导/后导图标或文本，常用于搜索与单位场景。',
-      code: `<Input prefix="🔍" placeholder="搜索" />\n<Input suffix="%" defaultValue="12" />`,
+      desc: 'prefix / suffix 接收自备图标节点或文本，常用于搜索与单位场景。',
+      code: `<Input prefix={SearchIcon()} placeholder="搜索" />\n<Input suffix="%" defaultValue="12" />`,
       Comp: () => (
         <div class="demo-row">
-          <Input prefix="🔍" placeholder="搜索" />
+          <Input prefix={SearchIcon()} placeholder="搜索" />
           <Input suffix="%" defaultValue="12" />
         </div>
       ),
@@ -822,6 +869,57 @@ export const plainDocs: Record<string, PlainCase[]> = {
         }));
         return <VirtualTable rows={rows} columns={cols} rowHeight={33} />;
       },
+    },
+  ],
+
+  // ——— Icon 契约页（Plain 侧不能把 JSX 写进属性，需「调用子组件」传入结果）———
+  Icon: [
+    {
+      title: '自备图标传入',
+      desc: '组件不内置图标库：任意 24×24 viewBox + currentColor 的节点都能塞进 icon 插槽。Plain 侧不能把 JSX 直接写进属性，要「调用子组件」传入结果。',
+      code: `function PlusIcon() {\n  return (\n    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"\n         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">\n      <path d="M12 5v14M5 12h14"></path>\n    </svg>\n  );\n}\n\n<Button icon={PlusIcon()} variant="primary">新建</Button>\n<Tag icon={StarIcon()} type="brand">重点</Tag>`,
+      Comp: () => (
+        <div class="demo-row">
+          <Button icon={PlusIcon()} variant="primary">
+            新建
+          </Button>
+          <Tag icon={StarIcon()} type="brand">
+            重点
+          </Tag>
+        </div>
+      ),
+    },
+    {
+      title: '尺寸跟随容器',
+      desc: '图标自身不写 width/height，尺寸由容器的 .ui-icon 与 --ui-icon-size 决定，随 size 档位自动缩放。',
+      code: `<Button size="lg" variant="primary" icon={PlusIcon()}>大</Button>\n<Button variant="primary" icon={PlusIcon()}>中</Button>\n<Button size="sm" variant="primary" icon={PlusIcon()}>小</Button>`,
+      Comp: () => (
+        <div class="demo-row">
+          <Button size="lg" variant="primary" icon={PlusIcon()}>
+            大
+          </Button>
+          <Button variant="primary" icon={PlusIcon()}>
+            中
+          </Button>
+          <Button size="sm" variant="primary" icon={PlusIcon()}>
+            小
+          </Button>
+        </div>
+      ),
+    },
+    {
+      title: '可覆盖与不可覆盖',
+      desc: '内容类图标（Empty 的占位图）走 icon 插槽，可整段覆盖；状态类图标（Steps 已完成步的 check）是组件语义的一部分，内置且不可替换。',
+      code: `<Empty description="可覆盖：传入自备图标" icon={StarIcon()} />\n<Steps steps={[{ title: '选股' }, { title: '回测' }, { title: '实盘' }]} defaultCurrent={2} />`,
+      Comp: () => (
+        <div class="demo-row">
+          <Empty description="可覆盖：传入自备图标" icon={StarIcon()} />
+          <Steps
+            steps={[{ title: '选股' }, { title: '回测' }, { title: '实盘' }]}
+            defaultCurrent={2}
+          />
+        </div>
+      ),
     },
   ],
 };

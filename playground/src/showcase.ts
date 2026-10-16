@@ -146,7 +146,7 @@ export function createShowcase(view: HTMLElement): ShowcaseHandle {
     head.innerHTML = `<span id="pg-title"></span><code id="pg-path"></code>`;
     head.querySelector('#pg-title')!.textContent = doc.label;
     head.querySelector('#pg-path')!.textContent =
-      `import { ${id} } from 'uni-ui/react' · 'uni-ui/vue' · 'uni-ui/plain'`;
+      doc.importHint ?? `import { ${id} } from 'uni-ui/react' · 'uni-ui/vue' · 'uni-ui/plain'`;
 
     // 组件级框架切换（React / Vue / Plain）：控制 demo 面板、代码块与 API 表
     const fwTabs = document.createElement('div');

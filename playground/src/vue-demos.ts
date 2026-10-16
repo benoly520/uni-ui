@@ -112,6 +112,40 @@ const vtableRows = Array.from({ length: 5000 }, (_, i) => ({
   price: (i % 3) - 1,
 }));
 
+/** 演示用「自备图标」：24×24 viewBox + currentColor，形状与 lucide `plus` / `star` / `search` 一致 */
+const PlusIcon = () =>
+  h('svg', {
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    'stroke-width': 2,
+    'stroke-linecap': 'round',
+    'stroke-linejoin': 'round',
+  }, [h('path', { d: 'M12 5v14M5 12h14' })]);
+
+const StarIcon = () =>
+  h('svg', {
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    'stroke-width': 2,
+    'stroke-linecap': 'round',
+    'stroke-linejoin': 'round',
+  }, [h('path', { d: 'M12 3l2.7 6.3 6.8.6-5.2 4.5 1.6 6.6L12 17.4 6.1 21l1.6-6.6L2.5 9.9l6.8-.6z' })]);
+
+const SearchIcon = () =>
+  h('svg', {
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    'stroke-width': 2,
+    'stroke-linecap': 'round',
+    'stroke-linejoin': 'round',
+  }, [
+    h('circle', { cx: 11, cy: 11, r: 7 }),
+    h('path', { d: 'M21 21l-4.3-4.3' }),
+  ]);
+
 /** 静态用例助手：setup 直接返回渲染函数（makeRender() 即渲染函数），避免层级错位被 Vue 当文本渲染 */
 const S = (makeRender: () => () => ReturnType<typeof h>): DefineComponent =>
   defineComponent({ setup: makeRender });
@@ -202,12 +236,12 @@ export const vueDocs: Record<string, DemoCase[]> = {
 
   Avatar: [
     {
-      code: `<Avatar text="茅台" tone="brand" />\n<Avatar text="宁" tone="success" />\n<Avatar :icon="() => '★'" tone="warning" />\n<Avatar src="https://i.pravatar.cc/80?img=12" />`,
+      code: `<Avatar text="茅台" tone="brand" />\n<Avatar text="宁" tone="success" />\n<Avatar :icon="StarIcon" tone="warning" />\n<Avatar src="https://i.pravatar.cc/80?img=12" />`,
       Comp: S(() => () =>
         h('div', { class: 'demo-row' }, [
           h(Avatar, { text: '茅台', tone: 'brand' }),
           h(Avatar, { text: '宁', tone: 'success' }),
-          h(Avatar, { icon: h('span', '★'), tone: 'warning' }),
+          h(Avatar, { icon: StarIcon, tone: 'warning' }),
           h(Avatar, { src: 'https://i.pravatar.cc/80?img=12' }),
         ]),
       ),
@@ -241,10 +275,10 @@ export const vueDocs: Record<string, DemoCase[]> = {
       }),
     },
     {
-      code: `<Input :prefix="() => '🔍'" placeholder="搜索" />\n<Input :suffix="() => '%'" model-value="12" />`,
+      code: `<Input :prefix="SearchIcon" placeholder="搜索" />\n<Input :suffix="() => '%'" model-value="12" />`,
       Comp: S(() => () =>
         h('div', { class: 'demo-row' }, [
-          h(Input, { prefix: h('span', '🔍'), placeholder: '搜索' }),
+          h(Input, { prefix: SearchIcon, placeholder: '搜索' }),
           h(Input, { suffix: h('span', '%'), value: '12' }),
         ]),
       ),
@@ -664,6 +698,41 @@ export const vueDocs: Record<string, DemoCase[]> = {
       code: `<VirtualTable :rows="rows" :columns="cols" :row-height="33" />`,
       Comp: S(() => () =>
         h(VirtualTable, { rows: vtableRows, columns: vtableColumns, rowHeight: 33 }),
+      ),
+    },
+  ],
+
+  // ——— Icon 契约页（Vue 侧 icon 插槽走 <component :is="icon" />，因此传组件）———
+  Icon: [
+    {
+      code: `const PlusIcon = () => h('svg', { viewBox: '0 0 24 24', fill: 'none',\n  stroke: 'currentColor', 'stroke-width': 2, 'stroke-linecap': 'round',\n  'stroke-linejoin': 'round' }, [h('path', { d: 'M12 5v14M5 12h14' })]);\n\nh(Button, { icon: PlusIcon, variant: 'primary' }, () => '新建')\nh(Tag, { icon: StarIcon, type: 'brand' }, () => '重点')`,
+      Comp: S(() => () =>
+        h('div', { class: 'demo-row' }, [
+          h(Button, { icon: PlusIcon, variant: 'primary' }, () => '新建'),
+          h(Tag, { icon: StarIcon, type: 'brand' }, () => '重点'),
+        ]),
+      ),
+    },
+    {
+      code: `<Button size="lg" variant="primary" :icon="PlusIcon">大</Button>\n<Button variant="primary" :icon="PlusIcon">中</Button>\n<Button size="sm" variant="primary" :icon="PlusIcon">小</Button>`,
+      Comp: S(() => () =>
+        h('div', { class: 'demo-row' }, [
+          h(Button, { size: 'lg', variant: 'primary', icon: PlusIcon }, '大'),
+          h(Button, { variant: 'primary', icon: PlusIcon }, '中'),
+          h(Button, { size: 'sm', variant: 'primary', icon: PlusIcon }, '小'),
+        ]),
+      ),
+    },
+    {
+      code: `<Empty description="可覆盖：传入自备图标" :icon="StarIcon" />\n<Steps :steps="[{ title: '选股' }, { title: '回测' }, { title: '实盘' }]" :default-current="2" />`,
+      Comp: S(() => () =>
+        h('div', { class: 'demo-row' }, [
+          h(Empty, { description: '可覆盖：传入自备图标', icon: StarIcon }),
+          h(Steps, {
+            steps: [{ title: '选股' }, { title: '回测' }, { title: '实盘' }],
+            defaultCurrent: 2,
+          }),
+        ]),
       ),
     },
   ],

@@ -14,7 +14,7 @@
 |---|---|---|---|---|
 | `data` | `TreeData[]` | — | 渲染层级 | 层级数据 |
 | `checkable` | `boolean` | `true` | 是否渲染 `ui-tree-check` | 勾选框（筛入板块） |
-| `defaultExpandedKeys` | `string[]` | `parentKeys(data)` | — | 非受控初始展开 |
+| `defaultExpandedKeys` | `string[]` | `parentKeys(data)` | — | 非受控初始展开；**仅在未传时**取默认值，显式传 `[]` 表示一个都不展开 |
 | `defaultCheckedKeys` | `string[]` | `[]` | — | 非受控初始勾选 |
 | `expandedKeys` | `string[]` | — | 受控展开 | 受控模式 |
 | `checkedKeys` | `string[]` | — | 受控勾选 | 受控模式 |

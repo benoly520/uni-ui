@@ -19,7 +19,7 @@ const props = withDefaults(
   }>(),
   {
     checkable: true,
-    defaultExpandedKeys: () => [],
+    // 不设默认值：必须能区分「未传 → 展开全部父节点」与「显式传 [] → 一个都不展开」
     defaultCheckedKeys: () => [],
     'aria-label': '树',
   },
@@ -43,7 +43,12 @@ function collectParentKeys(nodes: TreeData[], acc: string[] = []): string[] {
 const isExpControlled = computed(() => props.expandedKeys != null);
 const isChkControlled = computed(() => props.checkedKeys != null);
 
-const expanded = ref<string[]>(props.defaultExpandedKeys.length ? props.defaultExpandedKeys.slice() : collectParentKeys(props.data));
+// 与 React / Plain 一致：未传则展开全部父节点；显式传 [] 则以传入值为准（一个都不展开）
+const expanded = ref<string[]>(
+  props.defaultExpandedKeys != null
+    ? props.defaultExpandedKeys.slice()
+    : collectParentKeys(props.data),
+);
 const checked = ref<string[]>(props.defaultCheckedKeys.slice());
 
 watch(

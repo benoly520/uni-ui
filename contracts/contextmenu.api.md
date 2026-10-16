@@ -12,7 +12,7 @@
 | 名称 | 类型 | 默认值 | 对应 class / 属性 | 说明 |
 |---|---|---|---|---|
 | `items` | `ContextMenuItem[]` | — | 渲染菜单项（命令式传入） | 菜单内容 |
-| `targetRef` | `Ref<HTMLElement \| null>` | — | 右键触发目标 | 命令式绑定 |
+| `targetRef` | `Ref<HTMLElement \| null>` | — | 右键触发目标 | 命令式绑定；**Plain 端例外**：无 ref 概念，对应 prop 名为 `target`，类型放宽为 `HTMLElement \| (() => HTMLElement \| null) \| { current }`（语义等价） |
 | `open` | `boolean` | — | 受控显隐（可选） | 受控模式 |
 | `defaultOpen` | `boolean` | `false` | — | 非受控初始 |
 | `onOpenChange` | `(open: boolean) => void` | — | — | 显隐变化 |

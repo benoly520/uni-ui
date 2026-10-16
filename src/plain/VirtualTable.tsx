@@ -107,7 +107,8 @@ export function VirtualTable(props: VirtualTableProps) {
             return (
               <div
                 class="ui-vtable-row"
-                style={() => ({ ...gridStyle(), transform: `translateY(${i * rh}px)` })}
+                // plain 的 style 只接受「对象或字符串」求值结果，传取值函数会被静默丢弃
+                style={{ ...gridStyle(), transform: `translateY(${i * rh}px)` }}
               >
                 {(resolve(props.columns) as VTableColumn[]).map((col) => {
                   const t = () => (col.trend ? col.trend(row) : undefined);

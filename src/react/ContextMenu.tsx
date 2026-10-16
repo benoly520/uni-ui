@@ -118,7 +118,9 @@ export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
       let py = pos.y;
       if (px + r.width > window.innerWidth) px = px - r.width;
       if (py + r.height > window.innerHeight) py = py - r.height;
-      setPos({ x: px, y: py });
+      // 值未变化时不得 setPos：每次传新对象引用会让 pos 变化 → effect 重跑 → 死循环
+      // （React 抛 Maximum update depth exceeded）。与 plain / vue 端守卫保持一致。
+      if (px !== pos.x || py !== pos.y) setPos({ x: px, y: py });
     }, [isOpen, pos, items]);
 
     return (

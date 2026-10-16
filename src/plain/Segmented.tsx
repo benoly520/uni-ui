@@ -43,10 +43,12 @@ export function Segmented(props: SegmentedProps) {
 
   let rootEl: HTMLElement | null = null;
   const moveThumb = () => {
+    // 依赖必须在同步执行期读取：effect 只在同步阶段收集依赖，
+    // 若放进 rAF（activeEffect 已还原）或放在早退之后，选中项变化将不触发重跑。
+    const idx = opts().findIndex((o) => o.value === selected());
     const el = rootEl;
     if (!el) return;
     requestAnimationFrame(() => {
-      const idx = opts().findIndex((o) => o.value === selected());
       // 不用自定义 data-* 标记（会与 React / Vue 端 DOM 不一致）：thumb 是第 0 个子节点
       const b = (el.children[idx + 1] as HTMLElement | undefined) ?? null;
       const thumb = el.querySelector('.thumb') as HTMLElement | null;

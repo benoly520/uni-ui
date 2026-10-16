@@ -17,7 +17,7 @@ withDefaults(
 </script>
 
 <template>
-  <div class="ui-message" :class="[`ui-message--${type}`, { 'ui-message.show': show }]" role="status" aria-live="polite" :style="style">
+  <div class="ui-message" :class="[`ui-message--${type}`, { show }]" role="status" aria-live="polite" :style="style">
     <span class="dot"></span>
     <span class="msg-text"><slot>{{ content }}</slot></span>
   </div>

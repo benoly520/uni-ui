@@ -33,7 +33,8 @@ export const Message = forwardRef<HTMLDivElement, MessageProps>(function Message
   return (
     <div
       ref={ref}
-      className={cx('ui-message', `ui-message--${type}`, show && 'ui-message.show', className)}
+      // 同 Toast：可见态加独立的 `show` 类（`.ui-message.show`），不能写成 'ui-message.show'
+      className={cx('ui-message', `ui-message--${type}`, show && 'show', className)}
       role="status"
       aria-live="polite"
       style={style}

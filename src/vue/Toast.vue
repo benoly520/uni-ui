@@ -17,7 +17,7 @@ withDefaults(
 </script>
 
 <template>
-  <div class="ui-toast ui-glass" :class="{ 'ui-toast.show': show }" role="status" aria-live="polite" :style="style">
+  <div class="ui-toast ui-glass" :class="{ show }" role="status" aria-live="polite" :style="style">
     <span v-if="icon != null" class="ui-icon"><component :is="(icon as VNode)" /></span>
     <slot>{{ content }}</slot>
   </div>

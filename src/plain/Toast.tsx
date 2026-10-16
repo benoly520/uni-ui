@@ -27,7 +27,8 @@ export function Toast(props: ToastProps) {
   return (
     <div
       id={resolve(props.id)}
-      class={cx('ui-toast', 'ui-glass', show() && 'ui-toast.show', resolve(props.className))}
+      // 可见态加独立的 `show` 类（CSS 是 `.ui-toast.show`），写成 'ui-toast.show' 永远匹配不上
+      class={cx('ui-toast', 'ui-glass', show() && 'show', resolve(props.className))}
       role="status"
       aria-live="polite"
       style={resolve(props.style)}

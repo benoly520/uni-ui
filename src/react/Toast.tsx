@@ -31,7 +31,9 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
   return (
     <div
       ref={ref}
-      className={cx('ui-toast', 'ui-glass', show && 'ui-toast.show', className)}
+      // 注意：可见态必须加**独立的** `show` 类（CSS 选择器是 `.ui-toast.show`）。
+      // 写成 `'ui-toast.show'` 会变成单个带点的类名，永远匹配不上 -> 元素 opacity:0 不可见。
+      className={cx('ui-toast', 'ui-glass', show && 'show', className)}
       role="status"
       aria-live="polite"
       style={style}

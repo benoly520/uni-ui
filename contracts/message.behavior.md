@@ -7,7 +7,7 @@
 | 状态 | 表现 | 触发 |
 |---|---|---|
 | 隐藏 | `transform: translate(-50%, -140%); opacity: 0` | 默认 / 超时 |
-| 显示 | `ui-message.show` → `translate(-50%, 0); opacity: 1` | `show` 切真 / 命令式 `showMessage()` |
+| 显示 | `.ui-message.show`（加独立 `show` 类）→ `translate(-50%, 0); opacity: 1` | `show` 切真 / 命令式 `showMessage()` |
 | hover | 无特殊态 | — |
 
 ## 状态机

@@ -7,7 +7,7 @@
 | 状态 | 表现 | 触发 |
 |---|---|---|
 | 隐藏 | `transform: translateY(120%); opacity: 0` | 默认 / 超时 |
-| 显示 | `ui-toast.show` → `translateY(0); opacity: 1` | `show` 切真 / 命令式 `toast()` |
+| 显示 | `.ui-toast.show`（加独立 `show` 类）→ `translateY(0); opacity: 1` | `show` 切真 / 命令式 `toast()` |
 | hover | 无特殊态（轻提示不应打断操作） | — |
 
 ## 状态机

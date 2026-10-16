@@ -30,7 +30,7 @@ export function Message(props: MessageProps) {
   return (
     <div
       id={resolve(props.id)}
-      class={cx('ui-message', 'ui-message--' + type(), show() && 'ui-message.show', resolve(props.className))}
+      class={cx('ui-message', 'ui-message--' + type(), show() && 'show', resolve(props.className))}
       role="status"
       aria-live="polite"
       style={resolve(props.style)}

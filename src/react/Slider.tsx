@@ -35,9 +35,24 @@ function formatVal(v: number, fmt: SliderFormat): string {
   return String(v);
 }
 
+/** 按数值的小数位收敛浮点误差（min/step 非整数时 min + n*step 会得到 44.999999）。 */
+function decimalsOf(n: number): number {
+  const s = String(n);
+  const i = s.indexOf('.');
+  return i < 0 ? 0 : s.length - i - 1;
+}
+
+/**
+ * 吸附到以 min 为基准的 step 栅格，再钳制到 [min, max]。
+ * 锚点必须是 min（对齐原生 input[type=range] 的 step base）；
+ * 写成 round(v / step) * step 时，min 非 step 整数倍会产生无法选中的死区。
+ */
 function clampStep(v: number, min: number, max: number, step: number): number {
-  const snapped = Math.round((v - min) / step) * step;
-  return Math.min(max, Math.max(min, snapped));
+  const s = step || 1;
+  const snapped = min + Math.round((v - min) / s) * s;
+  const d = Math.max(decimalsOf(min), decimalsOf(s));
+  const val = d > 0 ? Number(snapped.toFixed(d)) : snapped;
+  return Math.min(max, Math.max(min, val));
 }
 
 /**
@@ -66,8 +81,10 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(
   const [inner, setInner] = useState<[number, number]>(
     () => defaultValue ?? [min, max],
   );
-  const lo = isControlled ? value![0] : inner[0];
-  const hi = isControlled ? value![1] : inner[1];
+  // 受控值同样做 lo ≤ hi 归一：契约要求「始终 lo ≤ hi」，
+  // 父级传逆序时若不归一，填充条宽度会算出负值。
+  const lo = isControlled ? Math.min(value![0], value![1]) : inner[0];
+  const hi = isControlled ? Math.max(value![0], value![1]) : inner[1];
   // 拖拽期间挂在 document 上的监听：若拖拽未结束组件就被卸载，必须回收，否则泄漏并继续 commit
   const dragCleanupRef = useRef<(() => void) | null>(null);
   useEffect(() => () => dragCleanupRef.current?.(), []);

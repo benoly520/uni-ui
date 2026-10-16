@@ -58,7 +58,26 @@ export function Slider(props: SliderProps) {
     isControlled()
       ? Math.max((resolve(props.value) as any)[0], (resolve(props.value) as any)[1])
       : hiInner();
-  const pct = (v: number) => ((v - min()) / (max() - min())) * 100;
+  // 分母兜底：min === max 时避免 0/0 得到 NaN%
+  const pct = (v: number) => ((v - min()) / ((max() - min()) || 1)) * 100;
+  /** 按数值的小数位收敛浮点误差（min/step 非整数时 min + n*step 会得到 44.999999）。 */
+  const decimalsOf = (n: number) => {
+    const s = String(n);
+    const i = s.indexOf('.');
+    return i < 0 ? 0 : s.length - i - 1;
+  };
+  /**
+   * 吸附到以 min 为基准的 step 栅格，再钳制到 [min, max]。
+   * 锚点必须是 min（对齐原生 input[type=range] 的 step base）；
+   * 旧实现按绝对值取整（round(v / step) * step），min 非 step 整数倍时会产生死区。
+   */
+  const snapStep = (v: number, floor: number, ceil: number, s: number) => {
+    const st = s || 1;
+    const snapped = floor + Math.round((v - floor) / st) * st;
+    const d = Math.max(decimalsOf(floor), decimalsOf(st));
+    const val = d > 0 ? Number(snapped.toFixed(d)) : snapped;
+    return Math.min(ceil, Math.max(floor, val));
+  };
   const fmtVal = (v: number): string => {
     const f = fmt();
     if (typeof f === 'function') return f(v);
@@ -92,7 +111,7 @@ export function Slider(props: SliderProps) {
       const rect = track.getBoundingClientRect();
       const ratio = Math.min(1, Math.max(0, (ev.clientX - rect.left) / rect.width));
       let nv = min() + ratio * (max() - min());
-      nv = Math.round(nv / step()) * step();
+      nv = snapStep(nv, min(), max(), step());
       setHandle(handle, nv);
     };
     const up = () => {

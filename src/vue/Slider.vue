@@ -31,8 +31,18 @@ const emit = defineEmits<{
 
 const isControlled = computed(() => props.value != null);
 const inner = ref<[number, number]>(props.defaultValue ?? [props.min, props.max]);
-const lo = computed(() => (isControlled.value ? (props.value as [number, number])[0] : inner.value[0]));
-const hi = computed(() => (isControlled.value ? (props.value as [number, number])[1] : inner.value[1]));
+// 受控值同样做 lo ≤ hi 归一：契约要求「始终 lo ≤ hi」，
+// 父级传逆序时若不归一，填充条宽度会算出负值。
+const lo = computed(() =>
+  isControlled.value
+    ? Math.min((props.value as [number, number])[0], (props.value as [number, number])[1])
+    : inner.value[0],
+);
+const hi = computed(() =>
+  isControlled.value
+    ? Math.max((props.value as [number, number])[0], (props.value as [number, number])[1])
+    : inner.value[1],
+);
 
 const trackRef = ref<HTMLElement | null>(null);
 const range = computed(() => props.max - props.min || 1);

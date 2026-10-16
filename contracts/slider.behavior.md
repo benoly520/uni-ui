@@ -27,8 +27,13 @@
 
 ## 位置算法（对齐 `initSlider`）
 ```
-   pct(v) = (v - min) / (max - min) * 100
+   pct(v) = (v - min) / ((max - min) || 1) * 100     // 分母兜底：min === max 时避免 0/0 → NaN%
    fill: left = pct(lo)%, width = pct(hi) - pct(lo)%
    thumb: left = pct(lo|hi)%
-   valFromX(clientX): 按 track 宽度比例 → 四舍五入到 step → clamp
+   valFromX(clientX): 按 track 宽度比例 → 吸附到 step 栅格 → clamp
+   snap(v) = min + round((v - min) / step) * step    // 锚点为 min，对齐原生 input[type=range] 的 step base
 ```
+
+- 吸附锚点**必须**是 `min`：写成 `round(v / step) * step`（绝对取整）时，`min` 非 `step` 整数倍会产生无法选中的死区（如 `min=10, step=25` 时 `[10,25)` 整段不可选）。
+- 当 `(max - min)` 不是 `step` 整数倍时，最大栅格点小于 `max`，「拖到轨道最右」达不到 `max` —— 与原生 `input[type=range]` 行为一致，不做端点特例。
+- `min` / `step` 为小数时按二者较大的小数位收敛浮点误差（避免 `44.999999`）。

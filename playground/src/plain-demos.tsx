@@ -768,7 +768,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
     },
   ],
 
-  // ——— 以下为 plain 侧新增/补充组件（React/Vue 侧暂无对应用例）———
+  // ——— Accordion / Form / VirtualTable：plain 侧用例（React/Vue 用例见 react-demos / vue-demos）———
   Accordion: [
     {
       title: '手风琴',
@@ -787,7 +787,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
   Form: [
     {
       title: '表单',
-      desc: 'fields 字段集；submit 时逐字段校验。',
+      desc: 'fields 字段集；submit 时逐字段校验，未通过写行内错误，通过后回调 onSubmit。',
       code: `<Form fields={fields} onSubmit={(v) => console.log(v)} />`,
       Comp: () => {
         const fields = [

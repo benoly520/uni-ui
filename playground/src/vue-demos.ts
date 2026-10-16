@@ -4,6 +4,7 @@ import {
   Tag,
   Badge,
   Avatar,
+  Accordion,
   Input,
   Switch,
   Select,
@@ -15,6 +16,7 @@ import {
   Progress,
   Skeleton,
   Empty,
+  Form,
   Tabs,
   Breadcrumb,
   Steps,
@@ -27,6 +29,7 @@ import {
   Tree,
   Slider,
   DataTable,
+  VirtualTable,
   toast,
   showMessage,
 } from 'uni-ui/vue';
@@ -70,6 +73,44 @@ const tableData = [
   { name: '宁德时代', code: '300750', price: 241.8, chg: '-0.86%' },
   { name: '招商银行', code: '600036', price: 38.42, chg: '+0.31%' },
 ];
+
+const accordionItems = [
+  { key: '1', title: '行业研究', badge: '12', content: '覆盖 31 个申万一级行业。' },
+  { key: '2', title: '个股追踪', content: '实时跟踪持仓标的异动。' },
+  { key: '3', title: '风险提示', content: '市场有风险，投资需谨慎。' },
+];
+
+const formFields = [
+  {
+    name: 'name',
+    label: '标的名称',
+    placeholder: '如：贵州茅台',
+    rules: [{ required: true, message: '请输入标的名称' }],
+  },
+  {
+    name: 'code',
+    label: '标的代码',
+    placeholder: '6 位数字',
+    rules: [{ pattern: /^\d{6}$/, message: '需为 6 位数字' }],
+  },
+];
+
+const vtableColumns = [
+  { key: 'code', title: '代码', sticky: true, width: '120px' },
+  { key: 'name', title: '名称', width: '1fr' },
+  {
+    key: 'price',
+    title: '最新价',
+    numeric: true,
+    width: '100px',
+    trend: (row: Record<string, any>): 'up' | 'down' => (row.price > 0 ? 'up' : 'down'),
+  },
+];
+const vtableRows = Array.from({ length: 5000 }, (_, i) => ({
+  code: 'GN' + (1000 + i),
+  name: '标的 ' + i,
+  price: (i % 3) - 1,
+}));
 
 /** 静态用例助手：setup 直接返回渲染函数（makeRender() 即渲染函数），避免层级错位被 Vue 当文本渲染 */
 const S = (makeRender: () => () => ReturnType<typeof h>): DefineComponent =>
@@ -594,6 +635,35 @@ export const vueDocs: Record<string, DemoCase[]> = {
           h(Button, { onClick: () => showMessage('数据已更新', 'success') }, 'success'),
           h(Button, { variant: 'outline', onClick: () => showMessage('请求失败', 'danger') }, 'danger'),
         ]),
+      ),
+    },
+  ],
+
+  // ——— 补齐 plain 侧已有、React/Vue 侧原先缺失的用例（Accordion / Form / VirtualTable）———
+  Accordion: [
+    {
+      code: `<Accordion :items="items" :default-active-keys="['1']" />`,
+      Comp: S(() => () => h(Accordion, { items: accordionItems, defaultActiveKeys: ['1'] })),
+    },
+  ],
+
+  Form: [
+    {
+      code: `<Form :fields="fields" @submit="(v) => showMessage('已提交 ' + v.code)" />`,
+      Comp: S(() => () =>
+        h(Form, {
+          fields: formFields,
+          onSubmit: (v: Record<string, string>) => showMessage('已提交 ' + v.code, 'success'),
+        }),
+      ),
+    },
+  ],
+
+  VirtualTable: [
+    {
+      code: `<VirtualTable :rows="rows" :columns="cols" :row-height="33" />`,
+      Comp: S(() => () =>
+        h(VirtualTable, { rows: vtableRows, columns: vtableColumns, rowHeight: 33 }),
       ),
     },
   ],

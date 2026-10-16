@@ -194,6 +194,20 @@ export const docs: ComponentDoc[] = [
     ],
   },
   {
+    id: 'Form',
+    label: 'Form 表单',
+    category: '输入',
+    summary: '栅格化表单 + 字段校验，提交时逐字段校验并把错误写到行内提示。',
+    api: [
+      { name: 'fields', type: 'FormField[]', default: '—', desc: '{ name, label, type?, placeholder?, defaultValue?, rules? }' },
+      { name: 'grid', type: 'boolean', default: 'true', desc: '字段栅格布局' },
+      { name: 'submitText', type: 'string', default: "'提交'", desc: '提交按钮文案' },
+      { name: 'idPrefix', type: 'string', default: '—', desc: '字段 id 命名空间前缀，同页多表单需传唯一值' },
+      { name: 'rules', type: 'FormRule[]', default: '—', desc: '{ required?, pattern?, min?, message? }，命中首条规则即报错' },
+      { name: 'onSubmit', type: '(values: Record<string, string>) => void', default: '—', desc: '校验通过回调（React）/ @submit（Vue）' },
+    ],
+  },
+  {
     id: 'Stat',
     label: 'Stat 指标卡',
     category: '展示',
@@ -237,6 +251,18 @@ export const docs: ComponentDoc[] = [
       { name: 'description', type: 'ReactNode / string', default: '—', desc: '空状态描述文案' },
       { name: 'icon', type: 'ReactNode', default: '—', desc: '图标插槽（默认 table 占位）' },
       { name: 'children / 默认插槽', type: '—', default: '—', desc: '操作区插槽' },
+    ],
+  },
+  {
+    id: 'Accordion',
+    label: 'Accordion 折叠面板',
+    category: '展示',
+    summary: '分组折叠面板，多组可同时展开，支持受控/非受控展开键与 max-height 过渡。',
+    api: [
+      { name: 'items', type: 'AccordionItem[]', default: '—', desc: '{ key, title, badge?, content? }' },
+      { name: 'activeKeys', type: 'string[]', default: '—', desc: '受控展开的 key 列表' },
+      { name: 'defaultActiveKeys', type: 'string[]', default: '[]', desc: '非受控初始展开' },
+      { name: 'onChange', type: '(keys: string[]) => void', default: '—', desc: '展开集合变化（React）/ @change（Vue）' },
     ],
   },
   {
@@ -401,6 +427,19 @@ export const docs: ComponentDoc[] = [
     ],
   },
   {
+    id: 'VirtualTable',
+    label: 'VirtualTable 虚拟表格',
+    category: '数据',
+    summary: '固定行高的虚拟滚动表，仅渲染可视窗口，5000 行也只保留约 20 个行节点。',
+    api: [
+      { name: 'rows', type: 'Record<string, any>[]', default: '—', desc: '行数据（支持 5000+ 行）' },
+      { name: 'columns', type: 'VTableColumn[]', default: '—', desc: '{ key, title, numeric?, sticky?, trend?, width? }' },
+      { name: 'rowHeight', type: 'number', default: '33', desc: '固定行高（px），窗口化基准' },
+      { name: 'buffer', type: 'number', default: '6', desc: '上下缓冲行数，防白屏' },
+      { name: 'ariaLabel', type: 'string', default: '—', desc: '滚动容器无障碍标签' },
+    ],
+  },
+  {
     id: 'Toast',
     label: 'Toast 轻提示',
     category: '反馈',
@@ -440,12 +479,14 @@ export const categories: { name: string; items: { id: string; label: string }[] 
     { id: 'DatePicker', label: 'DatePicker 日期' },
     { id: 'Segmented', label: 'Segmented 分段' },
     { id: 'Search', label: 'Search 搜索' },
+    { id: 'Form', label: 'Form 表单' },
   ] },
   { name: '展示 Display', items: [
     { id: 'Stat', label: 'Stat 指标卡' },
     { id: 'Progress', label: 'Progress 进度' },
     { id: 'Skeleton', label: 'Skeleton 骨架' },
     { id: 'Empty', label: 'Empty 空态' },
+    { id: 'Accordion', label: 'Accordion 折叠面板' },
   ] },
   { name: '导航 Nav', items: [
     { id: 'Tabs', label: 'Tabs 标签页' },
@@ -464,6 +505,7 @@ export const categories: { name: string; items: { id: string; label: string }[] 
     { id: 'Tree', label: 'Tree 树' },
     { id: 'Slider', label: 'Slider 滑块' },
     { id: 'DataTable', label: 'DataTable 表格' },
+    { id: 'VirtualTable', label: 'VirtualTable 虚拟表格' },
   ] },
   { name: '反馈 Feedback', items: [
     { id: 'Toast', label: 'Toast 轻提示' },

@@ -4,6 +4,7 @@ import {
   Tag,
   Badge,
   Avatar,
+  Accordion,
   Input,
   Switch,
   Select,
@@ -15,6 +16,7 @@ import {
   Progress,
   Skeleton,
   Empty,
+  Form,
   Tabs,
   Breadcrumb,
   Steps,
@@ -27,9 +29,11 @@ import {
   Tree,
   Slider,
   DataTable,
+  VirtualTable,
   toast,
   showMessage,
 } from 'uni-ui/react';
+import type { AccordionItemData, FormField, VTableColumn } from 'uni-ui/react';
 
 /** 单个用例：标题 + 说明 + React 代码片段 + 实时 demo 组件（title/desc/code 为单一来源） */
 export interface DemoCase {
@@ -72,6 +76,44 @@ const tableData = [
   { name: '宁德时代', code: '300750', price: 241.8, chg: '-0.86%' },
   { name: '招商银行', code: '600036', price: 38.42, chg: '+0.31%' },
 ];
+
+const accordionItems: AccordionItemData[] = [
+  { key: '1', title: '行业研究', badge: '12', content: '覆盖 31 个申万一级行业。' },
+  { key: '2', title: '个股追踪', content: '实时跟踪持仓标的异动。' },
+  { key: '3', title: '风险提示', content: '市场有风险，投资需谨慎。' },
+];
+
+const formFields: FormField[] = [
+  {
+    name: 'name',
+    label: '标的名称',
+    placeholder: '如：贵州茅台',
+    rules: [{ required: true, message: '请输入标的名称' }],
+  },
+  {
+    name: 'code',
+    label: '标的代码',
+    placeholder: '6 位数字',
+    rules: [{ pattern: /^\d{6}$/, message: '需为 6 位数字' }],
+  },
+];
+
+const vtableColumns: VTableColumn[] = [
+  { key: 'code', title: '代码', sticky: true, width: '120px' },
+  { key: 'name', title: '名称', width: '1fr' },
+  {
+    key: 'price',
+    title: '最新价',
+    numeric: true,
+    width: '100px',
+    trend: (row) => (row.price > 0 ? 'up' : 'down'),
+  },
+];
+const vtableRows = Array.from({ length: 5000 }, (_, i) => ({
+  code: 'GN' + (1000 + i),
+  name: '标的 ' + i,
+  price: (i % 3) - 1,
+}));
 
 export const reactDocs: Record<string, DemoCase[]> = {
   Button: [
@@ -679,6 +721,36 @@ export const reactDocs: Record<string, DemoCase[]> = {
           <Button variant="outline" onClick={() => showMessage('请求失败', 'danger')}>danger</Button>
         </div>
       ),
+    },
+  ],
+
+  // ——— 补齐 plain 侧已有、React/Vue 侧原先缺失的用例（Accordion / Form / VirtualTable）———
+  Accordion: [
+    {
+      title: '手风琴',
+      desc: 'items 数据集（可含 badge）；defaultActiveKeys 控制默认展开。',
+      code: `<Accordion items={items} defaultActiveKeys={['1']} />`,
+      Comp: () => <Accordion items={accordionItems} defaultActiveKeys={['1']} />,
+    },
+  ],
+
+  Form: [
+    {
+      title: '表单',
+      desc: 'fields 字段集；submit 时逐字段校验，未通过写行内错误，通过后回调 onSubmit。',
+      code: `<Form fields={fields} onSubmit={(v) => showMessage('已提交 ' + v.code)} />`,
+      Comp: () => (
+        <Form fields={formFields} onSubmit={(v) => showMessage('已提交 ' + v.code, 'success')} />
+      ),
+    },
+  ],
+
+  VirtualTable: [
+    {
+      title: '虚拟表',
+      desc: '5000 行仅渲染可视窗口；首列 sticky；trend 涨跌着色。',
+      code: `<VirtualTable rows={rows} columns={cols} rowHeight={33} />`,
+      Comp: () => <VirtualTable rows={vtableRows} columns={vtableColumns} rowHeight={33} />,
     },
   ],
 };

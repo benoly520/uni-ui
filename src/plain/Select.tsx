@@ -121,7 +121,7 @@ export function Select(props: SelectProps) {
           open.set(!open());
         }}
       >
-        {labelText()}
+        <span class="ui-select-value">{labelText()}</span>
         <span class="caret ui-icon">
           <IconCaret />
         </span>

@@ -425,7 +425,7 @@ a { color: var(--ui-color-brand); text-decoration: none; }
 
 /* Select — 自定义下拉（单/多选/可搜索），选股/选行业/选财报期（P1） */
 .ui-select { position: relative; min-width: 200px; }
-.ui-select-trigger { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--ui-space-2);
+.ui-select-trigger { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--ui-space-2); min-width: 0;
   height: var(--ui-control-h); padding: 0 var(--ui-pad-x); font-family: var(--ui-font-body); font-size: var(--ui-fs-control); color: var(--ui-text);
   background: rgb(var(--ui-glass-tint) / var(--ui-input-glass-opacity, var(--ui-glass-opacity-strong))); border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-md); cursor: pointer; text-align: left; }
@@ -435,7 +435,12 @@ a { color: var(--ui-color-brand); text-decoration: none; }
 .ui-select-menu { position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 20; display: none; max-height: 260px; overflow-y: auto;
   padding: var(--ui-space-2); background: rgb(var(--ui-glass-tint) / 0.96); border: 1px solid var(--ui-border); border-radius: var(--ui-radius-md);
   box-shadow: var(--ui-shadow-3); backdrop-filter: blur(18px) saturate(var(--ui-glass-saturate)); -webkit-backdrop-filter: blur(18px) saturate(var(--ui-glass-saturate)); }
+.ui-select.open { z-index: 30; }
 .ui-select.open .ui-select-menu { display: block; }
+/* 选中值超长省略：value 包一层 span（flex 容器上 text-overflow 不生效） */
+.ui-select-value { overflow: hidden; min-width: 0; text-overflow: ellipsis; white-space: nowrap; }
+/* 选项 hover 反馈 */
+.ui-select-option:hover { background: var(--ui-color-brand-soft); }
 .ui-select-search { width: 100%; height: var(--ui-control-h-sm); margin-bottom: var(--ui-space-2); padding: 0 var(--ui-space-3); font-size: var(--ui-fs-control);
   color: var(--ui-text); background: transparent; border: 1px solid var(--ui-border); border-radius: var(--ui-radius-sm); }
 .ui-select-search:focus { outline: none; border-color: var(--ui-color-brand); }

@@ -329,6 +329,19 @@ a { color: var(--ui-color-brand); text-decoration: none; }
   -webkit-backdrop-filter: blur(var(--ui-tooltip-glass-blur, var(--ui-glass-blur))) saturate(var(--ui-glass-saturate)); }
 /* 演示用：强制气泡常显，便于实时观察透明度 / 模糊旋钮（不影响真实 hover 行为） */
 .ui-tip.ui-tip--demo .bubble { opacity: 1; transform: translateX(-50%) translateY(0); }
+/* 受控/键盘显示（a11y：is-open 由 JS 切换，focus-within 覆盖键盘聚焦） */
+.ui-tip.is-open .bubble,
+.ui-tip:focus-within .bubble { opacity: 1; }
+/* 方位变体：--bottom / --left / --right（默认 top） */
+.ui-tip--bottom .bubble { bottom: auto; top: calc(100% + 8px); transform: translateX(-50%) translateY(-4px); }
+.ui-tip--bottom.is-open .bubble,
+.ui-tip--bottom:focus-within .bubble { transform: translateX(-50%) translateY(0); }
+.ui-tip--left .bubble { left: auto; right: calc(100% + 8px); top: 50%; transform: translateY(-50%) translateX(4px); }
+.ui-tip--left.is-open .bubble,
+.ui-tip--left:focus-within .bubble { transform: translateY(-50%) translateX(0); }
+.ui-tip--right .bubble { left: calc(100% + 8px); top: 50%; transform: translateY(-50%) translateX(-4px); }
+.ui-tip--right.is-open .bubble,
+.ui-tip--right:focus-within .bubble { transform: translateY(-50%) translateX(0); }
 
 /* ============================================================
    6b. 金融域组件：Stat（指标卡）+ Number（数字着色）+ Data Table
@@ -338,7 +351,7 @@ a { color: var(--ui-color-brand); text-decoration: none; }
 .ui-num--up { color: var(--ui-color-up); }
 .ui-num--down { color: var(--ui-color-down); }
 .ui-num--muted { color: var(--ui-text-muted); }
-.ui-num[ data-num] { text-align: right; }
+.ui-num[data-num] { text-align: right; }
 
 /* Stat：标签 + 主值 + 涨跌 delta（箭头 + 色） */
 .ui-stat { display: flex; flex-direction: column; gap: 4px; }
@@ -404,10 +417,15 @@ a { color: var(--ui-color-brand); text-decoration: none; }
 .ui-drawer-overlay.show .ui-drawer { transform: translateX(0); }
 .ui-drawer header { display: flex; justify-content: space-between; align-items: center; gap: var(--ui-space-3); padding: var(--ui-space-5); border-bottom: 1px solid var(--ui-border); }
 .ui-drawer .body { padding: var(--ui-space-5); overflow-y: auto; display: flex; flex-direction: column; gap: var(--ui-space-4); }
+/* 侧边变体：--left / --bottom（默认 right） */
+.ui-drawer--left { right: auto; left: 0; border-left: none; border-right: 1px solid var(--ui-border); transform: translateX(-100%); }
+.ui-drawer-overlay.show .ui-drawer--left { transform: translateX(0); }
+.ui-drawer--bottom { top: auto; bottom: 0; left: 0; right: 0; width: auto; height: min(60vh, 90vw); border-left: none; border-top: 1px solid var(--ui-border); transform: translateY(100%); }
+.ui-drawer-overlay.show .ui-drawer--bottom { transform: translateY(0); }
 
 /* Select — 自定义下拉（单/多选/可搜索），选股/选行业/选财报期（P1） */
 .ui-select { position: relative; min-width: 200px; }
-.ui-select-trigger { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--ui-space-2);
+.ui-select-trigger { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--ui-space-2); min-width: 0;
   height: var(--ui-control-h); padding: 0 var(--ui-pad-x); font-family: var(--ui-font-body); font-size: var(--ui-fs-control); color: var(--ui-text);
   background: rgb(var(--ui-glass-tint) / var(--ui-input-glass-opacity, var(--ui-glass-opacity-strong))); border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-md); cursor: pointer; text-align: left; }
@@ -419,6 +437,10 @@ a { color: var(--ui-color-brand); text-decoration: none; }
   box-shadow: var(--ui-shadow-3); backdrop-filter: blur(18px) saturate(var(--ui-glass-saturate)); -webkit-backdrop-filter: blur(18px) saturate(var(--ui-glass-saturate)); }
 .ui-select.open { z-index: 30; }
 .ui-select.open .ui-select-menu { display: block; }
+/* 选中值超长省略：value 包一层 span（flex 容器上 text-overflow 不生效） */
+.ui-select-value { overflow: hidden; min-width: 0; text-overflow: ellipsis; white-space: nowrap; }
+/* 选项 hover 反馈 */
+.ui-select-option:hover { background: var(--ui-color-brand-soft); }
 .ui-select-search { width: 100%; height: var(--ui-control-h-sm); margin-bottom: var(--ui-space-2); padding: 0 var(--ui-space-3); font-size: var(--ui-fs-control);
   color: var(--ui-text); background: transparent; border: 1px solid var(--ui-border); border-radius: var(--ui-radius-sm); }
 .ui-select-search:focus { outline: none; border-color: var(--ui-color-brand); }
@@ -447,6 +469,10 @@ a { color: var(--ui-color-brand); text-decoration: none; }
 .ui-form { display: flex; flex-direction: column; gap: var(--ui-space-4); }
 .ui-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: var(--ui-space-4); }
 .ui-form-row { display: flex; flex-direction: column; gap: var(--ui-space-2); }
+/* 字段以 <label> 包裹 <input> 建立隐式关联：不依赖 id，同页多实例不会串 label。
+   作用域限定在 .ui-form-row 内，避免影响 Empty 描述 / Drawer 副标题对 .ui-label 的复用。 */
+.ui-form-row > .ui-label { display: flex; flex-direction: column; gap: var(--ui-space-2); }
+.ui-form-row > .ui-label > .ui-input { font-weight: 400; }
 .ui-form-error { color: var(--ui-color-danger); font-size: var(--ui-fs-xs); min-height: 1em; margin-top: 2px; }
 
 /* Pagination — 翻页（P1） */
@@ -479,6 +505,8 @@ a { color: var(--ui-color-brand); text-decoration: none; }
 /* Progress — 回测/导入进度（P2） */
 .ui-progress { height: 8px; border-radius: var(--ui-radius-pill); background: var(--ui-border); overflow: hidden; }
 .ui-progress > span { display: block; height: 100%; background: var(--ui-color-brand); border-radius: var(--ui-radius-pill); transition: width var(--ui-dur-base) var(--ui-ease); }
+.ui-progress--indeterminate > span { width: 40%; animation: ui-progress-indeterminate 1.2s var(--ui-ease) infinite; }
+@keyframes ui-progress-indeterminate { 0% { transform: translateX(-100%); } 100% { transform: translateX(250%); } }
 
 /* Skeleton — 加载占位（P2，修复大数据加载态缺失） */
 .ui-skeleton { border-radius: var(--ui-radius-sm); background: linear-gradient(90deg, var(--ui-border) 25%, rgba(128,128,128,0.18) 37%, var(--ui-border) 63%); background-size: 400% 100%; animation: ui-shimmer 1.4s ease infinite; }
@@ -659,6 +687,9 @@ input[type="range"] { width: 100%; min-width: 0; }
 .ui-steps { display: flex; align-items: flex-start; }
 .ui-step { display: flex; align-items: center; flex: 1; }
 .ui-step-dot { width: 28px; height: 28px; flex: none; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; border: 2px solid var(--ui-border); color: var(--ui-text-muted); background: var(--ui-bg-elevated); transition: all var(--ui-dur-base) var(--ui-ease); }
+/* 圆点内的 check SVG：此处的图标不包在 .ui-icon 内，尺寸由本规则给出
+   （图标 svg 自身不写 width/height，以保证 React / Vue / Plain 三端 DOM 逐字一致） */
+.ui-step-dot svg { width: 24px; height: 24px; display: block; }
 .ui-step-icon { width: 1em; height: 1em; display: inline-block; }
 .ui-step-text { margin-left: 8px; display: flex; flex-direction: column; line-height: 1.2; }
 .ui-step-title { font-size: 13px; font-weight: 600; color: var(--ui-text-muted); }

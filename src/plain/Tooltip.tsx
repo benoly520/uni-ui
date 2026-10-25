@@ -10,7 +10,7 @@ export interface TooltipProps {
   glass?: MaybeGetter<boolean>;
   /** 气泡内容（文本或任意节点） */
   content: MaybeGetter<Renderable>;
-  /** invert=反转色（默认）；surface=跟随主题表面 + 毛玻璃 */
+  /** surface=跟随主题表面 + 毛玻璃（默认）；invert=反转色（浅色黑泡 / 暗色白泡） */
   variant?: MaybeGetter<TooltipVariant>;
   /** 气泡方位 */
   placement?: MaybeGetter<TooltipPlacement>;
@@ -36,12 +36,13 @@ let tipSeq = 0;
 
 /**
  * Tooltip · 悬浮提示（浮层导航组）
- * 默认 invert 反转色；hover / focus 显示；Esc 关闭并归还焦点；外部点击关闭。
+ * 默认 surface 跟随主题表面（毛玻璃，可被全站 data-glass="off" 回退为实心面）；
+ * variant="invert" 可切回反转色（macOS 浮层惯例）。hover / focus 显示；Esc 关闭并归还焦点。
  * ARIA：气泡 role=tooltip + id；触发元素 aria-describedby 指向该 id。
  * 焦点跟随改用 ref 注入 focusin/focusout（新框架无 onFocusIn/Out），并回收监听。
  */
 export function Tooltip(props: TooltipProps) {
-  const variant = () => resolve(props.variant) ?? 'invert';
+  const variant = () => resolve(props.variant) ?? 'surface';
   const placement = () => resolve(props.placement) ?? 'top';
   const isControlled = () => resolve(props.open) != null;
   const inner = signal<boolean>(!!(resolve(props.defaultOpen) ?? false));
@@ -117,6 +118,8 @@ export function Tooltip(props: TooltipProps) {
         variant() === 'surface' && 'ui-tip--surface',
         placement() !== 'top' && 'ui-tip--' + placement(),
         shown() && 'is-open',
+        // 契约 tooltip.api.md：className 透传到根 span（此前漏接，导致外部布局类失效）
+        resolve(props.className),
       )}
       style={resolve(props.style)}
       onMouseEnter={show}

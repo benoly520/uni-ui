@@ -5,14 +5,14 @@
 ## 组件标识
 - 根 class：`ui-tip`（必首位，`<span>` 包裹，内部联排 inline-flex）
 - 气泡 class：`bubble`（`role="tooltip"`，绝对定位浮于触发元素上方）
-- 变体修饰：`ui-tip--surface`（跟随主题表面 + 毛玻璃；默认 `invert` 反转色，不写类）
+- 变体修饰：`ui-tip--surface`（默认变体：跟随主题表面 + 毛玻璃）；`variant="invert"`（反转色）时不写类
 
 ## Props / 属性
 
 | 名称 | 类型 | 默认值 | 对应 class / 属性 | 说明 |
 |---|---|---|---|---|
 | `content` | `ReactNode` / `slot` | — | 包入 `.bubble` | 提示内容（文本或任意节点） |
-| `variant` | `'invert' \| 'surface'` | `'invert'` | `ui-tip--surface` | invert=浅色黑泡/暗色白泡（macOS 惯例）；surface=跟随表面+毛玻璃 |
+| `variant` | `'invert' \| 'surface'` | `'surface'` | `ui-tip--surface` | surface=跟随表面+毛玻璃（默认）；invert=浅色黑泡/暗色白泡（macOS 浮层惯例） |
 | `placement` | `'top' \| 'bottom' \| 'left' \| 'right'` | `'top'` | `ui-tip--{placement}` | 气泡方位（仅 `top` 已有 CSS，其余见交付报告缺口） |
 | `open` | `boolean` | — | 受控显示 | 受控时由父级管理显隐 |
 | `defaultOpen` | `boolean` | `false` | — | 非受控初始显隐 |
@@ -31,13 +31,13 @@
 - `onOpenChange(open)`：显示/隐藏状态切换时触发。
 
 ## 毛玻璃
-- `invert`（默认）气泡用 `--ui-text` 背景 + `--ui-bg` 文字（反转色，零硬编码）。
-- `surface` 走 `.ui-tip--surface`：背景 `rgb(var(--ui-glass-tint) / var(--ui-tooltip-glass-opacity, var(--ui-glass-opacity)))`，模糊 `var(--ui-tooltip-glass-blur, var(--ui-glass-blur))`，关闭自引用回退链（§17.19）。
+- `variant="invert"` 时气泡用 `--ui-text` 背景 + `--ui-bg` 文字（反转色，零硬编码）。
+- 默认 `surface` 走 `.ui-tip--surface`：背景 `rgb(var(--ui-glass-tint) / var(--ui-tooltip-glass-opacity, var(--ui-glass-opacity)))`，模糊 `var(--ui-tooltip-glass-blur, var(--ui-glass-blur))`，关闭自引用回退链（§17.19）。
 
 ## 玻璃开关（glass）
 - `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
 - 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
-- 本组件受影响部位：`variant="surface"` 时的 `.bubble`（默认 `invert` 为不透明反转色，不受影响）。
+- 本组件受影响部位：默认（`surface`）的 `.bubble`；`variant="invert"` 为不透明反转色，不受影响。
 - 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律

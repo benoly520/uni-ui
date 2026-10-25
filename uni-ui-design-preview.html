@@ -328,15 +328,16 @@ a { color: var(--ui-color-brand); text-decoration: none; }
 .ui-tabpanel { margin-top: var(--ui-space-3); padding: var(--ui-space-4); border: 1px solid var(--ui-border); border-radius: var(--ui-radius-md); color: var(--ui-text-muted); font-size: var(--ui-fs-sm); }
 .ui-tabpanel[hidden] { display: none; }
 
-/* Tooltip — 默认反转色（invert，macOS 惯例）；加 .ui-tip--surface 关闭反转、切换为「跟随主题表面 + 毛玻璃」 */
+/* Tooltip — 默认跟随主题表面（.ui-tip--surface，毛玻璃）；variant="invert" 时不写该类，走下方反转色 */
 .ui-tip { position: relative; display: inline-flex; }
 .ui-tip .bubble { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%) translateY(4px);
-  /* invert=true（默认）：用「文字色 / 背景色」对调实现反转色 —— 浅色黑底白字、暗色白底黑字 */
+  /* 反转色（仅 variant="invert"）：用「文字色 / 背景色」对调 —— 浅色黑底白字、暗色白底黑字 */
   background: var(--ui-text); color: var(--ui-bg); font-size: var(--ui-fs-xs); padding: var(--ui-space-2) var(--ui-space-3);
   border-radius: var(--ui-radius-sm); white-space: nowrap; opacity: 0; pointer-events: none;
+  z-index: 120;
   transition: opacity var(--ui-dur-fast) ease, transform var(--ui-dur-fast) var(--ui-ease); }
 .ui-tip:hover .bubble { opacity: 1; transform: translateX(-50%) translateY(0); }
-/* invert=false（跟随表面 + 毛玻璃）：纳入逐组件玻璃旋钮 --ui-tooltip-glass-opacity / --ui-tooltip-glass-blur；
+/* 默认态（跟随表面 + 毛玻璃）：纳入逐组件玻璃旋钮 --ui-tooltip-glass-opacity / --ui-tooltip-glass-blur；
    回退到全局默认 --ui-glass-opacity / --ui-glass-blur（不同名，无自引用循环）。 */
 .ui-tip.ui-tip--surface .bubble {
   background: rgb(var(--ui-glass-tint) / var(--ui-tooltip-glass-opacity, var(--ui-glass-opacity)));
@@ -988,8 +989,8 @@ input[type="range"] { width: 100%; min-width: 0; }
         <div class="row">
           <span class="ui-badge">● 在线</span>
           <span class="ui-avatar">U</span>
-          <span class="ui-tip"><button class="ui-btn ui-btn--default ui-size-sm">悬停我（反转·默认）</button><span class="bubble">反转色 tooltip</span></span>
-          <span class="ui-tip ui-tip--surface"><button class="ui-btn ui-btn--default ui-size-sm">悬停我（跟随表面）</button><span class="bubble">跟随主题表面 + 毛玻璃</span></span>
+          <span class="ui-tip"><button class="ui-btn ui-btn--default ui-size-sm">悬停我（variant=invert）</button><span class="bubble">反转色 tooltip</span></span>
+          <span class="ui-tip ui-tip--surface"><button class="ui-btn ui-btn--default ui-size-sm">悬停我（默认）</button><span class="bubble">跟随主题表面 + 毛玻璃</span></span>
         </div>
       </div>
 

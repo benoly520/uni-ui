@@ -17,15 +17,15 @@
 3. `.bubble` 固定 `role="tooltip"` + `id`；触发元素注入 `aria-describedby` 指向该 `id`。
 4. 关闭态在 `.bubble` 写 `aria-hidden="true"`；显示态去掉该属性。
 5. 禁止 scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash（§16.5），class 手写稳定字符串。
-6. 颜色零硬编码：invert 用 `var(--ui-text)` / `var(--ui-bg)`；surface 走 token 玻璃链。
+6. 颜色零硬编码：默认 surface 走 token 玻璃链；`variant="invert"` 用 `var(--ui-text)` / `var(--ui-bg)`。
 7. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。
 
 ## 基准用例（对齐预览页）
 
 | 场景 | DOM |
 |---|---|
-| invert 默认 | `<span class="ui-tip"><button class="ui-btn ui-btn--default ui-size-sm">悬停我（反转·默认）</button><span class="bubble" role="tooltip" id="tip-1" aria-hidden="true">反转色 tooltip</span></span>` |
-| surface | `<span class="ui-tip ui-tip--surface"><button class="ui-btn ui-btn--default ui-size-sm">悬停我（跟随表面）</button><span class="bubble" role="tooltip" id="tip-2" aria-hidden="true">跟随主题表面 + 毛玻璃</span></span>` |
+| surface 默认 | `<span class="ui-tip ui-tip--surface"><button class="ui-btn ui-btn--default ui-size-sm">悬停我（默认）</button><span class="bubble" role="tooltip" id="tip-1" aria-hidden="true">跟随主题表面 tooltip</span></span>` |
+| invert | `<span class="ui-tip"><button class="ui-btn ui-btn--default ui-size-sm">悬停我（variant="invert"）</button><span class="bubble" role="tooltip" id="tip-2" aria-hidden="true">反转色 tooltip</span></span>` |
 | 显示态 | `<span class="ui-tip is-open">…<span class="bubble" role="tooltip" id="tip-3">…</span></span>` |
 
 ## 主题缺口（由中央补 theme.css）

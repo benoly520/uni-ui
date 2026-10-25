@@ -912,19 +912,19 @@ export const vueDocs: Record<string, DemoCase[]> = {
 
   Tooltip: [
     {
-      code: `<Tooltip content="这是一条提示"><Button>悬停查看</Button></Tooltip>\n<Tooltip content="跟随主题表面" variant="surface"><Button>surface</Button></Tooltip>`,
+      code: `<Tooltip content="这是一条提示"><Button>悬停查看</Button></Tooltip>\n<Tooltip content="反转色提示" variant="invert"><Button>invert</Button></Tooltip>`,
       Comp: S(() => () =>
         h('div', { class: 'demo-row' }, [
           h(Tooltip, { content: '这是一条提示' }, { default: () => h(Button, null, '悬停查看') }),
-          h(Tooltip, { content: '跟随主题表面', variant: 'surface' }, { default: () => h(Button, { variant: 'outline' }, 'surface') }),
+          h(Tooltip, { content: '反转色提示', variant: 'invert' }, { default: () => h(Button, { variant: 'outline' }, 'invert') }),
         ]),
       ),
     },
     {
-      code: `<Tooltip content="默认：磨砂气泡" variant="surface"><Button>悬停：磨砂</Button></Tooltip>\n<Tooltip content="关闭：实心气泡" variant="surface" :glass="false"><Button variant="outline">悬停：实心</Button></Tooltip>`,
+      code: `<Tooltip content="默认：磨砂气泡"><Button>悬停：磨砂</Button></Tooltip>\n<Tooltip content="关闭：实心气泡" variant="surface" :glass="false"><Button variant="outline">悬停：实心</Button></Tooltip>`,
       Comp: S(() => () =>
         h('div', { class: 'demo-row' }, [
-          h(Tooltip, { content: '默认：磨砂气泡', variant: 'surface' }, {
+          h(Tooltip, { content: '默认：磨砂气泡' }, {
             default: () => h(Button, null, '悬停：磨砂'),
           }),
           h(Tooltip, { content: '关闭：实心气泡', variant: 'surface', glass: false }, {

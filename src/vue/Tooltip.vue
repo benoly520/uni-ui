@@ -18,7 +18,7 @@ const props = withDefaults(
     glass?: boolean;
     /** 气泡内容（与 React / Plain 端同名的 prop；亦可使用 content 插槽） */
     content?: unknown;
-    /** invert=反转色（默认 macOS 惯例）；surface=跟随主题表面 + 毛玻璃 */
+    /** surface=跟随主题表面 + 毛玻璃（默认）；invert=反转色（macOS 浮层惯例） */
     variant?: TooltipVariant;
     /** 气泡方位（仅 top 已有 CSS，其余见交付报告） */
     placement?: TooltipPlacement;
@@ -35,7 +35,7 @@ const props = withDefaults(
   }>(),
   {
     glass: true,
-    variant: 'invert',
+    variant: 'surface',
     placement: 'top',
     defaultOpen: false,
     delay: 0,

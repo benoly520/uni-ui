@@ -19,7 +19,7 @@ export interface TooltipProps {
   glass?: boolean;
   /** 气泡内容（文本或任意节点） */
   content: ReactNode;
-  /** invert=反转色（默认 macOS 惯例）；surface=跟随主题表面 + 毛玻璃 */
+  /** surface=跟随主题表面 + 毛玻璃（默认）；invert=反转色（macOS 浮层惯例） */
   variant?: TooltipVariant;
   /** 气泡方位（仅 top 已有 CSS，其余见交付报告） */
   placement?: TooltipPlacement;
@@ -43,7 +43,7 @@ export interface TooltipProps {
 
 /**
  * Tooltip · 悬浮提示（浮层导航组）
- * - 默认 invert 反转色；`variant="surface"` 跟随主题表面 + 毛玻璃（--ui-tooltip-glass-*）
+ * - 默认 surface 跟随主题表面 + 毛玻璃（--ui-tooltip-glass-*）；`variant="invert"` 切回反转色
  * - hover / focus 显示；Esc 关闭并归还焦点；外部点击关闭
  * - ARIA：气泡 role=tooltip + id；触发元素 aria-describedby 指向该 id
  * - 受控 / 非受控双模式；不携带任何样式，全部走 theme.css
@@ -52,7 +52,7 @@ export const Tooltip = forwardRef<HTMLSpanElement, TooltipProps>(function Toolti
   {
     glass,
     content,
-    variant = 'invert',
+    variant = 'surface',
     placement = 'top',
     open: openProp,
     defaultOpen = false,

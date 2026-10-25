@@ -1023,22 +1023,22 @@ export const reactDocs: Record<string, DemoCase[]> = {
   Tooltip: [
     {
       title: '提示变体',
-      desc: 'variant=invert 反转色；surface 跟随主题表面并带毛玻璃。默认 placement=top。',
-      code: `<Tooltip content="这是一条提示"><Button>悬停查看</Button></Tooltip>\n<Tooltip content="跟随主题表面" variant="surface"><Button variant="outline">surface</Button></Tooltip>`,
+      desc: '默认 surface 跟随主题表面并带毛玻璃；variant=invert 切换为反转色。默认 placement=top。',
+      code: `<Tooltip content="这是一条提示"><Button>悬停查看</Button></Tooltip>\n<Tooltip content="反转色提示" variant="invert"><Button variant="outline">invert</Button></Tooltip>`,
       Comp: () => (
         <div className="demo-row">
           <Tooltip content="这是一条提示"><Button>悬停查看</Button></Tooltip>
-          <Tooltip content="跟随主题表面" variant="surface"><Button variant="outline">surface</Button></Tooltip>
+          <Tooltip content="反转色提示" variant="invert"><Button variant="outline">invert</Button></Tooltip>
         </div>
       ),
     },
     {
       title: '玻璃开关（glass）',
       desc: 'glass 默认 true 保持磨砂观感；传 false 时组件根节点输出 data-glass="off"，theme.css 把半透明面回退为不透明实心面并真移除 backdrop-filter（不是把透明度压到 100%）。',
-      code: `<Tooltip content="默认：磨砂气泡" variant="surface"><Button>悬停：磨砂</Button></Tooltip>\n<Tooltip content="关闭：实心气泡" variant="surface" glass={false}><Button variant="outline">悬停：实心</Button></Tooltip>`,
+      code: `<Tooltip content="默认：磨砂气泡"><Button>悬停：磨砂</Button></Tooltip>\n<Tooltip content="关闭：实心气泡" variant="surface" glass={false}><Button variant="outline">悬停：实心</Button></Tooltip>`,
       Comp: () => (
         <div className="demo-row">
-          <Tooltip content="默认：磨砂气泡" variant="surface">
+          <Tooltip content="默认：磨砂气泡">
             <Button>悬停：磨砂</Button>
           </Tooltip>
           <Tooltip content="关闭：实心气泡" variant="surface" glass={false}>

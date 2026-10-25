@@ -11,6 +11,8 @@ export type DrawerSide = 'right' | 'left' | 'bottom';
 export type DrawerPlacement = DrawerSide;
 
 export interface DrawerProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   open?: MaybeGetter<boolean>;
   defaultOpen?: MaybeGetter<boolean>;
   onOpenChange?: (open: boolean) => void;
@@ -125,6 +127,7 @@ export function Drawer(props: DrawerProps) {
 
   return (
     <div
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       id={resolve(props.id)}
       ref={refCb}
       class={cx('ui-drawer-overlay', isOpen() && 'show')}

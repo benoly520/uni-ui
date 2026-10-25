@@ -3,7 +3,12 @@ import Message from './Message.vue';
 
 export type MessageType = 'success' | 'warning' | 'info' | 'danger';
 
-const state = reactive({ show: false, content: '' as string, type: 'info' as MessageType });
+const state = reactive({
+  show: false,
+  content: '' as string,
+  type: 'info' as MessageType,
+  glass: undefined as boolean | undefined,
+});
 let mountEl: HTMLElement | null = null;
 let timer: ReturnType<typeof setTimeout> | null = null;
 
@@ -12,7 +17,13 @@ function ensureMount(): void {
   mountEl = document.createElement('div');
   document.body.appendChild(mountEl);
   const app: App = createApp({
-    render: () => h(Message, { show: state.show, type: state.type, content: state.content }),
+    render: () =>
+      h(Message, {
+        show: state.show,
+        type: state.type,
+        content: state.content,
+        glass: state.glass,
+      }),
   });
   app.mount(mountEl);
 }
@@ -21,15 +32,18 @@ function ensureMount(): void {
  * showMessage · 命令式顶部通知（Vue）
  * - 单例容器挂 body，响应式切换 show 触发入场/退场动画
  * - duration 默认 2600ms，0 不自动关闭；重复调用重置计时器
+ * - glass 传 false 可回退为不透明实心面（默认 true）
  * - 与 React 版 showMessage() 行为一致
  */
 export function showMessage(
   content: string,
   type: MessageType = 'info',
   duration = 2600,
+  glass?: boolean,
 ): void {
   state.content = content;
   state.type = type;
+  state.glass = glass;
   ensureMount();
   state.show = true;
   if (timer) clearTimeout(timer);

@@ -3,6 +3,8 @@ import { cx, boolAttr } from './_shared';
 import type { MaybeGetter, Renderable } from './_shared';
 
 export interface PopoverProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   /** 面板内容（可含可交互元素，如按钮） */
   content: MaybeGetter<Renderable>;
   /** 受控显示 */
@@ -86,6 +88,7 @@ export function Popover(props: PopoverProps) {
 
   return (
     <div
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       class={cx('ui-popover', resolve(props.className))}
       style={resolve(props.style)}
       onMouseEnter={show}

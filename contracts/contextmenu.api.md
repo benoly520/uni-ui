@@ -19,6 +19,7 @@
 | `onSelect` | `(key: string) => void` | — | — | 点击项执行 |
 | `aria-label` | `string` | `'操作菜单'` | 根 `role="menu"` aria-label | — |
 | `className` / `style` | — | — | 根 class / style | — |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ### `ContextMenuItem`
 | 字段 | 类型 | 说明 |
@@ -40,6 +41,12 @@
 ## 交互特性（对齐 `initContextMenu`）
 - 右键（`contextmenu`）光标处弹出；近视口边缘翻转（x/width、y/height）。
 - 危险项 `is-danger` 红 hover；分隔线无交互。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件不含磨砂面（不消耗 `--ui-glass-tint` / `backdrop-filter`），为三端 API 一致性保留，传 `false` 无视觉变化；内部组合的玻璃组件由其自身 `glass` 控制。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律
 - class 手写稳定；**根无连字符** `ui-contextmenu`；禁 scoped / CSS-in-JS / hash。

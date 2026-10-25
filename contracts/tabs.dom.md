@@ -26,6 +26,7 @@
 3. 选中 tab：`aria-selected="true"` + `tabindex="0"`；其余 `aria-selected="false"` + `tabindex="-1"`。
 4. 面板紧随 wrap 之后，作为同级兄弟；非激活面板带 `hidden`。
 5. 禁止 scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash，class 手写稳定字符串。
+6. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。
 
 ## 基准用例（对齐预览页）
 

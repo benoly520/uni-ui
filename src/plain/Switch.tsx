@@ -5,6 +5,8 @@ import type { MaybeGetter } from './_shared';
 export type SwitchSize = 'lg' | 'md' | 'sm' | 'xs';
 
 export interface SwitchProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   checked?: MaybeGetter<boolean>;
   defaultChecked?: MaybeGetter<boolean>;
   onChange?: (checked: boolean) => void;
@@ -28,6 +30,7 @@ export function Switch(props: SwitchProps) {
   const on = () => (isControlled() ? !!resolve(props.checked) : inner());
   return (
     <button
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       id={resolve(props.id)}
       type="button"
       role="switch"

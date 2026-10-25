@@ -6,6 +6,8 @@ import React, {
 import { cx } from '../utils/cx';
 
 export interface PaginationProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 总条目数 */
   total: number;
   /** 每页条目数 */
@@ -50,6 +52,7 @@ function getPages(current: number, totalPages: number, sibling: number): PageIte
  */
 export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagination(
   {
+    glass,
     total,
     pageSize = 10,
     page,
@@ -78,6 +81,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
 
   return (
     <nav
+      data-glass={glass === false ? 'off' : undefined}
       ref={ref}
       className={cx('ui-pagination', className)}
       style={style}

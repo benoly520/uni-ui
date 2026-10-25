@@ -29,3 +29,4 @@
 2. 形状 / 尺寸一律内联 `style`，不新增 `ui-skeleton--*` 类（避免改 theme.css）。
 3. **偏差说明**：因 `theme.css` 仅 `.ui-skeleton` 基础 + `ui-shimmer`，圆形/文本形状经内联 `style` 实现，与预览内联写法同源；不新增 CSS、不改 theme.css，保持双框架零样式纪律。
 4. **禁止** scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash（§16.5）。
+5. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

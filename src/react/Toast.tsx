@@ -6,6 +6,8 @@ import React, {
 import { cx } from '../utils/cx';
 
 export interface ToastProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 可见性；命令式/受控都用 show 切换入场/退场动画 */
   show?: boolean;
   /** 轻提示正文 */
@@ -25,11 +27,12 @@ export interface ToastProps {
  * - 命令式入口见 toast.ts（createRoot 挂 body）
  */
 export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
-  { show = false, content, icon, children, className, style },
+  { glass, show = false, content, icon, children, className, style },
   ref,
 ) {
   return (
     <div
+      data-glass={glass === false ? 'off' : undefined}
       ref={ref}
       // 注意：可见态必须加**独立的** `show` 类（CSS 选择器是 `.ui-toast.show`）。
       // 写成 `'ui-toast.show'` 会变成单个带点的类名，永远匹配不上 -> 元素 opacity:0 不可见。

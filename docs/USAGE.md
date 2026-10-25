@@ -114,6 +114,40 @@ Plain 端同构：`import { Button } from 'uni-ui/plain'`，配合 `plain/vite` 
 }
 ```
 
+### 3.2 关闭 / 调整毛玻璃（glass）
+
+每个组件都有 `glass` 属性（默认 `true`）——默认不输出任何 DOM 属性，渲染结果与未引入该开关时完全一致；传 `false` 时组件根节点输出 `data-glass="off"`，`theme.css` §4.1 把该子树的半透明面回退为不透明实心面，并真移除 `backdrop-filter`（不是把透明度压到 100% 那种「视觉看不见但合成层还在」的假关闭）。
+
+```tsx
+<Dialog glass={false} open={open}>…</Dialog>       // React / Plain
+<Button variant="default" glass={false}>按钮</Button>
+```
+
+```vue
+<Dialog :glass="false" :open="open">…</Dialog>    <!-- Vue -->
+```
+
+三种粒度：
+
+| 粒度 | 写法 | 说明 |
+|---|---|---|
+| 单组件 | `glass={false}` | 只影响该组件及其内部浮层（如 Select 的下拉、Table 的吸顶表头） |
+| 全站 | `<html data-glass="off">` | 一次关闭全站磨砂（命令式 `toast()` / `showMessage()` 同样生效） |
+| 局部子树 | 任意祖先元素加 `data-glass="off"` | 脱离组件 API 的逃生舱，样式层即可控制 |
+
+命令式 API 也可单独指定：`toast('已保存', { glass: false })`、`showMessage('已更新', 'success', 2600, false)`。
+
+回退面可换成任意不透明色，不必是默认的抬升面：
+
+```css
+:root {
+  --ui-glass-off-surface: #ffffff;        /* 关闭磨砂后的实心面，默认 --ui-bg-elevated */
+  --ui-glass-off-surface-active: #f0f0f2; /* 实心面上的 hover 反馈，默认 --ui-bg */
+}
+```
+
+只想调而不想关时，仍用原有组件级旋钮（`--ui-dialog-glass-opacity`、`--ui-dialog-glass-blur`、`--ui-input-glass-opacity` 等），两边互不干扰。各组件受影响的具体部位见对应 `contracts/*.api.md` 的「玻璃开关」节。
+
 ## 4. 按需引入（可选）
 
 默认发布为单文件 ESM bundle（`uni-ui/react`、`uni-ui/vue`、`uni-ui/plain`），由使用方打包器 tree-shaking 按需。
@@ -136,7 +170,9 @@ import { Button } from 'uni-ui/plain/Button';      // Plain 按组件直引
 import { toast, showMessage } from 'uni-ui/react'; // 或 uni-ui/vue、uni-ui/plain
 
 toast('操作成功', { duration: 2400 });                 // 轻提示，duration=0 常驻
+toast('已保存', { glass: false });                     // 关掉该条提示的磨砂
 showMessage('数据已更新', 'success');                  // 顶部通知，type: info|success|warning|error
+showMessage('已更新', 'success', 2600, false);         // 第 4 个参数：glass=false 回退实心面
 ```
 
 ## 6. 运行 Playground（三端对比）

@@ -20,6 +20,8 @@ export interface TreeData {
 }
 
 export interface TreeProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 层级数据 */
   data: TreeData[];
   /** 是否显示勾选框（金融筛选=筛入板块），默认 true */
@@ -57,6 +59,7 @@ function parentKeys(nodes: TreeData[], acc: string[] = []): string[] {
  */
 export const Tree = forwardRef<HTMLDivElement, TreeProps>(function Tree(
   {
+    glass,
     data,
     checkable = true,
     defaultExpandedKeys,
@@ -165,7 +168,7 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(function Tree(
   };
 
   return (
-    <div className={cx('ui-tree', className)} style={style} ref={ref} role="tree" aria-label={ariaLabel}>
+    <div className={cx('ui-tree', className)} style={style} ref={ref} role="tree" aria-label={ariaLabel} data-glass={glass === false ? 'off' : undefined}>
       <ul className="ui-tree-children">{data.map(renderNode)}</ul>
     </div>
   );

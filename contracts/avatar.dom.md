@@ -38,3 +38,4 @@
 2. **禁止** scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash；尺寸/底色用静态内联 `style`。
 3. 颜色零硬编码：底色 `var(--ui-color-{tone})`，仅文字 `#fff` 例外。
 4. 图片 `object-fit:cover` 经内联 `style` 实现，不引入新 CSS 规则。
+5. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

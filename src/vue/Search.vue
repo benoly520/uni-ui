@@ -13,6 +13,8 @@ interface SearchOption {
   tag?: SearchTag;
 }
 interface SearchProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   options?: SearchOption[];
   value?: string;
   defaultValue?: string;
@@ -20,6 +22,7 @@ interface SearchProps {
 }
 
 const props = withDefaults(defineProps<SearchProps>(), {
+  glass: true,
   options: () => [],
   placeholder: '搜索…',
 });
@@ -87,7 +90,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
 </script>
 
 <template>
-  <div ref="rootRef" class="ui-search" :class="open && 'open'">
+  <div ref="rootRef" class="ui-search" :class="open && 'open'" :data-glass="glass === false ? 'off' : undefined">
     <span class="ico ui-icon">
       <IconSearch />
     </span>

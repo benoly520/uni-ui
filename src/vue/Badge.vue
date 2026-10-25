@@ -5,6 +5,8 @@ type BadgeTone = 'brand' | 'danger' | 'success' | 'warning' | 'info';
 
 const props = withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     /** 语义色（token 驱动，无硬色值） */
     tone?: BadgeTone;
     /** 前置状态圆点 */
@@ -17,6 +19,7 @@ const props = withDefaults(
     showZero?: boolean;
   }>(),
   {
+    glass: true,
     tone: 'brand',
     dot: false,
     max: 99,
@@ -38,7 +41,7 @@ const content = computed(() => {
 </script>
 
 <template>
-  <span v-if="visible" class="ui-badge" :style="toneStyle">
+  <span v-if="visible" class="ui-badge" :style="toneStyle" :data-glass="glass === false ? 'off' : undefined">
     <span
       v-if="dot"
       class="ui-badge-dot"

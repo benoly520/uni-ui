@@ -27,3 +27,4 @@
 3. 禁止 scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash。
 4. 颜色零硬编码：涨 `var(--ui-color-up)`、跌 `var(--ui-color-down)`、灰 `var(--ui-text-muted)`，全 token。
 5. 图标/三角不占 DOM，由 theme.css `.delta::before` 绘制。
+6. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

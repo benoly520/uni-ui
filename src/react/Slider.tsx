@@ -13,6 +13,8 @@ import { cx } from '../utils/cx';
 export type SliderFormat = 'pct' | 'num' | ((v: number) => string);
 
 export interface SliderProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   min?: number;
   max?: number;
   step?: number;
@@ -63,6 +65,7 @@ function clampStep(v: number, min: number, max: number, step: number): number {
  */
 export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(
   {
+    glass,
     min = 0,
     max = 100,
     step = 1,
@@ -150,7 +153,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(
   const pHi = pct(hi);
 
   return (
-    <div className={cx('ui-slider-wrap', className)} style={style} ref={ref}>
+    <div className={cx('ui-slider-wrap', className)} style={style} ref={ref} data-glass={glass === false ? 'off' : undefined}>
       <div className="ui-slider">
         <div className="ui-slider-track" ref={trackRef}>
           <div

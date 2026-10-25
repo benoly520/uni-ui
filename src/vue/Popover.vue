@@ -11,6 +11,8 @@ import { computed, cloneVNode, ref, onMounted, onUnmounted, type VNode } from 'v
 
 const props = withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     /** 受控显示 */
     open?: boolean;
     /** 非受控初始显示 */
@@ -21,6 +23,7 @@ const props = withDefaults(
     id?: string;
   }>(),
   {
+    glass: true,
     defaultOpen: false,
     ariaLabel: 'Popover',
   },
@@ -102,6 +105,7 @@ const triggerNode = computed(() => {
 
 <template>
   <div
+    :data-glass="glass === false ? 'off' : undefined"
     ref="rootRef"
     class="ui-popover"
     @mouseenter="onRootEnter"

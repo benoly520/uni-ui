@@ -38,3 +38,4 @@
 2. **禁止** scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash；圆点用静态内联 `style`。
 3. 颜色零硬编码：`tone` 背景/前景一律 `var(--ui-color-*)`，圆点 `background:currentColor` 继承前景。
 4. dot 仅需 `<span class="ui-badge-dot">` + 内联 `style`，不引入新 CSS 规则。
+5. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

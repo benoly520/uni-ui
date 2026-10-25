@@ -25,6 +25,8 @@ export interface ContextMenuItem {
 }
 
 export interface ContextMenuProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 菜单项（命令式传入） */
   items: ContextMenuItem[];
   /** 右键触发目标 */
@@ -50,6 +52,7 @@ export interface ContextMenuProps {
 export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
   function ContextMenu(
     {
+      glass,
       items,
       targetRef,
       open,
@@ -125,6 +128,7 @@ export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
 
     return (
       <div
+        data-glass={glass === false ? 'off' : undefined}
         ref={(node) => {
           menuRef.current = node;
           if (typeof ref === 'function') ref(node);

@@ -9,12 +9,15 @@ interface TabItem {
 
 const props = withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     items: TabItem[];
     value?: string;
     defaultValue?: string;
     ariaLabel?: string;
   }>(),
   {
+    glass: true,
     ariaLabel: '标签页',
   },
 );
@@ -99,7 +102,7 @@ function scrollByStep(dir: -1 | 1) {
 </script>
 
 <template>
-  <div class="ui-tabs-wrap" ref="wrapRef">
+  <div class="ui-tabs-wrap" ref="wrapRef" :data-glass="glass === false ? 'off' : undefined">
     <button
       class="ui-tabs-arrow ui-tabs-arrow--left"
       aria-label="向左滚动标签"

@@ -24,6 +24,8 @@ export interface DataTableColumn {
 }
 
 export interface DataTableProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   columns: DataTableColumn[];
   data: Record<string, any>[];
   /** 紧凑密度（投研默认） */
@@ -83,6 +85,7 @@ function sortRows(
 export const DataTable = forwardRef<HTMLDivElement, DataTableProps>(
   function DataTable(
     {
+      glass,
       columns,
       data,
       compact = false,
@@ -164,6 +167,7 @@ export const DataTable = forwardRef<HTMLDivElement, DataTableProps>(
 
     return (
       <div
+        data-glass={glass === false ? 'off' : undefined}
         ref={ref}
         className={cx(
           'ui-table',

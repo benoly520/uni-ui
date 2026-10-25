@@ -4,6 +4,8 @@ import { IconTable } from './icons';
 import type { MaybeGetter, Renderable } from './_shared';
 
 export interface EmptyProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   description?: Renderable | (() => Renderable);
   /** 图标插槽（24×24 + currentColor）；默认内置 table 图标，可覆盖 */
   icon?: Renderable | (() => Renderable);
@@ -20,6 +22,7 @@ export interface EmptyProps {
 export function Empty(props: EmptyProps) {
   return (
     <div
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       id={resolve(props.id)}
       class={cx('ui-empty', resolve(props.className))}
       style={resolve(props.style)}

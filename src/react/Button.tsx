@@ -11,6 +11,8 @@ export type ButtonSize = 'lg' | 'md' | 'xs' | 'sm';
 
 export interface ButtonProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick' | 'type'> {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 语义变体（颜色语义） */
   variant?: ButtonVariant;
   /** 尺寸 Scale（全局修饰，md 默认无类） */
@@ -37,6 +39,7 @@ export interface ButtonProps
  */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
+    glass,
     variant = 'default',
     size = 'md',
     pill = false,
@@ -57,6 +60,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     <button
       ref={ref}
       type={type}
+      data-glass={glass === false ? 'off' : undefined}
       className={cx(
         'ui-btn',
         `ui-btn--${variant}`,

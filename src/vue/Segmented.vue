@@ -14,6 +14,8 @@ type SegmentedSize = 'lg' | 'md' | 'xs' | 'sm';
 
 const props = withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     /** 选项列表 */
     options: SegmentedOption[];
     /** 受控选中值 */
@@ -27,6 +29,7 @@ const props = withDefaults(
     ariaLabel?: string;
   }>(),
   {
+    glass: true,
     size: 'md',
     disabled: false,
   },
@@ -82,6 +85,7 @@ const cls = computed(() => [
 
 <template>
   <div
+    :data-glass="glass === false ? 'off' : undefined"
     ref="rootRef"
     :class="cls"
     :aria-label="ariaLabel"

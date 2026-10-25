@@ -17,6 +17,7 @@
 | `ariaLabel` | `string` | `'Popover'` | `.ui-popover-panel` 的 `aria-label` | 面板无障碍标签 |
 | `id` | `string` | 自动生成 | 面板 `id` | 用于 trigger `aria-controls` |
 | `className` / `style` | — | — | 透传到根 | — |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ## 插槽
 - **默认插槽**：触发元素（如 `<button>`），组件注入 `aria-expanded` + `aria-controls`。
@@ -28,6 +29,12 @@
 ## 与 Tooltip 区别
 - Popover 面板**可交互**（按钮可点）；Tooltip 为纯标签展示、不可交互。
 - 因此 Popover 用 `role="dialog"`（Tooltip 用 `role="tooltip"`），且不因移动到气泡而关闭。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件不含磨砂面（不消耗 `--ui-glass-tint` / `backdrop-filter`），为三端 API 一致性保留，传 `false` 无视觉变化；内部组合的玻璃组件由其自身 `glass` 控制。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律
 - 根 `ui-popover` 必首位；面板 `ui-popover-panel` 紧随触发元素。

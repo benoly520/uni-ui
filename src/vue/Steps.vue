@@ -9,12 +9,15 @@ interface StepItem {
 
 const props = withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     steps: StepItem[];
     current?: number;
     defaultCurrent?: number;
     clickable?: boolean;
   }>(),
   {
+    glass: true,
     current: undefined,
     defaultCurrent: 0,
     clickable: true,
@@ -37,7 +40,7 @@ function go(i: number) {
 </script>
 
 <template>
-  <div class="ui-steps">
+  <div class="ui-steps" :data-glass="glass === false ? 'off' : undefined">
     <template v-for="(s, i) in steps" :key="`step-${i}`">
       <div
         :class="[

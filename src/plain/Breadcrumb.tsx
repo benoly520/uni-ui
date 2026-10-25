@@ -8,6 +8,8 @@ export interface BreadcrumbItem {
 }
 
 export interface BreadcrumbProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   items: MaybeGetter<BreadcrumbItem[]>;
   separator?: MaybeGetter<string>;
   'aria-label'?: MaybeGetter<string>;
@@ -26,6 +28,7 @@ export function Breadcrumb(props: BreadcrumbProps) {
   const itemsArr = () => resolve(props.items) || [];
   return (
     <nav
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       id={resolve(props.id)}
       class={cx('ui-breadcrumb', resolve(props.className))}
       aria-label={ariaLabel()}

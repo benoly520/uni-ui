@@ -18,6 +18,7 @@
 | `trend` | `'up' \| 'down' \| 'muted'` | — | `ui-num--up/down/muted` + `data-num` | 涨跌着色：走 `--ui-color-up/down`；`muted` 灰色 |
 | `className` | `string` | — | 追加根 | — |
 | `style` | `CSSProperties` | — | 内联 | — |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ## 插槽
 - 无具名插槽。`value` / `delta` 为纯文本 + 可选 `prefix`/`suffix`；图标类展示（如箭头）由 theme.css 的 `.delta::before` 三角自动提供，组件不内置。
@@ -28,6 +29,12 @@
 ## 涨跌着色约定
 - `trend` 同时产出 `class="ui-num--up|down|muted"`（theme.css 实际着色入口）与 `data-num="up|down|muted"` 属性（满足 `data-num` 语义契约；theme.css 着色为类驱动，见交付报告缺口）。
 - 颜色走 `--ui-color-up` / `--ui-color-down`，受 `[data-mkt="cn|intl"]` 红涨绿跌/绿涨红跌覆盖。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件不含磨砂面（不消耗 `--ui-glass-tint` / `backdrop-filter`），为三端 API 一致性保留，传 `false` 无视觉变化；内部组合的玻璃组件由其自身 `glass` 控制。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律
 - 根 `ui-stat` 必首位；涨跌色用 `ui-num--*` 工具类；禁止派生子 token。

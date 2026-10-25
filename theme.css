@@ -717,3 +717,76 @@ input[type="range"] { width: 100%; min-width: 0; }
 .ui-contextmenu-sep { height: 1px; background: var(--ui-border); margin: 4px 2px; }
 .ui-contextmenu-shortcut { font-family: var(--ui-font-mono); font-size: 11px; color: var(--ui-text-muted); }
 .ui-contextmenu-target { border: 1px dashed var(--ui-border); border-radius: var(--ui-radius-md); padding: var(--ui-space-4); color: var(--ui-text-muted); font-size: 13px; text-align: center; }
+
+/* ============================================================
+   4.1 玻璃开关（data-glass="off"）— 逐组件 / 全站按需关闭磨砂
+   编号沿用 §4 主题层（contracts/token.md 与 docs/USAGE.md 均引用「§4.1」），
+   但物理位置置于文件末尾，原因见下方「位置约束」。
+   用法：
+     · 组件级：<Dialog glass={false}> → 组件根输出 data-glass="off"
+     · 全站：<html data-glass="off">
+     · 逃生舱：任意祖先元素加 data-glass="off"，即对其子树生效
+   回退策略：半透明 tint 面 → 不透明 --ui-glass-off-surface；backdrop-filter 显式置 none
+   （只把 opacity 压到 100% 会让模糊视觉消失但合成层开销仍在）。遮罩层只去模糊、
+   保留半透明黑（压暗背景是遮罩语义，不属材质）。未标注 data-glass 时零样式影响。
+   ⚠ 位置约束：本段**必须留在文件最末尾**。它与暗色 / 换肤规则（如
+   [data-theme="dark"] .ui-dialog）同为 0,2,0 特异性，同特异性由源码顺序决胜，
+   排在末尾才能保证暗色场景下关闭同样生效。
+   ============================================================ */
+:root {
+  /* 关闭磨砂后的实心面（可覆盖成任意不透明色）；active 面用于 hover 保持反馈 */
+  --ui-glass-off-surface: var(--ui-bg-elevated);
+  --ui-glass-off-surface-active: var(--ui-bg);
+}
+
+/* ① 玻璃浮层 / 半透明底：统一压成实心面，并真正移除背景模糊 */
+[data-glass="off"].ui-glass,
+[data-glass="off"] .ui-glass,
+[data-glass="off"].ui-drawer,
+[data-glass="off"] .ui-drawer,
+[data-glass="off"].ui-select-menu,
+[data-glass="off"] .ui-select-menu,
+[data-glass="off"].ui-search-suggest,
+[data-glass="off"] .ui-search-suggest,
+[data-glass="off"].ui-message,
+[data-glass="off"] .ui-message,
+[data-glass="off"].ui-tabs-arrow,
+[data-glass="off"] .ui-tabs-arrow,
+[data-glass="off"].ui-table,
+[data-glass="off"] .ui-table,
+[data-glass="off"] .ui-table thead th,
+[data-glass="off"].ui-select-trigger,
+[data-glass="off"] .ui-select-trigger,
+[data-glass="off"].ui-search-input,
+[data-glass="off"] .ui-search-input,
+[data-glass="off"].ui-input,
+[data-glass="off"] .ui-input,
+[data-glass="off"].ui-btn--default,
+[data-glass="off"] .ui-btn--default,
+[data-glass="off"].ui-pagination button,
+[data-glass="off"] .ui-pagination button,
+[data-glass="off"].ui-tip.ui-tip--surface .bubble,
+[data-glass="off"] .ui-tip.ui-tip--surface .bubble,
+[data-glass="off"].nav,
+[data-glass="off"] .nav {
+  background: var(--ui-glass-off-surface);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* ② hover 面：实心底上仍需可辨识的交互反馈（原 tint/0.40 半透明白在同色底上会消失） */
+[data-glass="off"].ui-btn--default:hover,
+[data-glass="off"] .ui-btn--default:hover,
+[data-glass="off"] .ui-table tbody tr:hover,
+[data-glass="off"] .ui-vtable-row:hover {
+  background: var(--ui-glass-off-surface-active);
+}
+
+/* ③ 遮罩：只移除背景模糊，保留半透明黑（遮罩本质是压暗背景，不是材质） */
+[data-glass="off"].ui-overlay,
+[data-glass="off"] .ui-overlay,
+[data-glass="off"].ui-drawer-overlay,
+[data-glass="off"] .ui-drawer-overlay {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}

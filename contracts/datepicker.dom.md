@@ -52,3 +52,4 @@
 3. 弹层 `hidden` 属性控制显隐（CSS `.ui-datepicker-pop[hidden]{display:none}`）。
 4. 图标为内置内联 SVG（`{SVG:calendar@2}` / `{SVG:chevron-left@2.4}` / `{SVG:chevron-right@2.4}`，记法见 `icon.md`），不依赖 lucide 运行时。
 5. 颜色零硬编码（除 #fff 文本对比）：选中底 `var(--ui-color-brand)`，today 描边同，柔光 `var(--ui-color-brand-soft)`。
+6. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

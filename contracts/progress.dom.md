@@ -24,3 +24,4 @@
 3. `width` 仅以内联 `style` 给出（百分比），不派生 token。
 4. **偏差说明**：`ui-progress--indeterminate` 已在 DOM 产出，但 `theme.css` 暂无对应规则；保留类以对齐契约，待补 CSS 后即刻呈现不确定动画，不影响双框架 DOM 一致性。
 5. **禁止** scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash（§16.5）。
+6. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

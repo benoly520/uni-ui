@@ -12,6 +12,8 @@ import { cx } from '../utils/cx';
 export type DrawerSide = 'right' | 'left' | 'bottom';
 
 export interface DrawerProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 受控打开状态 */
   open: boolean;
   /** 打开/关闭回调 */
@@ -45,6 +47,7 @@ const FOCUSABLE =
  */
 export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(
   {
+    glass,
     open,
     onOpenChange,
     side = 'right',
@@ -116,6 +119,7 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(
 
   return (
     <div
+      data-glass={glass === false ? 'off' : undefined}
       ref={(node) => {
         (overlayRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
         if (typeof ref === 'function') ref(node);

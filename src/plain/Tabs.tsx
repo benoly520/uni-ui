@@ -12,6 +12,8 @@ export interface TabItem {
 }
 
 export interface TabsProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   /** 标签与面板数据 */
   items: MaybeGetter<TabItem[]>;
   /** 受控选中 key */
@@ -124,6 +126,7 @@ export function Tabs(props: TabsProps) {
   return (
     <>
       <div
+        data-glass={resolve(props.glass) === false ? 'off' : undefined}
         id={resolve(props.id)}
         class={cx('ui-tabs-wrap', resolve(props.className))}
         style={resolve(props.style)}

@@ -33,3 +33,4 @@
 3. caret 为内置 24×24 `currentColor` chevron-down 内联 SVG（非 lucide 运行时），保证双框架一致。
 4. 颜色零硬编码：caret / hover 走 `var(--ui-color-brand-soft)`、badge 走 `var(--ui-color-brand)`。
 5. 面板过渡靠内联 `style.maxHeight`（open 取 scrollHeight，closed 取 0），值由运行时测量，两侧算法一致。
+6. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

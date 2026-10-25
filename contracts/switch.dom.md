@@ -27,3 +27,4 @@
 2. **禁止** scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash，class 手写稳定字符串。
 3. 颜色零硬编码：轨道开 `var(--ui-color-brand)`、关 `var(--ui-border)`，滑块 `#fff`（文本对比例外），全部走 token/约定。
 4. 切换仅改 `aria-checked` 与（React/Vue 受控时）受控 prop；不引入额外 class 或子节点。
+5. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

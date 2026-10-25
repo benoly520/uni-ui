@@ -10,6 +10,8 @@ export interface SelectOption {
 }
 
 export interface SelectProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   options: MaybeGetter<SelectOption[]>;
   value?: MaybeGetter<string | string[]>;
   defaultValue?: MaybeGetter<string | string[]>;
@@ -104,6 +106,7 @@ export function Select(props: SelectProps) {
 
   return (
     <div
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       id={resolve(props.id)}
       ref={refRoot}
       class={cx('ui-select', open() && 'open', resolve(props.className))}

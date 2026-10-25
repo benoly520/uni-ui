@@ -19,6 +19,7 @@
 | `placeholder` | `string` | `'请选择'` | 触发器占位文案 | — |
 | `onChange` | `(value, option) => void` | — | 选中变化 | 单值/数组 + 对应 option(s) |
 | `className` / `style` | — | — | — | — |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ### SelectOption
 | 字段 | 类型 | 说明 |
@@ -35,6 +36,12 @@
 - 选项点击：单选 → 设 `aria-selected=true` 并关闭；多选 → 切换 `aria-selected`、更新触发器文案。
 - 搜索框 input：按 `data-val` 包含过滤（不区分大小写），隐藏不匹配项。
 - 点击组件外部 / Esc：关闭。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件受影响部位：`.ui-select-trigger` 底色 + `.ui-select-menu` 下拉面板。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律
 - 多选根加 `data-multiple`（属性，非 class）；多选选项加 `.multi` 类与 `.check` 图标（`ui-icon`）。

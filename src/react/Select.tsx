@@ -17,6 +17,8 @@ export interface SelectOption {
 }
 
 export interface SelectProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   options: SelectOption[];
   /** 受控选中值：单选 string / 多选 string[] */
   value?: string | string[];
@@ -40,6 +42,7 @@ export interface SelectProps {
  */
 export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   {
+    glass,
     options,
     value,
     defaultValue,
@@ -138,6 +141,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
 
   return (
     <div
+      data-glass={glass === false ? 'off' : undefined}
       ref={setRef}
       className={cx('ui-select', open && 'open', className)}
       data-multiple={multiple || undefined}

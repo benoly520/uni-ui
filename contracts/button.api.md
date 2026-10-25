@@ -17,6 +17,7 @@
 | `disabled` | `boolean` | `false` | 原生 `disabled` | 透明度 0.45、`not-allowed` |
 | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | 原生 `type` | 表单语义（表单内按钮必显式指定） |
 | `icon` | 节点（SVG / 图标库） | — | 包入 `.ui-icon` 插槽 | 见 `icon.md` |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ## 插槽
 - **默认插槽**：文本或任意节点（如 `新建`）。
@@ -27,6 +28,12 @@
 
 ## 毛玻璃
 - `default` 变体背景走 `--ui-btn-glass-opacity` → 回退 `--ui-glass-opacity-strong`（§17.19 惰性求值）。其他变体为实色，不吃玻璃。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件受影响部位：仅 `default` 变体底色（primary / ghost / outline / danger 为实色，不受影响）。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律
 - 变体用 `ui-btn--*`、形状修饰用 `ui-btn--pill`、尺寸用全局 `ui-size-*`；**禁止**派生子 token 承载可覆盖参数（§17.19）。

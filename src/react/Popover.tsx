@@ -13,6 +13,8 @@ import React, {
 import { cx } from '../utils/cx';
 
 export interface PopoverProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 面板内容（可含可交互元素，如按钮） */
   content: ReactNode;
   /** 受控显示 */
@@ -39,6 +41,7 @@ export interface PopoverProps {
  */
 export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover(
   {
+    glass,
     content,
     open: openProp,
     defaultOpen = false,
@@ -117,6 +120,7 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
 
   return (
     <div
+      data-glass={glass === false ? 'off' : undefined}
       ref={ref}
       className={cx('ui-popover', className)}
       style={style}

@@ -5,6 +5,8 @@ import type { MaybeGetter, Renderable } from './_shared';
 export type MessageType = 'success' | 'warning' | 'info' | 'danger';
 
 export interface MessageProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   /** 可见性；命令式/受控都用 show 切换入场/退场动画 */
   show?: MaybeGetter<boolean>;
   /** 类型，左 .dot 用语义色 token */
@@ -29,6 +31,7 @@ export function Message(props: MessageProps) {
   const type = () => resolve(props.type) ?? 'info';
   return (
     <div
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       id={resolve(props.id)}
       class={cx('ui-message', 'ui-message--' + type(), show() && 'show', resolve(props.className))}
       role="status"

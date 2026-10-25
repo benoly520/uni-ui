@@ -3,6 +3,8 @@ import { cx } from './_shared';
 import type { MaybeGetter, Renderable } from './_shared';
 
 export interface ToastProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   /** 可见性；命令式/受控都用 show 切换入场/退场动画 */
   show?: MaybeGetter<boolean>;
   /** 轻提示正文 */
@@ -26,6 +28,7 @@ export function Toast(props: ToastProps) {
   const show = () => resolve(props.show) ?? false;
   return (
     <div
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       id={resolve(props.id)}
       // 可见态加独立的 `show` 类（CSS 是 `.ui-toast.show`），写成 'ui-toast.show' 永远匹配不上
       class={cx('ui-toast', 'ui-glass', show() && 'show', resolve(props.className))}

@@ -15,6 +15,8 @@ export interface StepItem {
 }
 
 export interface StepsProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 流程步骤 */
   steps: StepItem[];
   /** 受控当前步索引（高亮 + 描边） */
@@ -36,6 +38,7 @@ export interface StepsProps {
  */
 export const Steps = forwardRef<HTMLDivElement, StepsProps>(function Steps(
   {
+    glass,
     steps,
     current,
     defaultCurrent = 0,
@@ -85,7 +88,7 @@ export const Steps = forwardRef<HTMLDivElement, StepsProps>(function Steps(
   });
 
   return (
-    <div className={cx('ui-steps', className)} style={style} ref={ref}>
+    <div className={cx('ui-steps', className)} style={style} ref={ref} data-glass={glass === false ? 'off' : undefined}>
       {nodes}
     </div>
   );

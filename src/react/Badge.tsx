@@ -8,6 +8,8 @@ import { cx } from '../utils/cx';
 export type BadgeTone = 'brand' | 'danger' | 'success' | 'warning' | 'info';
 
 export interface BadgeProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 语义色（token 驱动，无硬色值） */
   tone?: BadgeTone;
   /** 前置状态圆点 */
@@ -32,6 +34,7 @@ export interface BadgeProps {
  */
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
   {
+    glass,
     tone = 'brand',
     dot = false,
     count,
@@ -55,6 +58,7 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
 
   return (
     <span
+      data-glass={glass === false ? 'off' : undefined}
       ref={ref}
       className={cx('ui-badge', className)}
       style={{ ...toneStyle, ...style }}

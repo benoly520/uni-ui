@@ -11,6 +11,8 @@ interface ContextMenuItem {
 
 const props = withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     items: ContextMenuItem[];
     targetRef: Ref<HTMLElement | null>;
     open?: boolean;
@@ -18,6 +20,7 @@ const props = withDefaults(
     ariaLabel?: string;
   }>(),
   {
+    glass: true,
     open: undefined,
     defaultOpen: false,
     ariaLabel: '操作菜单',
@@ -100,6 +103,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div
+    :data-glass="glass === false ? 'off' : undefined"
     ref="menuRef"
     :class="['ui-contextmenu', isOpen && 'is-open']"
     role="menu"

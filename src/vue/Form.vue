@@ -16,6 +16,8 @@ interface FormField {
   rules?: FormRule[];
 }
 interface FormProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   fields: FormField[];
   grid?: boolean;
   submitText?: string;
@@ -26,6 +28,7 @@ interface FormProps {
 }
 
 const props = withDefaults(defineProps<FormProps>(), {
+  glass: true,
   grid: true,
   submitText: '提交',
 });
@@ -64,7 +67,7 @@ function handleSubmit() {
 </script>
 
 <template>
-  <form class="ui-form" :class="className" :style="style" novalidate @submit.prevent="handleSubmit">
+  <form class="ui-form" :class="className" :style="style" novalidate @submit.prevent="handleSubmit" :data-glass="glass === false ? 'off' : undefined">
     <div v-if="grid" class="ui-form-grid">
       <div
         v-for="f in fields"

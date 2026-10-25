@@ -8,6 +8,8 @@ import { cx } from '../utils/cx';
 export type InputSize = 'lg' | 'md' | 'xs' | 'sm';
 
 export interface InputProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 受控值 */
   value?: string;
   /** 非受控初始值 */
@@ -42,6 +44,7 @@ export interface InputProps {
  */
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   {
+    glass,
     value,
     defaultValue,
     onChange,
@@ -69,6 +72,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 
   const inputEl = (
     <input
+      data-glass={glass === false ? 'off' : undefined}
       ref={ref}
       className={cx('ui-input', size !== 'md' && `ui-size-${size}`, error && 'ui-input--error', className)}
       type={type}

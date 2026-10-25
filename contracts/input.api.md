@@ -25,6 +25,7 @@
 | `suffix` | 节点（图标） | — | 包入 `.ui-icon` 插槽 | 后导图标/装饰（adornment sibling） |
 | `className` | `string` | — | 附加 class | 加在 `<input>` 上（非 `.ui-input-wrap`） |
 | `style` | `CSSProperties` | — | 内联样式 | 加在 `<input>` 上（非 `.ui-input-wrap`） |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ## 插槽
 - **默认**：无（文本输入走 `value`/`defaultValue`）。
@@ -35,6 +36,12 @@
 
 ## 毛玻璃
 - 背景走 `--ui-input-glass-opacity` → 回退 `--ui-glass-opacity-strong`（惰性求值，§17.19）。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件受影响部位：`.ui-input` 自身底色。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律
 - 尺寸用全局 `ui-size-*`；错误态用 `ui-input--error`；**禁止**派生子 token 承载可覆盖参数。

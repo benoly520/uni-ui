@@ -27,3 +27,4 @@
 2. 固定子结构：先 `<span class="dot">` 后 `<span class="msg-text">`，顺序不可颠倒（CSS flex 布局依赖）。
 3. **禁止** scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash（§16.5）。
 4. 颜色零硬编码：`.dot` 走 `var(--ui-color-*)` 语义 token（§473-§476）。
+5. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

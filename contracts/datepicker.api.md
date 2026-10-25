@@ -19,6 +19,7 @@
 | `className` | `string` | — | 根 class 追加 | — |
 | `style` | `CSSProperties` | — | 根 style | — |
 | `aria-label` | `string` | `选择日期` / `选择日期区间` | 弹层 `aria-label` + 触发器语义 | — |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ## 插槽
 - 无显式插槽；图标为内置 24×24 `currentColor` SVG（日历 / 上下月箭头），不依赖 lucide 运行时。
@@ -31,6 +32,12 @@
 - `view`：当前展示月份（首次以 `value`/`defaultValue` 月份或当月）。
 - `start` / `end`：`Date | null`，来自 `value`/`defaultValue` 解析。
 - `open`：弹层开关。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件受影响部位：内部 `.ui-datepicker-trigger.ui-input` 底色（`.ui-datepicker-pop` 面板本就不透明）。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律
 - 全部 class 手写稳定（`ui-datepicker` 系列、`dp-*`、`ui-btn--*`），禁 scoped / CSS-in-JS / hash。

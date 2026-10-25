@@ -31,3 +31,4 @@
 2. **禁止** scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash（§16.5）—— class 必须手写稳定字符串。
 3. 颜色零硬编码（除 #fff 文本对比）：primary 背景 `var(--ui-color-brand)`、danger `var(--ui-color-danger)`，全部走 token。
 4. 图标节点形状不限（lucide / heroicons / 自有），只要满足 `icon.md` 的 24×24 + currentColor 契约。
+5. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

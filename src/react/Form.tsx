@@ -23,6 +23,8 @@ export interface FormField {
   rules?: FormRule[];
 }
 export interface FormProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   fields: FormField[];
   /** 字段栅格布局，默认 true */
   grid?: boolean;
@@ -54,6 +56,7 @@ function validateField(field: FormField, value: string): string {
  */
 export const Form = forwardRef<HTMLFormElement, FormProps>(function Form(
   {
+    glass,
     fields,
     grid = true,
     submitText = '提交',
@@ -117,6 +120,7 @@ export const Form = forwardRef<HTMLFormElement, FormProps>(function Form(
 
   return (
     <form
+      data-glass={glass === false ? 'off' : undefined}
       ref={ref}
       className={cx('ui-form', className)}
       style={style}

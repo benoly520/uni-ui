@@ -21,6 +21,8 @@ export interface TabItem {
 }
 
 export interface TabsProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 标签与面板数据 */
   items: TabItem[];
   /** 受控选中 key */
@@ -43,6 +45,7 @@ export interface TabsProps {
  */
 export const Tabs = forwardRef<HTMLDivElement, TabsProps>(function Tabs(
   {
+    glass,
     items,
     value,
     defaultValue,
@@ -131,11 +134,16 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(function Tabs(
 
   return (
     <>
-      <div className={cx('ui-tabs-wrap', className)} style={style} ref={(node) => {
-        (wrapRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-        if (typeof ref === 'function') ref(node);
-        else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
-      }}>
+      <div
+        className={cx('ui-tabs-wrap', className)}
+        style={style}
+        data-glass={glass === false ? 'off' : undefined}
+        ref={(node) => {
+          (wrapRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+          if (typeof ref === 'function') ref(node);
+          else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+        }}
+      >
         <button
           className="ui-tabs-arrow ui-tabs-arrow--left"
           aria-label="向左滚动标签"

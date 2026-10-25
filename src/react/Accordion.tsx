@@ -23,6 +23,8 @@ export interface AccordionItemData {
 }
 
 export interface AccordionProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 分组数据 */
   items: AccordionItemData[];
   /** 受控展开 key 列表 */
@@ -78,7 +80,7 @@ const AccordionItemView = ({
  */
 export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
   function Accordion(
-    { items, activeKeys, defaultActiveKeys, onChange, className, style },
+    { glass, items, activeKeys, defaultActiveKeys, onChange, className, style },
     ref,
   ) {
     const isControlled = activeKeys != null;
@@ -98,7 +100,7 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
     );
 
     return (
-      <div className={cx('ui-accordion', className)} style={style} ref={ref}>
+      <div className={cx('ui-accordion', className)} style={style} ref={ref} data-glass={glass === false ? 'off' : undefined}>
         {items.map((item) => (
           <AccordionItemView
             key={item.key}

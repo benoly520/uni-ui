@@ -35,3 +35,4 @@
 4. 数值单元格 `.ui-num` + `data-num`；涨跌单元格追加 `ui-num--up/down`。
 5. 禁止 scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash。
 6. React/Vue 必须产出相同标签、class 顺序、层级与窗口化算法。
+7. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

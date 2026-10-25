@@ -19,6 +19,7 @@
 3. 面板 `role="dialog"` + `aria-label` + 唯一 `id`；触发元素 `aria-expanded` 随显隐切换、`aria-controls` 指向面板 `id`。
 4. 关闭态面板写 `hidden`（`.ui-popover-panel[hidden]{display:none}` 已有，无需新增规则）。
 5. 禁止 scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash，class 手写稳定。
+6. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。
 
 ## 基准用例（对齐预览页）
 

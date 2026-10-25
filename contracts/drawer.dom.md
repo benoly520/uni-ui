@@ -28,6 +28,7 @@
 4. `role="dialog" aria-modal="true" aria-label` 必备。
 5. header 内含标题区（`.ui-drawer-title` + 可选 `.ui-label` 副标题）与关闭按钮；主体包入 `.body`。
 6. 禁止 scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash，class 手写稳定。
+7. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。
 
 ## 基准用例（对齐预览页）
 

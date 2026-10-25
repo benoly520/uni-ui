@@ -11,6 +11,8 @@ export interface TreeData {
 }
 
 export interface TreeProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   data: MaybeGetter<TreeData[]>;
   checkable?: MaybeGetter<boolean>;
   defaultExpandedKeys?: MaybeGetter<string[]>;
@@ -141,6 +143,7 @@ export function Tree(props: TreeProps) {
 
   return (
     <div
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       id={resolve(props.id)}
       class={cx('ui-tree', resolve(props.className))}
       role="tree"

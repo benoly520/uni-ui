@@ -11,11 +11,14 @@ interface AccordionItemData {
 
 const props = withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     items: AccordionItemData[];
     activeKeys?: string[];
     defaultActiveKeys?: string[];
   }>(),
   {
+    glass: true,
     activeKeys: undefined,
     defaultActiveKeys: () => [],
   },
@@ -57,7 +60,7 @@ watch(
 </script>
 
 <template>
-  <div class="ui-accordion">
+  <div class="ui-accordion" :data-glass="glass === false ? 'off' : undefined">
     <div
       v-for="item in items"
       :key="item.key"

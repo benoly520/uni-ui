@@ -5,6 +5,8 @@ type StatTrend = 'up' | 'down' | 'muted';
 
 const props = withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     /** 指标名（如「上证指数」） */
     label?: string;
     /** 主值，强制 tabular-nums 等宽数字 */
@@ -18,7 +20,7 @@ const props = withDefaults(
     /** 涨跌着色：走 --ui-color-up/down；muted 灰色 */
     trend?: StatTrend;
   }>(),
-  {},
+  {glass: true, },
 );
 
 const trendClass = computed(() =>
@@ -27,7 +29,7 @@ const trendClass = computed(() =>
 </script>
 
 <template>
-  <div class="ui-stat">
+  <div class="ui-stat" :data-glass="glass === false ? 'off' : undefined">
     <span v-if="label != null" class="label">{{ label }}</span>
     <span
       v-if="value != null"

@@ -32,3 +32,4 @@
 2. **禁止** scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash，class 手写稳定字符串。
 3. 颜色零硬编码（除 #fff 文本对比）：focus 描边 `var(--ui-color-brand)`、error `var(--ui-color-danger)`，全部走 token。
 4. `ui-input-wrap` 为纯聚合容器，不带任何视觉（不使用新增 CSS）；`ui-icon` 来自 `icon.md` 契约。
+5. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

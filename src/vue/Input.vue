@@ -5,6 +5,8 @@ type InputSize = 'lg' | 'md' | 'xs' | 'sm';
 
 const props = withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     /** 受控值 */
     value?: string;
     /** 非受控初始值 */
@@ -27,6 +29,7 @@ const props = withDefaults(
     ariaLabel?: string;
   }>(),
   {
+    glass: true,
     size: 'md',
     disabled: false,
     error: false,
@@ -62,7 +65,11 @@ function onInput(ev: Event) {
 </script>
 
 <template>
-  <span v-if="prefix || suffix" class="ui-input-wrap">
+  <span
+    v-if="prefix || suffix"
+    class="ui-input-wrap"
+    :data-glass="glass === false ? 'off' : undefined"
+  >
     <span v-if="prefix != null" class="ui-icon" aria-hidden="true"><component :is="prefix" /></span>
     <input
       v-bind="inputBind"
@@ -82,6 +89,7 @@ function onInput(ev: Event) {
   <input
     v-else
     v-bind="inputBind"
+    :data-glass="glass === false ? 'off' : undefined"
     :class="cls"
     :type="type"
     :placeholder="placeholder"

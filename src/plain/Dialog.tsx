@@ -5,6 +5,8 @@ import type { MaybeGetter, Renderable } from './_shared';
 const FOCUSABLE = 'a[href],button:not([disabled]),textarea,input,select,[tabindex]:not([tabindex="-1"])';
 
 export interface DialogProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   open?: MaybeGetter<boolean>;
   defaultOpen?: MaybeGetter<boolean>;
   onOpenChange?: (open: boolean) => void;
@@ -101,6 +103,7 @@ export function Dialog(props: DialogProps) {
 
   return (
     <div
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       id={resolve(props.id)}
       ref={refCb}
       class={cx('ui-overlay', isOpen() && 'show')}

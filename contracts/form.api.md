@@ -16,6 +16,7 @@
 | `onSubmit` | `(values: Record<string,string>) => void` | — | 校验通过回调 | — |
 | `idPrefix` | `string` | — | 生成 `id`：`${idPrefix}-${name}` | 同页多个 Form 建议传唯一值以避免重复 id；label 关联由 `<label>` 包裹 `<input>` 建立，不依赖 id |
 | `className` / `style` | — | — | — | — |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ### FormField
 | 字段 | 类型 | 说明 |
@@ -43,6 +44,12 @@
 - 正则：`!pattern.test(value)` → `message || '格式不正确'`。
 - 数值下限：`type==='number' && !(Number(value) > min)` → `message || '需大于 N'`。
 - 单字段多条规则按顺序命中第一条。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件受影响部位：内部 `.ui-input` 底色。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律
 - 错误态：行加 `.ui-form-item--error`（语义契约），输入框加 `.ui-input--error`（theme.css 实际红边，见交付报告缺口）；消息写 `.ui-form-error`。

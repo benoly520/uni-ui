@@ -22,6 +22,7 @@
 | `defaultValue` | `number` | `0` | — | 非受控初始值 |
 | `onChange` | `(value: number) => void` | — | — | 步进 / 失焦 / 回车提交钳制后的值 |
 | `aria-label` | `string` | — | 录入框 `aria-label` | 无障碍语义 |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ## 插槽
 - 无节点插槽；`prefix`/`suffix` 为纯字符串，包入 `.ui-number-prefix`/`.ui-number-suffix`。
@@ -34,6 +35,12 @@
 - 千分位：`v.toLocaleString('en-US', { minimumFractionDigits: precision, maximumFractionDigits: precision })`
 - 展示串 = `prefix + group(v) + suffix`；解析时剥离 prefix/suffix 与 `,`/空格。
 - 钳制：`Math.min(max, Math.max(min, v))`。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件不含磨砂面（不消耗 `--ui-glass-tint` / `backdrop-filter`），为三端 API 一致性保留，传 `false` 无视觉变化；内部组合的玻璃组件由其自身 `glass` 控制。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律
 - 全部 class 手写稳定（`ui-number*`），禁 scoped / CSS-in-JS / hash。

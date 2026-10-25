@@ -5,6 +5,8 @@ type SwitchSize = 'lg' | 'md' | 'xs' | 'sm';
 
 const props = withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     /** 受控开/关 */
     checked?: boolean;
     /** 非受控初始值 */
@@ -16,6 +18,7 @@ const props = withDefaults(
     label?: string;
   }>(),
   {
+    glass: true,
     size: 'md',
     disabled: false,
     defaultChecked: false,
@@ -48,6 +51,7 @@ function toggle() {
 
 <template>
   <button
+    :data-glass="glass === false ? 'off' : undefined"
     type="button"
     role="switch"
     :aria-checked="on"

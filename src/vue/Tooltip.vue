@@ -14,6 +14,8 @@ type TooltipPlacement = 'top' | 'bottom' | 'left' | 'right';
 
 const props = withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     /** 气泡内容（与 React / Plain 端同名的 prop；亦可使用 content 插槽） */
     content?: unknown;
     /** invert=反转色（默认 macOS 惯例）；surface=跟随主题表面 + 毛玻璃 */
@@ -32,6 +34,7 @@ const props = withDefaults(
     id?: string;
   }>(),
   {
+    glass: true,
     variant: 'invert',
     placement: 'top',
     defaultOpen: false,
@@ -113,6 +116,7 @@ const renderContent = () => props.content as VNode;
 
 <template>
   <span
+    :data-glass="glass === false ? 'off' : undefined"
     class="ui-tip"
     :class="[
       variant === 'surface' && 'ui-tip--surface',

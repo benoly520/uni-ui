@@ -19,6 +19,7 @@
 | `format` | `'pct' \| 'num' \| (v)=>string` | `'num'` | — | 数值格式化 |
 | `onChange` | `(value: [number, number]) => void` | — | — | 值变化 |
 | `minLabel` / `maxLabel` | `string` | `'最小值'`/`'最大值'` | thumb `aria-label` | — |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ## 插槽
 - 无显式插槽；值文案由 `format` 派生（`pct` → `±x.x%`；`num` → 纯数字）。
@@ -30,6 +31,12 @@
 - 双滑块拖拽 + 键盘（聚焦后 ←/→/↑/↓ 步进，Home/End 跳端），`step` 钳制，自动约束 `min ≤ lo ≤ hi`。
 - 填充条 + 双 thumb 按百分比定位，颜色走品牌色。
 - `role="slider"` + `aria-valuenow` 双 thumb。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件不含磨砂面（不消耗 `--ui-glass-tint` / `backdrop-filter`），为三端 API 一致性保留，传 `false` 无视觉变化；内部组合的玻璃组件由其自身 `glass` 控制。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律
 - 全部 class 手写稳定（`ui-slider*`）；禁 scoped / CSS-in-JS / hash。

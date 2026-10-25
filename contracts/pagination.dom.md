@@ -22,6 +22,7 @@
 4. 省略号：`<button class="ui-pagination--ellipsis" disabled aria-label="更多页">…</button>`（不可点）。
 5. 边界：首页时 `data-prev` `disabled`；末页时 `data-next` `disabled`。
 6. 禁止 scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash，class 手写稳定。
+7. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。
 
 ## 基准用例（对齐预览页）
 

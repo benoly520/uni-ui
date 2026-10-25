@@ -27,3 +27,4 @@
 2. 子结构顺序：图标 → 描述（`.ui-label`）→ 操作插槽，不可颠倒（flex 列顺序依赖）。
 3. 未传 `icon` 时默认渲染内置内联 SVG `{SVG:table@2}`（见上），覆盖时整段替换 `.ico` 内容。
 4. **禁止** scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash（§16.5）。
+5. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

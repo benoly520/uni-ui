@@ -8,6 +8,8 @@ import { cx } from '../utils/cx';
 export type StatTrend = 'up' | 'down' | 'muted';
 
 export interface StatProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 指标名（如「上证指数」） */
   label?: string;
   /** 主值，强制 tabular-nums 等宽数字 */
@@ -34,11 +36,11 @@ const trendClass = (t?: StatTrend) =>
  * - 纯展示，受控，零内部状态；不携带样式，全部走 theme.css
  */
 export const Stat = forwardRef<HTMLDivElement, StatProps>(function Stat(
-  { label, value, prefix, suffix, delta, trend, className, style },
+  { glass, label, value, prefix, suffix, delta, trend, className, style },
   ref,
 ) {
   return (
-    <div ref={ref} className={cx('ui-stat', className)} style={style}>
+    <div ref={ref} className={cx('ui-stat', className)} style={style} data-glass={glass === false ? 'off' : undefined}>
       {label != null && <span className="label">{label}</span>}
       {value != null && (
         <span

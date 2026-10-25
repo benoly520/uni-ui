@@ -21,6 +21,8 @@ export interface SegmentedOption {
 export type SegmentedSize = 'lg' | 'md' | 'xs' | 'sm';
 
 export interface SegmentedProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 选项列表 */
   options: SegmentedOption[];
   /** 受控选中值 */
@@ -46,6 +48,7 @@ export interface SegmentedProps {
  */
 export const Segmented = forwardRef<HTMLDivElement, SegmentedProps>(function Segmented(
   {
+    glass,
     options,
     value,
     defaultValue,
@@ -94,6 +97,7 @@ export const Segmented = forwardRef<HTMLDivElement, SegmentedProps>(function Seg
 
   return (
     <div
+      data-glass={glass === false ? 'off' : undefined}
       ref={(node) => {
         rootRef.current = node;
         if (typeof ref === 'function') ref(node);

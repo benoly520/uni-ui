@@ -15,6 +15,7 @@
 | `color` | `string`（token / 色值） | — | 内联 `color` + `border-color`（覆盖 type） | 自定义色 |
 | `icon` | 节点（24×24 + currentColor） | — | 包入 `.ui-icon` 插槽，置于文本前 | 见 `icon.md` |
 | `onClose` | `() => void` | — | 关闭按钮点击 | 仅 `closable` 时有效 |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ## 插槽
 - **默认插槽**：标签文本或任意节点。
@@ -25,6 +26,12 @@
 
 ## 关闭按钮
 - `closable` 时渲染 `<button type="button" class="ui-tag-close" aria-label="关闭">`，内联 `var(--ui-*)` 样式（无硬色值）。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件不含磨砂面（不消耗 `--ui-glass-tint` / `backdrop-filter`），为三端 API 一致性保留，传 `false` 无视觉变化；内部组合的玻璃组件由其自身 `glass` 控制。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律
 - 根 `ui-tag` 必首位；类型 `ui-tag--{type}`；`default` 不生成修饰类（§459 默认即中性色）。**禁止** scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash（§16.5）。

@@ -3,6 +3,8 @@ import { cx } from './_shared';
 import type { MaybeGetter } from './_shared';
 
 export interface ProgressProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   value?: MaybeGetter<number>;
   max?: MaybeGetter<number>;
   indeterminate?: MaybeGetter<boolean>;
@@ -22,6 +24,7 @@ export function Progress(props: ProgressProps) {
   const ariaNow = () => (indeterminate() ? undefined : value());
   return (
     <div
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       id={resolve(props.id)}
       class={cx('ui-progress', indeterminate() && 'ui-progress--indeterminate', resolve(props.className))}
       role="progressbar"

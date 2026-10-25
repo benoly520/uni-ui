@@ -31,3 +31,4 @@
 2. **禁止** scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash，class 手写稳定字符串。
 3. 颜色零硬编码：轨道 `var(--ui-seg-track)`、滑块 `var(--ui-seg-thumb)`、选中文字 `var(--ui-text)`，全部走 token。
 4. `.thumb` 仅用内联 `style` 写 `left/width`（数值像素，由 JS 测量），不引入新 class 或伪元素。
+5. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

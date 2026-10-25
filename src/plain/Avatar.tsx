@@ -6,6 +6,8 @@ export type AvatarTone = 'brand' | 'danger' | 'success' | 'warning' | 'info';
 export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | number;
 
 export interface AvatarProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   src?: MaybeGetter<string>;
   alt?: MaybeGetter<string>;
   text?: MaybeGetter<string>;
@@ -32,6 +34,7 @@ export function Avatar(props: AvatarProps) {
   };
   return (
     <span
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       id={resolve(props.id)}
       class={cx('ui-avatar', resolve(props.className))}
       aria-label={resolve(props['aria-label'])}

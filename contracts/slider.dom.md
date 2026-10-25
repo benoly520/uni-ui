@@ -38,3 +38,4 @@
 1. **根 class 为 `ui-slider-wrap`**（非 `ui-slider`）；`ui-slider` 为轨道外层，二者均手写稳定。
 2. class 顺序：根 `ui-slider-wrap` 必首位；track 内 `ui-slider-fill` 先于两个 `ui-slider-thumb`。
 3. 颜色零硬编码：fill / thumb 描边走 `var(--ui-color-brand)`。
+4. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

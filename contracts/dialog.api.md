@@ -17,6 +17,7 @@
 | `ariaLabel` | `string` | 取 `title` 或 `'对话框'` | `.ui-dialog` 的 `aria-label` | 无障碍标签 |
 | `closeOnOverlay` | `boolean` | `true` | — | 点击遮罩是否关闭 |
 | `className` / `style` | — | — | 透传到 `.ui-dialog` | — |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ## 插槽
 - **默认插槽**：对话框主体内容（如 `<p class="ui-label">…</p>`）。
@@ -30,6 +31,12 @@
 - 关闭：恢复此前触发按钮焦点（`document.activeElement` 记录）。
 - Esc 关闭；点击遮罩（target===overlay）关闭。
 - 关闭时遮罩 `inert` + `aria-hidden`，避免后台可聚焦。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件受影响部位：`.ui-overlay` 遮罩背景模糊 + `.ui-dialog` 面板（`.ui-glass`）。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律
 - 面板始终 `ui-dialog ui-glass`；遮罩 `ui-overlay`，可见态加 `show`。

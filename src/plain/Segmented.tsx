@@ -9,6 +9,8 @@ export interface SegmentedOption {
 }
 
 export interface SegmentedProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   options: MaybeGetter<SegmentedOption[]>;
   value?: MaybeGetter<string | number>;
   defaultValue?: MaybeGetter<string | number>;
@@ -69,6 +71,7 @@ export function Segmented(props: SegmentedProps) {
 
   return (
     <div
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       id={resolve(props.id)}
       ref={(el) => {
         rootEl = el;

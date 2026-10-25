@@ -5,6 +5,8 @@ type SliderFormat = 'pct' | 'num' | ((v: number) => string);
 
 const props = withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     min?: number;
     max?: number;
     step?: number;
@@ -16,6 +18,7 @@ const props = withDefaults(
     maxLabel?: string;
   }>(),
   {
+    glass: true,
     min: 0,
     max: 100,
     step: 1,
@@ -107,7 +110,7 @@ const pHi = computed(() => pct(hi.value));
 </script>
 
 <template>
-  <div class="ui-slider-wrap">
+  <div class="ui-slider-wrap" :data-glass="glass === false ? 'off' : undefined">
     <div class="ui-slider">
       <div class="ui-slider-track" ref="trackRef">
         <div

@@ -31,3 +31,4 @@
 2. 联想项 `.opt`（`role="option"`）；高亮 `.active`；代码 `.code`；板块标签 `.ui-tag`。
 3. 禁止 scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash；全部走 theme.css。
 4. React/Vue 必须产出相同标签、class 顺序、层级与键盘/过滤逻辑。
+5. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

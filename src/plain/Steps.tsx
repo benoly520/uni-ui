@@ -9,6 +9,8 @@ export interface StepItem {
 }
 
 export interface StepsProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   steps: MaybeGetter<StepItem[]>;
   current?: MaybeGetter<number>;
   defaultCurrent?: MaybeGetter<number>;
@@ -50,6 +52,7 @@ export function Steps(props: StepsProps) {
   };
   return (
     <div
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       id={resolve(props.id)}
       class={cx('ui-steps', resolve(props.className))}
       style={resolve(props.style)}

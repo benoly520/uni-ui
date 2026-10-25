@@ -8,6 +8,8 @@ import { cx } from '../utils/cx';
 export type TagType = 'brand' | 'up' | 'down' | 'default';
 
 export interface TagProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 语义类型（default 无修饰类） */
   type?: TagType;
   /** 可关闭：渲染关闭按钮并发出 onClose */
@@ -43,7 +45,7 @@ const CLOSE_STYLE: CSSProperties = {
  * - 不携带样式，全部走 theme.css（关闭钮内联 var(--ui-*)）
  */
 export const Tag = forwardRef<HTMLSpanElement, TagProps>(function Tag(
-  { type = 'default', closable = false, color, icon, onClose, className, style, children },
+  { glass, type = 'default', closable = false, color, icon, onClose, className, style, children },
   ref,
 ) {
   const customStyle: CSSProperties | undefined = color
@@ -51,6 +53,7 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(function Tag(
     : undefined;
   return (
     <span
+      data-glass={glass === false ? 'off' : undefined}
       ref={ref}
       className={cx(
         'ui-tag',

@@ -3,6 +3,8 @@ import { computed, ref } from 'vue';
 
 const props = withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     min?: number;
     max?: number;
     step?: number;
@@ -14,6 +16,7 @@ const props = withDefaults(
     ariaLabel?: string;
   }>(),
   {
+    glass: true,
     min: -Infinity,
     max: Infinity,
     step: 1,
@@ -77,6 +80,7 @@ function stepBy(dir: 1 | -1) {
 
 <template>
   <div
+    :data-glass="glass === false ? 'off' : undefined"
     class="ui-number"
     :data-min="min !== -Infinity ? min : undefined"
     :data-max="max !== Infinity ? max : undefined"

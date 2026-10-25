@@ -19,6 +19,8 @@ const CLOSE_STYLE = {
 export type TagType = 'brand' | 'up' | 'down' | 'default';
 
 export interface TagProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   type?: MaybeGetter<TagType>;
   closable?: MaybeGetter<boolean>;
   color?: MaybeGetter<string>;
@@ -45,6 +47,7 @@ export function Tag(props: TagProps) {
   const closable = () => resolve(props.closable) ?? false;
   return (
     <span
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       id={resolve(props.id)}
       class={cx(
         'ui-tag',

@@ -16,6 +16,7 @@
 | `onChange` | `(key: string) => void` | — | — | 选中变化回调 |
 | `ariaLabel` | `string` | `'标签页'` | `role="tablist"` 的 `aria-label` | 无障碍标签 |
 | `className` / `style` | — | — | 透传到 `.ui-tabs-wrap` | — |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ## 插槽
 - `items[].label`：标签文本/节点。
@@ -26,6 +27,12 @@
 
 ## 横滚
 - 标签过多时 `.ui-tabs-scroll` 横向滚动；左/右箭头在可滚动时加 `is-visible`（`.ui-tabs-arrow.is-visible{display:flex}` 已有）。点击箭头 `scrollBy` 平滑滚动；`scroll`/`resize`/`ResizeObserver` 实时更新箭头显隐。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件受影响部位：`.ui-tabs-arrow` 滚动箭头。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律
 - 标签按钮 `flex:none; white-space:nowrap`（theme.css 已写死，必填坑）；根 `ui-tabs` 必首位于 tablist 内。

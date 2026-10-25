@@ -10,6 +10,8 @@ interface VTableColumn {
   width?: string;
 }
 interface VirtualTableProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   rows: Record<string, any>[];
   columns: VTableColumn[];
   rowHeight?: number;
@@ -18,6 +20,7 @@ interface VirtualTableProps {
 }
 
 const props = withDefaults(defineProps<VirtualTableProps>(), {
+  glass: true,
   rowHeight: 33,
   buffer: 6,
 });
@@ -68,6 +71,7 @@ onMounted(recompute);
 
 <template>
   <div
+    :data-glass="glass === false ? 'off' : undefined"
     ref="scrollRef"
     class="ui-vtable"
     :aria-label="ariaLabel"

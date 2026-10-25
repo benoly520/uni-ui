@@ -9,6 +9,8 @@ export interface BreadcrumbItem {
 }
 
 export interface BreadcrumbProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 路径节点 */
   items: BreadcrumbItem[];
   /** 分隔符 */
@@ -26,7 +28,7 @@ export interface BreadcrumbProps {
  */
 export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
   function Breadcrumb(
-    { items, separator = '/', 'aria-label': ariaLabel = '路径导航', className, style },
+    { glass, items, separator = '/', 'aria-label': ariaLabel = '路径导航', className, style },
     ref,
   ) {
     const nodes: React.ReactNode[] = [];
@@ -53,7 +55,7 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
     });
 
     return (
-      <nav className={cx('ui-breadcrumb', className)} style={style} aria-label={ariaLabel} ref={ref as React.Ref<HTMLElement>}>
+      <nav className={cx('ui-breadcrumb', className)} style={style} aria-label={ariaLabel} ref={ref as React.Ref<HTMLElement>} data-glass={glass === false ? 'off' : undefined}>
         {nodes}
       </nav>
     );

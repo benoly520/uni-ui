@@ -10,6 +10,8 @@ import React, {
 import { cx } from '../utils/cx';
 
 export interface DialogProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 受控打开状态 */
   open: boolean;
   /** 打开/关闭回调（Esc/遮罩/动作均可触发） */
@@ -39,6 +41,7 @@ const FOCUSABLE =
  */
 export const Dialog = forwardRef<HTMLDivElement, DialogProps>(function Dialog(
   {
+    glass,
     open,
     onOpenChange,
     title,
@@ -108,6 +111,7 @@ export const Dialog = forwardRef<HTMLDivElement, DialogProps>(function Dialog(
 
   return (
     <div
+      data-glass={glass === false ? 'off' : undefined}
       ref={(node) => {
         (overlayRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
         if (typeof ref === 'function') ref(node);

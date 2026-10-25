@@ -16,6 +16,7 @@
 | `max` | `number` | `99` | — | `count > max` 时显示 `${max}+` |
 | `showZero` | `boolean` | `false` | — | `count === 0` 时是否仍渲染（默认不渲染） |
 | `children` | 节点 | — | 徽标文本/标签 | 如 `在线`、`● 在线` |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ## 插槽
 - **默认插槽**：徽标文本或任意节点；`count` 存在时以数字内容覆盖文本。
@@ -26,6 +27,12 @@
 
 ## 毛玻璃
 - 背景走 `--ui-color-{tone}-soft`（回退 `--ui-color-brand-soft`），前景 `var(--ui-color-{tone})`；不硬编码。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件不含磨砂面（不消耗 `--ui-glass-tint` / `backdrop-filter`），为三端 API 一致性保留，传 `false` 无视觉变化；内部组合的玻璃组件由其自身 `glass` 控制。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律
 - 颜色一律 token；圆点尺寸由内联 `style`（`width/height/border-radius:50%`、`background:currentColor`）承载，**禁止**派生子 token 或新 class 的视觉样式。

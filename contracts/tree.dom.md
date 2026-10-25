@@ -45,3 +45,4 @@
 2. 层级用 `<ul class="ui-tree-children">` 嵌套，递归渲染。
 3. 颜色零硬编码：row hover / caret 走 `var(--ui-color-brand-soft)`、勾选 `accent-color: var(--ui-color-brand)`。
 4. 详见 `tree.behavior.md` 的「已知双框架差异」：根 `aria-label` 与 caret SVG 渲染条件略有不同。
+5. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

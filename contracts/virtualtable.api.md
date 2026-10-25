@@ -16,6 +16,7 @@
 | `buffer` | `number` | `6` | 上下缓冲行 | 防白屏 |
 | `ariaLabel` | `string` | — | `.ui-vtable[aria-label]` | a11y |
 | `className` / `style` | — | — | — | — |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ### VTableColumn
 | 字段 | 类型 | 说明 |
@@ -37,3 +38,9 @@
 - 仅渲染索引 `[s, e)` 的行，每行 `style="transform:translateY(index * rowHeight)px)"` 绝对定位（theme.css `.ui-vtable-row` 为 `position:absolute`）。
 - 列数/列宽由 `columns` 经内联 `grid-template-columns` 驱动（覆盖 theme.css 默认 6 列网格）。
 - 渲染计数写 `.ui-vtable-meta`：`渲染 N 行 / 共 M 行`。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件受影响部位：`.ui-vtable-row:hover` 底色（容器与表头本就不透明）。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。

@@ -18,6 +18,7 @@
 4. 关闭态在 `.bubble` 写 `aria-hidden="true"`；显示态去掉该属性。
 5. 禁止 scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash（§16.5），class 手写稳定字符串。
 6. 颜色零硬编码：invert 用 `var(--ui-text)` / `var(--ui-bg)`；surface 走 token 玻璃链。
+7. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。
 
 ## 基准用例（对齐预览页）
 

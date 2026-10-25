@@ -10,6 +10,8 @@ interface DataTableColumn {
   render?: (row: Record<string, any>, rowIndex: number) => any;
 }
 interface DataTableProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   columns: DataTableColumn[];
   data: Record<string, any>[];
   compact?: boolean;
@@ -23,6 +25,7 @@ interface DataTableProps {
 }
 
 const props = withDefaults(defineProps<DataTableProps>(), {
+  glass: true,
   compact: false,
   selectable: false,
   rowKey: 'id',
@@ -127,6 +130,7 @@ function onRowClick(e: MouseEvent, key: string) {
 
 <template>
   <div
+    :data-glass="glass === false ? 'off' : undefined"
     class="ui-table"
     :class="[
       compact && 'ui-table--compact',

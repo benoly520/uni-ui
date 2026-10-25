@@ -21,6 +21,7 @@
 | `disabled` | `boolean` | `false` | — | 禁用提示（不绑定事件、无气泡） |
 | `id` | `string` | 自动生成 | `.bubble` 的 `id` | 用于 trigger 的 `aria-describedby` |
 | `className` / `style` | — | — | 透传到根 `span` | — |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ## 插槽
 - **默认插槽**：触发元素（建议为 `<button>`/可聚焦节点），组件会注入 `aria-describedby` 指向气泡 `id`。
@@ -32,6 +33,12 @@
 ## 毛玻璃
 - `invert`（默认）气泡用 `--ui-text` 背景 + `--ui-bg` 文字（反转色，零硬编码）。
 - `surface` 走 `.ui-tip--surface`：背景 `rgb(var(--ui-glass-tint) / var(--ui-tooltip-glass-opacity, var(--ui-glass-opacity)))`，模糊 `var(--ui-tooltip-glass-blur, var(--ui-glass-blur))`，关闭自引用回退链（§17.19）。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件受影响部位：`variant="surface"` 时的 `.bubble`（默认 `invert` 为不透明反转色，不受影响）。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律
 - 根 `ui-tip` 必首位；变体 `ui-tip--surface`、方位 `ui-tip--{placement}` 追加；显示态 `is-open`（需主题补规则，见交付报告）。

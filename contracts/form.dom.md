@@ -39,3 +39,4 @@
 6. `.ui-form-row > .ui-label` 的纵向排列（`flex-direction: column`）与 `input` 字重回正（`400`）由 theme.css 提供，作用域限定在 `.ui-form-row` 内，避免影响 Empty 描述 / Drawer 副标题对 `.ui-label` 的复用。
 6. 禁止 scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash；全部走 theme.css。
 7. React/Vue 必须产出相同标签、class 顺序、层级与校验逻辑。
+8. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

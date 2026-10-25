@@ -5,6 +5,8 @@ import type { MaybeGetter, Renderable } from './_shared';
 export type InputSize = 'lg' | 'md' | 'sm' | 'xs';
 
 export interface InputProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   value?: MaybeGetter<string>;
   defaultValue?: MaybeGetter<string>;
   onChange?: (value: string, e: Event) => void;
@@ -52,7 +54,11 @@ export function Input(props: InputProps) {
   return (
     <>
       {showWrap() ? (
-        <span class="ui-input-wrap" style={resolve(props.style)}>
+        <span
+          data-glass={resolve(props.glass) === false ? 'off' : undefined}
+          class="ui-input-wrap"
+          style={resolve(props.style)}
+        >
           {prefix() != null && <span class="ui-icon" aria-hidden="true">{prefix()}</span>}
           <input
             class={cx('ui-input', size() !== 'md' && 'ui-size-' + size(), error() && 'ui-input--error')}
@@ -70,6 +76,7 @@ export function Input(props: InputProps) {
         </span>
       ) : (
         <input
+          data-glass={resolve(props.glass) === false ? 'off' : undefined}
           class={cx(
             'ui-input',
             size() !== 'md' && 'ui-size-' + size(),

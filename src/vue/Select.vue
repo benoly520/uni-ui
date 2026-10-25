@@ -8,6 +8,8 @@ interface SelectOption {
   disabled?: boolean;
 }
 interface SelectProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   options: SelectOption[];
   value?: string | string[];
   defaultValue?: string | string[];
@@ -17,6 +19,7 @@ interface SelectProps {
 }
 
 const props = withDefaults(defineProps<SelectProps>(), {
+  glass: true,
   multiple: false,
   searchable: false,
   placeholder: '请选择',
@@ -87,6 +90,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
 
 <template>
   <div
+    :data-glass="glass === false ? 'off' : undefined"
     ref="rootRef"
     class="ui-select"
     :class="open && 'open'"

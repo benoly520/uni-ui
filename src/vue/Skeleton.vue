@@ -5,6 +5,8 @@ type SkeletonShape = 'text' | 'circle' | 'rect';
 
 const props = withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     /** 占位形状 */
     shape?: SkeletonShape;
     /** 宽度（数字转 px） */
@@ -16,7 +18,7 @@ const props = withDefaults(
     /** 内联样式 */
     style?: CSSProperties;
   }>(),
-  { shape: 'rect', active: true },
+  { glass: true, shape: 'rect', active: true },
 );
 
 function toSize(v?: string | number): string | undefined {
@@ -45,6 +47,7 @@ const shapeStyle = computed<CSSProperties>(() => {
 
 <template>
   <div
+    :data-glass="glass === false ? 'off' : undefined"
     class="ui-skeleton"
     role="presentation"
     :data-active="active ? 'true' : 'false'"

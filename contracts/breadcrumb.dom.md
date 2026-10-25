@@ -24,3 +24,4 @@
 2. 根须为 `<nav>` 语义元素，`aria-label` 默认「路径导航」。
 3. 末项绝不渲染 `href`，保持 `aria-current="page"`。
 4. 颜色零硬编码：链接 hover / 当前走 `var(--ui-color-brand)`、`var(--ui-text)`。
+5. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

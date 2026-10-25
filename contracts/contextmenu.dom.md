@@ -28,3 +28,4 @@
 3. 定位用内联 `style.left/top`（px），边缘翻转为负值偏移。
 4. 危险项追加 `is-danger`（仅 class，无额外结构）。
 5. 颜色零硬编码：hover 走 `var(--ui-color-brand)`、危险 hover 走 `var(--ui-color-danger)`。
+6. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

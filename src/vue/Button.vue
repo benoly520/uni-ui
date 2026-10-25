@@ -6,6 +6,8 @@ type ButtonSize = 'lg' | 'md' | 'xs' | 'sm';
 
 const props = withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     /** 语义变体（颜色语义） */
     variant?: ButtonVariant;
     /** 尺寸 Scale（全局修饰，md 默认无类） */
@@ -22,6 +24,7 @@ const props = withDefaults(
     icon?: unknown;
   }>(),
   {
+    glass: true,
     variant: 'default',
     size: 'md',
     pill: false,
@@ -53,6 +56,7 @@ function onClick(ev: MouseEvent) {
 
 <template>
   <button
+    :data-glass="glass === false ? 'off' : undefined"
     :class="cls"
     :type="type"
     :disabled="isDisabled"

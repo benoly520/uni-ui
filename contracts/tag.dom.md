@@ -28,3 +28,4 @@
 2. `default` 类型**不**生成 `ui-tag--default`（§459 默认即中性描边）。
 3. 关闭钮内联样式一律 `var(--ui-*)`（含 `currentColor` / `var(--ui-border)`），无裸色值。
 4. **禁止** scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash（§16.5）。
+5. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

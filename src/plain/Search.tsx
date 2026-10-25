@@ -15,6 +15,8 @@ export interface SearchOption {
 }
 
 export interface SearchProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   options?: MaybeGetter<SearchOption[]>;
   value?: MaybeGetter<string>;
   defaultValue?: MaybeGetter<string>;
@@ -79,6 +81,7 @@ export function Search(props: SearchProps) {
 
   return (
     <div
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       id={resolve(props.id)}
       class={cx('ui-search', open() && 'open', resolve(props.className))}
       style={resolve(props.style)}

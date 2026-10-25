@@ -7,6 +7,8 @@ export interface ToastOptions {
   icon?: ReactNode;
   /** 自动关闭时长 ms；0 = 不自动关闭 */
   duration?: number;
+  /** 玻璃材质开关：false 时回退为不透明实心面（默认 true） */
+  glass?: boolean;
 }
 
 let container: HTMLDivElement | null = null;
@@ -22,9 +24,9 @@ function ensureMount(): Root {
   return root!;
 }
 
-function render(show: boolean, content: ReactNode, icon?: ReactNode) {
+function render(show: boolean, content: ReactNode, icon?: ReactNode, glass?: boolean) {
   ensureMount().render(
-    createElement(Toast, { show, content, icon }),
+    createElement(Toast, { show, content, icon, glass }),
   );
 }
 
@@ -36,9 +38,9 @@ function render(show: boolean, content: ReactNode, icon?: ReactNode) {
  */
 export function toast(content: ReactNode, options?: ToastOptions): void {
   const duration = options?.duration ?? 2400;
-  render(true, content, options?.icon);
+  render(true, content, options?.icon, options?.glass);
   if (timer) clearTimeout(timer);
   if (duration > 0) {
-    timer = setTimeout(() => render(false, content, options?.icon), duration);
+    timer = setTimeout(() => render(false, content, options?.icon, options?.glass), duration);
   }
 }

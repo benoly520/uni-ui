@@ -6,6 +6,8 @@ type DatePickerValue = string | [string, string] | null;
 
 const props = withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     /** 范围模式（选起止两日）；否则单日 */
     range?: boolean;
     /** 受控值：单日 'YYYY-MM-DD'；范围 [起, 止]；未选 null */
@@ -17,6 +19,7 @@ const props = withDefaults(
     'aria-label'?: string;
   }>(),
   {
+    glass: true,
     range: false,
     defaultValue: null,
     placeholder: undefined,
@@ -183,7 +186,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="rootRef" class="ui-datepicker" :data-range="range ? '' : undefined">
+  <div ref="rootRef" class="ui-datepicker" :data-range="range ? '' : undefined" :data-glass="glass === false ? 'off' : undefined">
     <button
       type="button"
       class="ui-datepicker-trigger ui-input"

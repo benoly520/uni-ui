@@ -18,6 +18,8 @@ export interface DataTableColumn {
 }
 
 export interface DataTableProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   columns: MaybeGetter<DataTableColumn[]>;
   data: MaybeGetter<Record<string, any>[]>;
   /** 紧凑密度（投研默认） */
@@ -136,6 +138,7 @@ export function DataTable(props: DataTableProps) {
 
   return (
     <div
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       id={resolve(props.id)}
       class={cx(
         'ui-table',

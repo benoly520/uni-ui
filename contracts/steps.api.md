@@ -16,6 +16,7 @@
 | `defaultCurrent` | `number` | `0` | 非受控初始当前 | — |
 | `clickable` | `boolean` | `true` | 决定是否追加 `is-clickable` 并绑定点击 | 点击重算链 |
 | `onChange` | `(index: number) => void` | — | — | 点击步骤重算并回调新当前 |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ### `StepItem`
 | 字段 | 类型 | 说明 |
@@ -33,6 +34,12 @@
 - 已完成步实心品牌色 + check；当前步高亮描边（柔光圈）。
 - 点击步骤重算 `is-done` 链并重建圆点（done 显示 check，其余显示序号）。
 - 步间连接线随 done 状态转品牌色。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件不含磨砂面（不消耗 `--ui-glass-tint` / `backdrop-filter`），为三端 API 一致性保留，传 `false` 无视觉变化；内部组合的玻璃组件由其自身 `glass` 控制。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律
 - 全部 class 手写稳定；禁 scoped / CSS-in-JS / hash。

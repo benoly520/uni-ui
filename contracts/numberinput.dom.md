@@ -34,3 +34,4 @@
 2. 步进按钮必须带 `type="button"`，避免误提交表单。
 3. 录入框右对齐（`text-align:right`，theme.css 已定），千分位逗号随 `precision`。
 4. 颜色零硬编码：聚焦描边 / 柔光走 `var(--ui-color-brand)` / `var(--ui-color-brand-soft)`。
+5. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

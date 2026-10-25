@@ -6,6 +6,8 @@ export type TooltipVariant = 'invert' | 'surface';
 export type TooltipPlacement = 'top' | 'bottom' | 'left' | 'right';
 
 export interface TooltipProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   /** 气泡内容（文本或任意节点） */
   content: MaybeGetter<Renderable>;
   /** invert=反转色（默认）；surface=跟随主题表面 + 毛玻璃 */
@@ -109,6 +111,7 @@ export function Tooltip(props: TooltipProps) {
 
   return (
     <span
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       class={cx(
         'ui-tip',
         variant() === 'surface' && 'ui-tip--surface',

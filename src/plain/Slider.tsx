@@ -5,6 +5,8 @@ import type { MaybeGetter } from './_shared';
 export type SliderFormat = 'pct' | 'num' | ((v: number) => string);
 
 export interface SliderProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: MaybeGetter<boolean>;
   min?: MaybeGetter<number>;
   max?: MaybeGetter<number>;
   step?: MaybeGetter<number>;
@@ -135,6 +137,7 @@ export function Slider(props: SliderProps) {
 
   return (
     <div
+      data-glass={resolve(props.glass) === false ? 'off' : undefined}
       id={resolve(props.id)}
       class={cx('ui-slider-wrap', resolve(props.className))}
       style={resolve(props.style)}

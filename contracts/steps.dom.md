@@ -37,3 +37,4 @@
 1. class 顺序：根 `ui-steps` 必首位；`ui-step` 先基类，状态类 `is-done`/`is-current`/`is-clickable` 顺序固定。
 2. 连接线 `ui-step-line` 仅出现在相邻步之间（列表扁平结构：step, line, step, line, step）。
 3. 颜色零硬编码：done/current/line 走 `var(--ui-color-brand)`、柔光 `var(--ui-color-brand-soft)`。
+4. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。

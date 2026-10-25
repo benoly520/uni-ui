@@ -5,6 +5,8 @@ type TagType = 'brand' | 'up' | 'down' | 'default';
 
 withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     /** 语义类型（default 无修饰类） */
     type?: TagType;
     /** 可关闭：渲染关闭按钮并发出 close */
@@ -14,7 +16,7 @@ withDefaults(
     /** 图标插槽（24×24 + currentColor），置于文本前 */
     icon?: unknown;
   }>(),
-  { type: 'default', closable: false, color: '', icon: undefined },
+  { glass: true, type: 'default', closable: false, color: '', icon: undefined },
 );
 
 const emit = defineEmits<{
@@ -37,6 +39,7 @@ const closeStyle: CSSProperties = {
 
 <template>
   <span
+    :data-glass="glass === false ? 'off' : undefined"
     class="ui-tag"
     :class="[type !== 'default' && `ui-tag--${type}`, closable && 'ui-tag--closable']"
     :style="color ? { color, borderColor: color } : undefined"

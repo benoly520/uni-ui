@@ -24,6 +24,7 @@
 3. `role="dialog"` + `aria-modal="true"` + `aria-label`（无可见标题时仍须有 label）。
 4. 标题渲染为 `<h3>`（位于面板顶部）；存在 footer 时末尾渲染 `.ui-dialog-actions`。
 5. 禁止 scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash，class 手写稳定。
+6. `glass={false}` 时根节点额外输出 `data-glass="off"`（默认省略，DOM 与既有快照一致）。
 
 ## 基准用例（对齐预览页）
 

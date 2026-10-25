@@ -6,9 +6,16 @@ export interface ToastOptions {
   icon?: VNode | (() => VNode);
   /** 自动关闭时长 ms；0 = 不自动关闭 */
   duration?: number;
+  /** 玻璃材质开关：false 时回退为不透明实心面（默认 true） */
+  glass?: boolean;
 }
 
-const state = reactive({ show: false, content: '' as string, icon: undefined as ToastOptions['icon'] });
+const state = reactive({
+  show: false,
+  content: '' as string,
+  icon: undefined as ToastOptions['icon'],
+  glass: undefined as boolean | undefined,
+});
 let mountEl: HTMLElement | null = null;
 let timer: ReturnType<typeof setTimeout> | null = null;
 
@@ -17,7 +24,13 @@ function ensureMount(): void {
   mountEl = document.createElement('div');
   document.body.appendChild(mountEl);
   const app: App = createApp({
-    render: () => h(Toast, { show: state.show, content: state.content, icon: state.icon }),
+    render: () =>
+      h(Toast, {
+        show: state.show,
+        content: state.content,
+        icon: state.icon,
+        glass: state.glass,
+      }),
   });
   app.mount(mountEl);
 }
@@ -32,6 +45,7 @@ export function toast(content: string, options?: ToastOptions): void {
   const duration = options?.duration ?? 2400;
   state.content = content;
   state.icon = options?.icon;
+  state.glass = options?.glass;
   ensureMount();
   state.show = true;
   if (timer) clearTimeout(timer);

@@ -15,6 +15,8 @@ export type TooltipVariant = 'invert' | 'surface';
 export type TooltipPlacement = 'top' | 'bottom' | 'left' | 'right';
 
 export interface TooltipProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 气泡内容（文本或任意节点） */
   content: ReactNode;
   /** invert=反转色（默认 macOS 惯例）；surface=跟随主题表面 + 毛玻璃 */
@@ -48,6 +50,7 @@ export interface TooltipProps {
  */
 export const Tooltip = forwardRef<HTMLSpanElement, TooltipProps>(function Tooltip(
   {
+    glass,
     content,
     variant = 'invert',
     placement = 'top',
@@ -129,6 +132,7 @@ export const Tooltip = forwardRef<HTMLSpanElement, TooltipProps>(function Toolti
 
   return (
     <span
+      data-glass={glass === false ? 'off' : undefined}
       ref={ref}
       className={cx(
         'ui-tip',

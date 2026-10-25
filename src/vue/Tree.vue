@@ -5,6 +5,8 @@ import type { TreeData } from './tree-types';
 
 const props = withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     data: TreeData[];
     /** 是否显示勾选框（金融筛选=筛入板块），默认 true */
     checkable?: boolean;
@@ -18,6 +20,7 @@ const props = withDefaults(
     'aria-label'?: string;
   }>(),
   {
+    glass: true,
     checkable: true,
     // 不设默认值：必须能区分「未传 → 展开全部父节点」与「显式传 [] → 一个都不展开」
     defaultCheckedKeys: () => [],
@@ -95,7 +98,7 @@ const ariaLabel = computed(() => {
 </script>
 
 <template>
-  <div class="ui-tree" role="tree" :aria-label="ariaLabel">
+  <div class="ui-tree" role="tree" :aria-label="ariaLabel" :data-glass="glass === false ? 'off' : undefined">
     <ul class="ui-tree-children">
       <TreeNode
         v-for="node in data"

@@ -6,6 +6,8 @@ type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | number;
 
 const props = withDefaults(
   defineProps<{
+    /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+    glass?: boolean;
     /** 图片头像（优先）；存在时忽略 text / icon */
     src?: string;
     /** 图片替代文本（无障碍） */
@@ -21,6 +23,7 @@ const props = withDefaults(
     ariaLabel?: string;
   }>(),
   {
+    glass: true,
     size: 'md',
     tone: 'brand',
   },
@@ -43,7 +46,7 @@ const rootStyle = computed(() => ({
 </script>
 
 <template>
-  <span class="ui-avatar" :style="rootStyle" :aria-label="ariaLabel">
+  <span class="ui-avatar" :style="rootStyle" :aria-label="ariaLabel" :data-glass="glass === false ? 'off' : undefined">
     <img
       v-if="src"
       class="ui-avatar-img"

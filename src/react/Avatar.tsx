@@ -21,6 +21,8 @@ function pxOf(size: AvatarSize): number {
 }
 
 export interface AvatarProps {
+  /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
+  glass?: boolean;
   /** 图片头像（优先）；存在时忽略 text / icon */
   src?: string;
   /** 图片替代文本（无障碍） */
@@ -46,6 +48,7 @@ export interface AvatarProps {
  */
 export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
   {
+    glass,
     src,
     alt,
     text,
@@ -70,7 +73,7 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
 
   if (src) {
     return (
-      <span ref={ref} className={cx('ui-avatar', className)} style={rootStyle} aria-label={ariaLabel}>
+      <span ref={ref} className={cx('ui-avatar', className)} style={rootStyle} aria-label={ariaLabel} data-glass={glass === false ? 'off' : undefined}>
         <img
           className="ui-avatar-img"
           src={src}

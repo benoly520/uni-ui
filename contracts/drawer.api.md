@@ -19,6 +19,7 @@
 | `ariaLabel` | `string` | 取 `title` 或 `'抽屉'` | `.ui-drawer` 的 `aria-label` | 无障碍标签 |
 | `closeOnOverlay` | `boolean` | `true` | — | 点击遮罩是否关闭 |
 | `className` / `style` | — | — | 透传到 `.ui-drawer` | — |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ## 插槽
 - **默认插槽**：抽屉主体内容（包入 `.ui-drawer .body`）。
@@ -28,6 +29,12 @@
 
 ## 焦点管理（a11y 重点）
 - 同 Dialog：打开聚焦首项、Tab/Shift+Tab 循环、Esc 关闭、遮罩关闭、关闭恢复触发焦点；关闭态 `inert`+`aria-hidden`。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件受影响部位：`.ui-drawer-overlay` 遮罩背景模糊 + `.ui-drawer` 抽屉面（`.ui-glass`）。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律
 - 面板 `ui-drawer ui-glass`；方位用 `ui-drawer--{side}`（默认 right 无类）。

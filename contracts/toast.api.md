@@ -16,6 +16,7 @@
 | `children` | 节点 | — | 覆盖 `content` | 直接传复杂节点（如图标 + 文本混排） |
 | `className` | `string` | — | 附加 class | |
 | `style` | `CSSProperties` | — | 内联样式（位置/尺寸微调） | |
+| `glass` | `boolean` | `true` | 仅 `false` 时输出 `data-glass="off"` | 玻璃材质开关，`false` 回退为不透明实心面（见 token.md §玻璃开关） |
 
 ## 插槽
 - **默认插槽 / content**：正文文本或任意节点。
@@ -30,6 +31,12 @@
 
 ## 毛玻璃
 - `ui-toast` 通过 `.ui-glass` 取毛玻璃背景（§188），并用组件级 `--ui-toast-glass-*` → 回退 `--ui-glass-*-default`（§220）调节透明度 / 模糊。
+
+## 玻璃开关（glass）
+- `glass?: boolean`，默认 `true`：不输出任何属性，渲染结果与引入开关前完全一致。
+- 传 `false` 时根节点输出 `data-glass="off"`，theme.css §4.1 把受影响的玻璃面回退为不透明 `--ui-glass-off-surface`（默认 `--ui-bg-elevated`）并移除 `backdrop-filter`。
+- 本组件受影响部位：`.ui-toast` 根（`.ui-glass`）。
+- 全站关闭用 `<html data-glass="off">`；任意祖先元素加该属性即对其子树生效（逃生阀）。
 
 ## 命名纪律
 - 根 `ui-toast` 必首位；可见态追加**独立的** `show` 类（CSS 复合选择器 `.ui-toast.show`）；**禁止** scoped / 运行时 CSS-in-JS / CSS Modules 自动 hash（§16.5）。

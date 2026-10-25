@@ -19,6 +19,7 @@ app.innerHTML = `
     </div>
     <div class="nav-controls">
       <button class="ui-btn ui-btn--ghost ui-size-sm" id="themeBtn" aria-label="切换明暗主题">◐ 主题</button>
+      <button class="ui-btn ui-btn--ghost ui-size-sm" id="glassBtn" aria-label="切换毛玻璃材质">玻璃：开</button>
       <button class="ui-btn ui-btn--ghost ui-size-sm" id="mktBtn" aria-label="切换涨跌色约定">涨跌色：中国</button>
       <button class="ui-btn ui-btn--ghost ui-size-sm" id="densityBtn" aria-label="切换信息密度">密度：紧凑</button>
       <button class="ui-btn ui-btn--primary ui-size-sm" id="skinReset">默认品牌色</button>

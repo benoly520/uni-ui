@@ -175,6 +175,14 @@ html::-webkit-scrollbar-thumb:hover { background: rgb(var(--ui-glass-tint) / 0.4
 }
 .pg-stage { min-height: 80px; display: flex; flex-direction: column; gap: 12px; }
 .pg-stage .demo-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+/* 受控用例里回显当前值的小字提示 */
+.pg-stage .demo-hint {
+  margin: 0;
+  color: var(--ui-text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.pg-stage .demo-hint:not(:first-child) { margin-top: 6px; }
 .pg-stage .demo-target {
   border: 1px dashed var(--ui-color-brand);
   border-radius: var(--ui-radius-md);

@@ -59,7 +59,9 @@ export const docs: ComponentDoc[] = [
       { name: 'loading', type: 'boolean', default: 'false', desc: '文字透明 + spinner，禁用点击' },
       { name: 'icon', type: 'ReactNode', default: '—', desc: '前置 24×24 图标' },
       { name: 'disabled', type: 'boolean', default: 'false', desc: '原生禁用' },
+      { name: 'type', type: "'button' | 'submit' | 'reset'", default: "'button'", desc: '原生 type：表单内 submit 触发表单提交' },
       { name: 'onClick', type: '(e: MouseEvent) => void', default: '—', desc: '点击事件（React）/ @click（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，default 变体的半透明底回退为不透明面（默认 true）' },
     ],
   },
   {
@@ -73,6 +75,7 @@ export const docs: ComponentDoc[] = [
       { name: 'color', type: 'string', default: '—', desc: '自定义色，覆盖 type' },
       { name: 'icon', type: 'ReactNode', default: '—', desc: '前置图标' },
       { name: 'onClose', type: '() => void', default: '—', desc: '关闭时回调（React）/ @close（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，theme.css §4.1 回退为不透明实心面；本组件不含磨砂面，为三端 API 一致性保留（默认 true）' },
     ],
   },
   {
@@ -86,6 +89,7 @@ export const docs: ComponentDoc[] = [
       { name: 'max', type: 'number', default: '99', desc: '计数截断阈值' },
       { name: 'dot', type: 'boolean', default: 'false', desc: '前置状态圆点' },
       { name: 'showZero', type: 'boolean', default: 'false', desc: 'count 为 0 时是否仍渲染' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，theme.css §4.1 回退为不透明实心面；本组件不含磨砂面，为三端 API 一致性保留（默认 true）' },
     ],
   },
   {
@@ -95,10 +99,12 @@ export const docs: ComponentDoc[] = [
     summary: '展示用户或标的头像，支持文字、图片、图标三种来源与多种尺寸/语义色。',
     api: [
       { name: 'src', type: 'string', default: '—', desc: '图片地址，存在时忽略 text/icon' },
+      { name: 'alt', type: 'string', default: "''", desc: '图片替代文本（无障碍）' },
       { name: 'text', type: 'string', default: '—', desc: '文字头像' },
       { name: 'icon', type: 'ReactNode', default: '—', desc: '图标头像' },
       { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | number", default: "'md'", desc: '预设档 24/28/32/40px 或自定义像素' },
       { name: 'tone', type: "'brand' | 'danger' | 'success' | 'warning' | 'info'", default: "'brand'", desc: '文字/图标底色' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，theme.css §4.1 回退为不透明实心面；本组件不含磨砂面，为三端 API 一致性保留（默认 true）' },
     ],
   },
   {
@@ -111,9 +117,11 @@ export const docs: ComponentDoc[] = [
       { name: 'defaultValue', type: 'string', default: '—', desc: '非受控初始值' },
       { name: 'size', type: "'lg' | 'md' | 'sm' | 'xs'", default: "'md'", desc: '尺寸修饰' },
       { name: 'error', type: 'boolean', default: 'false', desc: '错误态（danger 描边）' },
+      { name: 'type / maxLength', type: 'string / number', default: "'text' / —", desc: '原生 type 透传与最大输入长度' },
       { name: 'disabled', type: 'boolean', default: 'false', desc: '禁用' },
       { name: 'prefix / suffix', type: 'ReactNode', default: '—', desc: '前导/后导装饰图标' },
       { name: 'onChange', type: '(value: string, e) => void', default: '—', desc: '输入变更（React）/ @change（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，输入框半透明底回退为不透明面（默认 true）' },
     ],
   },
   {
@@ -128,6 +136,7 @@ export const docs: ComponentDoc[] = [
       { name: 'disabled', type: 'boolean', default: 'false', desc: '禁用' },
       { name: 'label', type: 'string', default: '—', desc: '无障碍标签（role=switch）' },
       { name: 'onChange', type: '(checked: boolean) => void', default: '—', desc: '状态变更（React）/ @change（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，theme.css §4.1 回退为不透明实心面；本组件不含磨砂面，为三端 API 一致性保留（默认 true）' },
     ],
   },
   {
@@ -138,10 +147,12 @@ export const docs: ComponentDoc[] = [
     api: [
       { name: 'options', type: 'SelectOption[]', default: '—', desc: '{ label, value, disabled? }' },
       { name: 'value', type: 'string | string[]', default: '—', desc: '受控：单选 string / 多选 string[]' },
+      { name: 'defaultValue', type: 'string | string[]', default: '—', desc: '非受控初始值（多选传数组）' },
       { name: 'multiple', type: 'boolean', default: 'false', desc: '多选' },
       { name: 'searchable', type: 'boolean', default: 'false', desc: '搜索过滤' },
       { name: 'placeholder', type: 'string', default: "'请选择'", desc: '占位文案' },
       { name: 'onChange', type: '(value, option) => void', default: '—', desc: '选中变更（React）/ @change（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，触发器与下拉面板的半透明底回退为不透明面（默认 true）' },
     ],
   },
   {
@@ -155,7 +166,10 @@ export const docs: ComponentDoc[] = [
       { name: 'precision', type: 'number', default: '0', desc: '小数位（千分位 + 定点）' },
       { name: 'prefix / suffix', type: 'string', default: '—', desc: '前置/后置符号（如 ¥ / %）' },
       { name: 'defaultValue', type: 'number', default: '0', desc: '非受控初始值' },
+      { name: 'value', type: 'number | null', default: 'null', desc: '受控值' },
+      { name: "'aria-label'", type: 'string', default: '—', desc: '录入框无障碍名（加减按钮自带文案）' },
       { name: 'onChange', type: '(value: number) => void', default: '—', desc: '数值变更（React）/ @change（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，theme.css §4.1 回退为不透明实心面；本组件不含磨砂面，为三端 API 一致性保留（默认 true）' },
     ],
   },
   {
@@ -168,7 +182,9 @@ export const docs: ComponentDoc[] = [
       { name: 'value', type: "string | [string, string] | null", default: '—', desc: "受控值，单日 'YYYY-MM-DD'，范围 [起, 止]" },
       { name: 'defaultValue', type: '同上', default: 'null', desc: '非受控初始值' },
       { name: 'placeholder', type: 'string', default: "单日'选择日期'/范围'选择日期区间'", desc: '占位文案' },
+      { name: "'aria-label'", type: 'string', default: '—', desc: '触发器/弹层无障碍名，缺省取当前值' },
       { name: 'onChange', type: '(value) => void', default: '—', desc: '选中变更（React）/ @change（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，输入框与日历弹层的半透明底回退为不透明面（默认 true）' },
     ],
   },
   {
@@ -182,7 +198,9 @@ export const docs: ComponentDoc[] = [
       { name: 'defaultValue', type: 'string | number', default: '首项 value', desc: '非受控初始值' },
       { name: 'size', type: "'lg' | 'md' | 'sm' | 'xs'", default: "'md'", desc: '尺寸修饰' },
       { name: 'disabled', type: 'boolean', default: 'false', desc: '整组禁用' },
+      { name: "'aria-label'", type: 'string', default: '—', desc: '整组无障碍名（role=group）' },
       { name: 'onChange', type: '(value) => void', default: '—', desc: '选中变更（React）/ @change（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，theme.css §4.1 回退为不透明实心面；本组件不含磨砂面，为三端 API 一致性保留（默认 true）' },
     ],
   },
   {
@@ -193,9 +211,11 @@ export const docs: ComponentDoc[] = [
     api: [
       { name: 'options', type: 'SearchOption[]', default: '[]', desc: '{ label, value, code?, tag? }' },
       { name: 'value', type: 'string', default: '—', desc: '受控值' },
+      { name: 'defaultValue', type: 'string', default: '—', desc: '非受控初始关键词' },
       { name: 'placeholder', type: 'string', default: "'搜索…'", desc: '占位文案' },
       { name: 'onChange', type: '(value: string) => void', default: '—', desc: '输入变更（React）/ @change（Vue）' },
       { name: 'onSelect', type: '(option) => void', default: '—', desc: '选中联想项（React）/ @select（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，搜索框与联想面板的半透明底回退为不透明面（默认 true）' },
     ],
   },
   {
@@ -210,6 +230,7 @@ export const docs: ComponentDoc[] = [
       { name: 'idPrefix', type: 'string', default: '—', desc: '字段 id 命名空间前缀，同页多表单需传唯一值' },
       { name: 'rules', type: 'FormRule[]', default: '—', desc: '{ required?, pattern?, min?, message? }，命中首条规则即报错' },
       { name: 'onSubmit', type: '(values: Record<string, string>) => void', default: '—', desc: '校验通过回调（React）/ @submit（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，表单内输入类的半透明底随子树一并回退（默认 true）' },
     ],
   },
   {
@@ -223,6 +244,7 @@ export const docs: ComponentDoc[] = [
       { name: 'prefix / suffix', type: 'string', default: '—', desc: '前后缀（如 ¥ / 亿）' },
       { name: 'delta', type: 'string', default: '—', desc: '涨跌文案' },
       { name: 'trend', type: "'up' | 'down' | 'muted'", default: '—', desc: '涨跌着色（muted 为灰）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，theme.css §4.1 回退为不透明实心面；本组件不含磨砂面，为三端 API 一致性保留（默认 true）' },
     ],
   },
   {
@@ -234,6 +256,7 @@ export const docs: ComponentDoc[] = [
       { name: 'value', type: 'number', default: '0', desc: '当前进度' },
       { name: 'max', type: 'number', default: '100', desc: '满值' },
       { name: 'indeterminate', type: 'boolean', default: 'false', desc: '不确定态（无具体进度）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，theme.css §4.1 回退为不透明实心面；本组件不含磨砂面，为三端 API 一致性保留（默认 true）' },
     ],
   },
   {
@@ -245,6 +268,7 @@ export const docs: ComponentDoc[] = [
       { name: 'shape', type: "'text' | 'circle' | 'rect'", default: "'rect'", desc: '占位形状' },
       { name: 'width / height', type: 'string | number', default: '—', desc: '尺寸（数字转 px）' },
       { name: 'active', type: 'boolean', default: 'true', desc: '是否显示微光动画' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，theme.css §4.1 回退为不透明实心面；本组件不含磨砂面，为三端 API 一致性保留（默认 true）' },
     ],
   },
   {
@@ -256,6 +280,7 @@ export const docs: ComponentDoc[] = [
       { name: 'description', type: 'ReactNode / string', default: '—', desc: '空状态描述文案' },
       { name: 'icon', type: 'ReactNode', default: '内置 table', desc: '图标插槽（默认内置 table 内联 SVG，可覆盖）' },
       { name: 'children / 默认插槽', type: '—', default: '—', desc: '操作区插槽' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，theme.css §4.1 回退为不透明实心面；本组件不含磨砂面，为三端 API 一致性保留（默认 true）' },
     ],
   },
   {
@@ -268,6 +293,7 @@ export const docs: ComponentDoc[] = [
       { name: 'activeKeys', type: 'string[]', default: '—', desc: '受控展开的 key 列表' },
       { name: 'defaultActiveKeys', type: 'string[]', default: '[]', desc: '非受控初始展开' },
       { name: 'onChange', type: '(keys: string[]) => void', default: '—', desc: '展开集合变化（React）/ @change（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，theme.css §4.1 回退为不透明实心面；本组件不含磨砂面，为三端 API 一致性保留（默认 true）' },
     ],
   },
   {
@@ -281,6 +307,7 @@ export const docs: ComponentDoc[] = [
       { name: 'defaultValue', type: 'string', default: '首项 key', desc: '非受控初始' },
       { name: 'ariaLabel', type: 'string', default: "'标签页'", desc: 'tablist 无障碍标签' },
       { name: 'onChange', type: '(key: string) => void', default: '—', desc: '切换回调（React）/ @change（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，滚动箭头的半透明底回退为不透明面（默认 true）' },
     ],
   },
   {
@@ -292,6 +319,7 @@ export const docs: ComponentDoc[] = [
       { name: 'items', type: 'BreadcrumbItem[]', default: '—', desc: '{ label, href? }' },
       { name: 'separator', type: 'ReactNode / string', default: "'/'", desc: '分隔符' },
       { name: 'ariaLabel', type: 'string', default: "'路径导航'", desc: '根 nav 标签' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，theme.css §4.1 回退为不透明实心面；本组件不含磨砂面，为三端 API 一致性保留（默认 true）' },
     ],
   },
   {
@@ -305,6 +333,7 @@ export const docs: ComponentDoc[] = [
       { name: 'defaultCurrent', type: 'number', default: '0', desc: '非受控初始' },
       { name: 'clickable', type: 'boolean', default: 'true', desc: '点击步骤重算并回调' },
       { name: 'onChange', type: '(index: number) => void', default: '—', desc: '步骤变更（React）/ @change（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，theme.css §4.1 回退为不透明实心面；本组件不含磨砂面，为三端 API 一致性保留（默认 true）' },
     ],
   },
   {
@@ -318,7 +347,9 @@ export const docs: ComponentDoc[] = [
       { name: 'page', type: 'number', default: '—', desc: '受控当前页（1-based）' },
       { name: 'defaultPage', type: 'number', default: '1', desc: '非受控初始' },
       { name: 'siblingCount', type: 'number', default: '1', desc: '当前页两侧保留页码数' },
+      { name: 'ariaLabel', type: 'string', default: "'分页'", desc: '根 nav 无障碍名' },
       { name: 'onChange', type: '(page: number) => void', default: '—', desc: '翻页回调（React）/ @change（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，页码按钮的半透明底回退为不透明面（默认 true）' },
     ],
   },
   {
@@ -328,11 +359,13 @@ export const docs: ComponentDoc[] = [
     summary: '轻量 hover/focus 提示气泡，支持 invert/surface 两种变体与延迟显示。',
     api: [
       { name: 'content', type: 'ReactNode / 插槽', default: '—', desc: '气泡内容' },
-      { name: 'variant', type: "'invert' | 'surface'", default: "'invert'", desc: 'invert=反转色；surface=跟随主题表面' },
+      { name: 'variant', type: "'invert' | 'surface'", default: "'surface'", desc: 'invert=反转色；surface=跟随主题表面' },
       { name: 'placement', type: "'top' | 'bottom' | 'left' | 'right'", default: "'top'", desc: '方位（top 已完备支持）' },
       { name: 'delay', type: 'number', default: '0', desc: '显示延迟 (ms)' },
       { name: 'disabled', type: 'boolean', default: 'false', desc: '禁用提示' },
+      { name: 'open / defaultOpen', type: 'boolean', default: '— / false', desc: '受控 / 非受控初始显隐' },
       { name: 'onOpenChange', type: '(open) => void', default: '—', desc: '显隐变更（React）/ @open-change（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，surface 变体的气泡失去模糊、回退为不透明面（默认 true）' },
     ],
   },
   {
@@ -346,6 +379,7 @@ export const docs: ComponentDoc[] = [
       { name: 'defaultOpen', type: 'boolean', default: 'false', desc: '非受控初始' },
       { name: 'ariaLabel', type: 'string', default: "'Popover'", desc: '面板无障碍标签' },
       { name: 'onOpenChange', type: '(open) => void', default: '—', desc: '显隐变更（React）/ @open-change（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，theme.css §4.1 回退为不透明实心面；本组件不含磨砂面，为三端 API 一致性保留（默认 true）' },
     ],
   },
   {
@@ -359,6 +393,8 @@ export const docs: ComponentDoc[] = [
       { name: 'footer', type: 'ReactNode / 插槽', default: '—', desc: '底部操作区' },
       { name: 'closeOnOverlay', type: 'boolean', default: 'true', desc: '点击遮罩是否关闭' },
       { name: 'onOpenChange', type: '(open) => void', default: '—', desc: '显隐变更（React）/ @open-change（Vue）' },
+      { name: 'ariaLabel', type: 'string', default: 'title 文本 / 对话框', desc: '面板无障碍名，缺省取 title' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，对话框面板与遮罩失去模糊、回退为不透明面（默认 true）' },
     ],
   },
   {
@@ -373,6 +409,8 @@ export const docs: ComponentDoc[] = [
       { name: 'showClose', type: 'boolean', default: 'true', desc: '是否显示关闭按钮' },
       { name: 'closeOnOverlay', type: 'boolean', default: 'true', desc: '点击遮罩是否关闭' },
       { name: 'onOpenChange', type: '(open) => void', default: '—', desc: '显隐变更（React）/ @open-change（Vue）' },
+      { name: 'ariaLabel', type: 'string', default: 'title 文本 / 抽屉', desc: '面板无障碍名，缺省取 title' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，抽屉面板与遮罩失去模糊、回退为不透明面（默认 true）' },
     ],
   },
   {
@@ -383,9 +421,11 @@ export const docs: ComponentDoc[] = [
     api: [
       { name: 'items', type: 'ContextMenuItem[]', default: '—', desc: '{ key, label, shortcut?, danger?, separator? }' },
       { name: 'targetRef', type: 'Ref<HTMLElement>', default: '—', desc: '右键触发目标' },
+      { name: 'open', type: 'boolean', default: '—', desc: '受控显隐（缺省走内部状态）' },
       { name: 'defaultOpen', type: 'boolean', default: 'false', desc: '非受控初始' },
       { name: 'onSelect', type: '(key: string) => void', default: '—', desc: '菜单项选中（React）/ @select（Vue）' },
       { name: 'onOpenChange', type: '(open) => void', default: '—', desc: '显隐变更（React）/ @open-change（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，theme.css §4.1 回退为不透明实心面；本组件不含磨砂面，为三端 API 一致性保留（默认 true）' },
     ],
   },
   {
@@ -398,8 +438,10 @@ export const docs: ComponentDoc[] = [
       { name: 'checkable', type: 'boolean', default: 'true', desc: '是否显示勾选框' },
       { name: 'defaultExpandedKeys', type: 'string[]', default: '父节点', desc: '非受控默认展开' },
       { name: 'defaultCheckedKeys', type: 'string[]', default: '[]', desc: '非受控默认勾选' },
+      { name: 'expandedKeys / checkedKeys', type: 'string[]', default: '—', desc: '受控展开 / 勾选集合' },
       { name: 'onExpand', type: '(keys, info) => void', default: '—', desc: '展开变更（React）/ @expand（Vue）' },
       { name: 'onCheck', type: '(keys, info) => void', default: '—', desc: '勾选变更（React）/ @check（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，theme.css §4.1 回退为不透明实心面；本组件不含磨砂面，为三端 API 一致性保留（默认 true）' },
     ],
   },
   {
@@ -413,7 +455,9 @@ export const docs: ComponentDoc[] = [
       { name: 'value', type: '[number, number]', default: '—', desc: '受控值 [低, 高]' },
       { name: 'defaultValue', type: '[number, number]', default: '[min, max]', desc: '非受控默认' },
       { name: 'format', type: "'pct' | 'num' | (v) => string", default: "'num'", desc: '显示格式' },
+      { name: 'minLabel / maxLabel', type: 'string', default: "'最小值' / '最大值'", desc: '两端文字标签' },
       { name: 'onChange', type: '(value) => void', default: '—', desc: '值变更（React）/ @change（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，theme.css §4.1 回退为不透明实心面；本组件不含磨砂面，为三端 API 一致性保留（默认 true）' },
     ],
   },
   {
@@ -427,8 +471,12 @@ export const docs: ComponentDoc[] = [
       { name: 'compact', type: 'boolean', default: 'false', desc: '紧凑密度' },
       { name: 'selectable', type: 'boolean', default: 'false', desc: '行多选 + 表头全选' },
       { name: 'rowKey', type: 'string', default: "'id'", desc: '行标识键' },
+      { name: 'sortKey / sortDir', type: "string / 'asc' | 'desc'", default: '— / desc', desc: '受控排序列与方向（数据排序由业务侧执行）' },
+      { name: 'defaultSortKey / defaultSortDir', type: "string / 'asc' | 'desc'", default: '— / desc', desc: '非受控初始排序' },
+      { name: 'selectedKeys', type: 'string[]', default: '—', desc: '受控选中行 key' },
       { name: 'onSort', type: '(key, dir) => void', default: '—', desc: '排序回调（React）/ @sort（Vue）' },
       { name: 'onSelect', type: '(keys) => void', default: '—', desc: '选中回调（React）/ @select（Vue）' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，表体与吸顶表头的半透明底回退为不透明面（默认 true）' },
     ],
   },
   {
@@ -442,6 +490,7 @@ export const docs: ComponentDoc[] = [
       { name: 'rowHeight', type: 'number', default: '33', desc: '固定行高（px），窗口化基准' },
       { name: 'buffer', type: 'number', default: '6', desc: '上下缓冲行数，防白屏' },
       { name: 'ariaLabel', type: 'string', default: '—', desc: '滚动容器无障碍标签' },
+      { name: 'glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，表体与悬停行的半透明底回退为不透明面（默认 true）' },
     ],
   },
   {
@@ -453,6 +502,7 @@ export const docs: ComponentDoc[] = [
       { name: "toast(content, options?)", type: '(content, options?) => void', default: '—', desc: '命令式入口' },
       { name: 'options.icon', type: 'ReactNode', default: '—', desc: '前置图标' },
       { name: 'options.duration', type: 'number', default: '2400', desc: '自动关闭时长（0=常驻）' },
+      { name: 'options.glass', type: 'boolean', default: 'true', desc: '玻璃材质开关：false 时根节点输出 data-glass="off"，回退为不透明实心面（默认 true）' },
     ],
   },
   {
@@ -461,9 +511,10 @@ export const docs: ComponentDoc[] = [
     category: '反馈',
     summary: '命令式通知条，支持 success/warning/info/danger 四种语义类型。',
     api: [
-      { name: 'showMessage(text, type?, duration?)', type: '(text, type?, duration?) => void', default: '—', desc: '命令式入口' },
+      { name: 'showMessage(text, type?, duration?, glass?)', type: '(text, type?, duration?, glass?) => void', default: '—', desc: '命令式入口' },
       { name: 'type', type: "'success' | 'warning' | 'info' | 'danger'", default: "'info'", desc: '语义类型' },
       { name: 'duration', type: 'number', default: '2600', desc: '自动关闭时长（0=常驻）' },
+      { name: 'glass（第 4 参数）', type: 'boolean', default: 'true', desc: '玻璃材质开关：showMessage(text, type, duration, false) 回退为不透明实心面（默认 true）' },
     ],
   },
   {

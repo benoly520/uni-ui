@@ -1,4 +1,4 @@
-import { h, defineComponent, ref, type DefineComponent } from 'vue';
+import { h, defineComponent, ref, computed, type DefineComponent } from 'vue';
 import {
   Button,
   Tag,
@@ -186,6 +186,29 @@ export const vueDocs: Record<string, DemoCase[]> = {
         ]),
       ),
     },
+    {
+      code: `<Button variant="default">默认：磨砂</Button>\n<Button variant="default" :glass="false">关闭：实心</Button>`,
+      Comp: S(() => () =>
+        h('div', { class: 'demo-row' }, [
+          h(Button, { variant: 'default' }, '默认：磨砂'),
+          h(Button, { variant: 'default', glass: false }, '关闭：实心'),
+        ]),
+      ),
+    },
+    {
+      code: `<Button type="submit" variant="primary">type=submit</Button>\n<Button type="button" variant="outline">type=button</Button>\n<Button type="reset" variant="ghost">type=reset</Button>`,
+      Comp: defineComponent({
+        setup() {
+        return () =>
+          h('div', { class: 'demo-row' }, [
+            h(Button, { type: 'submit', variant: 'primary' }, 'type=submit'),
+            h(Button, { type: 'button', variant: 'outline' }, 'type=button'),
+            h(Button, { type: 'reset', variant: 'ghost' }, 'type=reset'),
+            h('p', { class: 'demo-hint' }, '表单内 submit 会触发表单提交，button 只响应 onClick。'),
+          ]);
+        },
+      }),
+    },
   ],
 
   Tag: [
@@ -210,6 +233,19 @@ export const vueDocs: Record<string, DemoCase[]> = {
         ]),
       ),
     },
+    {
+      code: `<Tag type="brand" :icon="StarIcon()">重点关注</Tag>\n<Tag type="up" :icon="PlusIcon()">加自选</Tag>\n<Tag closable :icon="StarIcon()">可关闭 + 图标</Tag>`,
+      Comp: defineComponent({
+        setup() {
+        return () =>
+          h('div', { class: 'demo-row' }, [
+            h(Tag, { type: 'brand', icon: h(StarIcon) }, '重点关注'),
+            h(Tag, { type: 'up', icon: h(PlusIcon) }, '加自选'),
+            h(Tag, { closable: true, icon: h(StarIcon) }, '可关闭 + 图标'),
+          ]);
+        },
+      }),
+    },
   ],
 
   Badge: [
@@ -232,17 +268,31 @@ export const vueDocs: Record<string, DemoCase[]> = {
         ]),
       ),
     },
+    {
+      code: `<Badge tone="danger" :count="120" :max="99" />\n<Badge tone="brand" :count="0" show-zero />\n<Badge tone="brand" :count="0" />`,
+      Comp: defineComponent({
+        setup() {
+        return () =>
+          h('div', { class: 'demo-row' }, [
+            h(Badge, { tone: 'danger', count: 120, max: 99 }),
+            h(Badge, { tone: 'brand', count: 0, showZero: true }),
+            h(Badge, { tone: 'brand', count: 0 }),
+            h('p', { class: 'demo-hint' }, '第三个 count=0 且未开 showZero，不渲染。'),
+          ]);
+        },
+      }),
+    },
   ],
 
   Avatar: [
     {
-      code: `<Avatar text="茅台" tone="brand" />\n<Avatar text="宁" tone="success" />\n<Avatar :icon="StarIcon" tone="warning" />\n<Avatar src="https://i.pravatar.cc/80?img=12" />`,
+      code: `<Avatar text="茅台" tone="brand" />\n<Avatar text="宁" tone="success" />\n<Avatar :icon="StarIcon" tone="warning" />\n<Avatar src="https://i.pravatar.cc/80?img=12" alt="用户头像" :size="48" />`,
       Comp: S(() => () =>
         h('div', { class: 'demo-row' }, [
           h(Avatar, { text: '茅台', tone: 'brand' }),
           h(Avatar, { text: '宁', tone: 'success' }),
           h(Avatar, { icon: StarIcon, tone: 'warning' }),
-          h(Avatar, { src: 'https://i.pravatar.cc/80?img=12' }),
+          h(Avatar, { src: 'https://i.pravatar.cc/80?img=12', alt: '用户头像', size: 48 }),
         ]),
       ),
     },
@@ -282,6 +332,29 @@ export const vueDocs: Record<string, DemoCase[]> = {
           h(Input, { suffix: h('span', '%'), value: '12' }),
         ]),
       ),
+    },
+    {
+      code: `<Input placeholder="默认：磨砂" />\n<Input placeholder="关闭：实心" :glass="false" />`,
+      Comp: S(() => () =>
+        h('div', { class: 'demo-row' }, [
+          h(Input, { placeholder: '默认：磨砂' }),
+          h(Input, { placeholder: '关闭：实心', glass: false }),
+        ]),
+      ),
+    },
+    {
+      code: `<Input size="lg" placeholder="size=lg" />\n<Input size="sm" placeholder="size=sm" />\n<Input type="password" default-value="secret" />\n<Input :max-length="6" default-value="600519" placeholder="maxLength=6" />`,
+      Comp: defineComponent({
+        setup() {
+        return () =>
+          h('div', { class: 'demo-row' }, [
+            h(Input, { size: 'lg', placeholder: 'size=lg' }),
+            h(Input, { size: 'sm', placeholder: 'size=sm' }),
+            h(Input, { type: 'password', defaultValue: 'secret' }),
+            h(Input, { maxLength: 6, defaultValue: '600519', placeholder: 'maxLength=6' }),
+          ]);
+        },
+      }),
     },
   ],
 
@@ -343,6 +416,68 @@ export const vueDocs: Record<string, DemoCase[]> = {
         ]),
       ),
     },
+    {
+      code: `<Select :options="options" placeholder="默认：磨砂" />\n<Select :options="options" placeholder="关闭：实心" :glass="false" />`,
+      Comp: S(() => () =>
+        h('div', { class: 'demo-row' }, [
+          h(Select, {
+            options: [
+              { label: '贵州茅台', value: '600519' },
+              { label: '宁德时代', value: '300750' },
+            ],
+            placeholder: '默认：磨砂',
+          }),
+          h(Select, {
+            glass: false,
+            options: [
+              { label: '贵州茅台', value: '600519' },
+              { label: '宁德时代', value: '300750' },
+            ],
+            placeholder: '关闭：实心',
+          }),
+        ]),
+      ),
+    },
+    {
+      code: `<script setup>\nconst v = ref('600519');\n</script>\n<Select :options="options" :value="v" @change="v = $event" />\n<p>当前值：{{ v }}</p>`,
+      Comp: defineComponent({
+        setup() {
+        const v = ref<string>('600519');
+        return () =>
+          h('div', null, [
+            h(Select, {
+              options: [
+                { label: '贵州茅台', value: '600519' },
+                { label: '宁德时代', value: '300750' },
+                { label: '招商银行', value: '600036' },
+              ],
+              value: v.value,
+              onChange: (val: string | string[]) => (v.value = val as string),
+            }),
+            h('p', { class: 'demo-hint' }, '当前值：' + v.value),
+          ]);
+        },
+      }),
+    },
+    {
+      code: `<Select default-value="600519" :options="options" />\n<p>宁德时代为 disabled，展开后不可点选。</p>`,
+      Comp: defineComponent({
+        setup() {
+        return () =>
+          h('div', null, [
+            h(Select, {
+              defaultValue: '600519',
+              options: [
+                { label: '贵州茅台', value: '600519' },
+                { label: '宁德时代', value: '300750', disabled: true },
+                { label: '招商银行', value: '600036' },
+              ],
+            }),
+            h('p', { class: 'demo-hint' }, '宁德时代为 disabled，展开后不可点选。'),
+          ]);
+        },
+      }),
+    },
   ],
 
   NumberInput: [
@@ -363,6 +498,19 @@ export const vueDocs: Record<string, DemoCase[]> = {
         ]),
       ),
     },
+    {
+      code: `<script setup>\nconst n = ref(1234.5);\n</script>\n<NumberInput :value="n" :precision="2" prefix="¥" @change="n = $event" />\n<p>当前值：{{ n }}</p>`,
+      Comp: defineComponent({
+        setup() {
+        const n = ref(1234.5);
+        return () =>
+          h('div', null, [
+            h(NumberInput, { value: n.value, precision: 2, prefix: '¥', onChange: (v: number) => (n.value = v) }),
+            h('p', { class: 'demo-hint' }, '当前值：' + n.value),
+          ]);
+        },
+      }),
+    },
   ],
 
   DatePicker: [
@@ -377,6 +525,28 @@ export const vueDocs: Record<string, DemoCase[]> = {
           h(DatePicker, { range: true, defaultValue: ['2026-01-01', '2026-01-31'] }),
         ]),
       ),
+    },
+    {
+      code: `<DatePicker default-value="2026-01-01" />\n<DatePicker default-value="2026-01-01" :glass="false" />`,
+      Comp: S(() => () =>
+        h('div', { class: 'demo-row' }, [
+          h(DatePicker, { defaultValue: '2026-01-01' }),
+          h(DatePicker, { defaultValue: '2026-01-01', glass: false }),
+        ]),
+      ),
+    },
+    {
+      code: `<script setup>\nconst v = ref('2026-01-01');\n</script>\n<DatePicker :value="v" placeholder="选择报告日期" @change="v = $event" />\n<p>当前值：{{ v || '未选择' }}</p>`,
+      Comp: defineComponent({
+        setup() {
+        const v = ref<string | null>('2026-01-01');
+        return () =>
+          h('div', null, [
+            h(DatePicker, { value: v.value, placeholder: '选择报告日期', onChange: (val: string | null) => (v.value = val) }),
+            h('p', { class: 'demo-hint' }, '当前值：' + (v.value || '未选择')),
+          ]);
+        },
+      }),
     },
   ],
 
@@ -405,6 +575,27 @@ export const vueDocs: Record<string, DemoCase[]> = {
         ]),
       ),
     },
+    {
+      code: `<script setup>\nconst v = ref('d');\n</script>\n<Segmented :options="options" :value="v" @change="v = $event" />\n<p>当前：{{ v }}</p>`,
+      Comp: defineComponent({
+        setup() {
+        const v = ref<string | number>('d');
+        return () =>
+          h('div', null, [
+            h(Segmented, {
+              options: [
+                { label: '日K', value: 'd' },
+                { label: '周K', value: 'w' },
+                { label: '月K', value: 'm' },
+              ],
+              value: v.value,
+              onChange: (val: string | number) => (v.value = val),
+            }),
+            h('p', { class: 'demo-hint' }, '当前：' + String(v.value)),
+          ]);
+        },
+      }),
+    },
   ],
 
   Search: [
@@ -422,16 +613,64 @@ export const vueDocs: Record<string, DemoCase[]> = {
         ]),
       ),
     },
+    {
+      code: `<Search :options="options" placeholder="默认：磨砂" />\n<Search :options="options" placeholder="关闭：实心" :glass="false" />`,
+      Comp: S(() => () =>
+        h('div', { class: 'demo-row' }, [
+          h(Search, {
+            options: [
+              { label: '贵州茅台', value: '600519', code: 'SH' },
+              { label: '宁德时代', value: '300750', code: 'SZ' },
+            ],
+            placeholder: '默认：磨砂',
+          }),
+          h(Search, {
+            glass: false,
+            options: [
+              { label: '贵州茅台', value: '600519', code: 'SH' },
+              { label: '宁德时代', value: '300750', code: 'SZ' },
+            ],
+            placeholder: '关闭：实心',
+          }),
+        ]),
+      ),
+    },
+    {
+      code: `<script setup>\nconst q = ref('茅台');\nconst picked = ref('未选择');\n</script>\n<Search v-model:value=\"q\" :options=\"options\" @select=\"(o) => (picked = o.label)\" />\n<Search default-value=\"茅台\" :options=\"options\" />\n<p>当前输入：{{ q }} · 已选：{{ picked }}</p>`,
+      Comp: defineComponent({
+        setup() {
+        const q = ref('茅台');
+        const picked = ref('未选择');
+        const options = [
+          { label: '贵州茅台', value: '600519', code: 'SH' },
+          { label: '宁德时代', value: '300750', code: 'SZ' },
+        ];
+        return () =>
+          h('div', null, [
+            h(Search, {
+              value: q.value,
+              onChange: (v: string) => (q.value = v),
+              options,
+              onSelect: (o: { label: string; code?: string }) =>
+                (picked.value = o.label + ' ' + (o.code ?? '')),
+            }),
+            h(Search, { defaultValue: '茅台', options }),
+            h('p', { class: 'demo-hint' }, '当前输入：' + q.value + ' · 已选：' + picked.value),
+          ]);
+        },
+      }),
+    },
   ],
 
   Stat: [
     {
-      code: `<Stat label="上证指数" :value="3218.45" delta="+1.24%" trend="up" />\n<Stat label="创业板指" :value="2012.8" delta="-0.86%" trend="down" />\n<Stat label="成交额" value="1.02" suffix="万亿" trend="muted" />`,
+      code: `<Stat label="上证指数" :value="3218.45" delta="+1.24%" trend="up" />\n<Stat label="创业板指" :value="2012.8" delta="-0.86%" trend="down" />\n<Stat label="成交额" value="1.02" suffix="万亿" trend="muted" />\n<Stat label="持仓市值" value="12.86" prefix="¥" suffix="万" trend="muted" />`,
       Comp: S(() => () =>
         h('div', { class: 'demo-row' }, [
           h(Stat, { label: '上证指数', value: 3218.45, delta: '+1.24%', trend: 'up' }),
           h(Stat, { label: '创业板指', value: 2012.8, delta: '-0.86%', trend: 'down' }),
           h(Stat, { label: '成交额', value: '1.02', suffix: '万亿', trend: 'muted' }),
+          h(Stat, { label: '持仓市值', value: '12.86', prefix: '¥', suffix: '万', trend: 'muted' }),
         ]),
       ),
     },
@@ -448,6 +687,19 @@ export const vueDocs: Record<string, DemoCase[]> = {
         ]),
       ),
     },
+    {
+      code: `<Progress :value="3" :max="5" />\n<Progress :value="1" :max="5" />`,
+      Comp: defineComponent({
+        setup() {
+        return () =>
+          h('div', { style: { display: 'flex', flexDirection: 'column', gap: '10px', width: '280px' } }, [
+            h(Progress, { value: 3, max: 5 }),
+            h(Progress, { value: 1, max: 5 }),
+            h('p', { class: 'demo-hint' }, 'value=3 / max=5 → 60%；value=1 / max=5 → 20%。'),
+          ]);
+        },
+      }),
+    },
   ],
 
   Skeleton: [
@@ -461,6 +713,19 @@ export const vueDocs: Record<string, DemoCase[]> = {
         ]),
       ),
     },
+    {
+      code: `<Skeleton active />\n<Skeleton :active="false" />`,
+      Comp: defineComponent({
+        setup() {
+        return () =>
+          h('div', { class: 'demo-row' }, [
+            h(Skeleton, { active: true }),
+            h(Skeleton, { active: false }),
+            h('p', { class: 'demo-hint' }, '左为默认闪光，右为静态占位。'),
+          ]);
+        },
+      }),
+    },
   ],
 
   Empty: [
@@ -469,6 +734,19 @@ export const vueDocs: Record<string, DemoCase[]> = {
       Comp: S(() => () =>
         h('div', { class: 'demo-row' }, [
           h(Empty, { description: '暂无自选标的' }, { default: () => h(Button, { variant: 'primary' }, '添加自选') }),
+        ]),
+      ),
+    },
+    {
+      code: `<Empty :icon="SearchIcon" description="没有匹配的标的">\n  <Button variant="outline">清空筛选</Button>\n</Empty>\n<Empty :icon="StarIcon" description="尚未添加自选" />`,
+      Comp: S(() => () =>
+        h('div', { class: 'demo-row' }, [
+          h(
+            Empty,
+            { icon: SearchIcon, description: '没有匹配的标的' },
+            { default: () => h(Button, { variant: 'outline' }, '清空筛选') },
+          ),
+          h(Empty, { icon: StarIcon, description: '尚未添加自选' }),
         ]),
       ),
     },
@@ -487,6 +765,49 @@ export const vueDocs: Record<string, DemoCase[]> = {
         }),
       ),
     },
+    {
+      code: `<Tabs :items="items" default-value="on-a" />\n<Tabs :items="items" default-value="on-a" :glass="false" />`,
+      Comp: S(() => () =>
+        h('div', { class: 'demo-row' }, [
+          h(Tabs, {
+            defaultValue: 'on-a',
+            items: [
+              { key: 'on-a', label: '概况', content: h('p', '默认磨砂。滚动箭头随 glass 变化。') },
+              { key: 'on-b', label: '财务', content: h('p', '营收 / 利润。') },
+            ],
+          }),
+          h(Tabs, {
+            glass: false,
+            defaultValue: 'off-a',
+            items: [
+              { key: 'off-a', label: '概况', content: h('p', '关闭玻璃：实心。') },
+              { key: 'off-b', label: '财务', content: h('p', '营收 / 利润。') },
+            ],
+          }),
+        ]),
+      ),
+    },
+    {
+      code: `<script setup>\nconst v = ref('a');\n</script>\n<Tabs :items="items" :value="v" @change="v = $event" />\n<p>当前 tab：{{ v }}</p>`,
+      Comp: defineComponent({
+        setup() {
+        const v = ref('a');
+        return () =>
+          h('div', null, [
+            h(Tabs, {
+              value: v.value,
+              onChange: (k: string) => (v.value = k),
+              items: [
+                { key: 'a', label: '概况', content: h('p', '公司基本面与行业地位。') },
+                { key: 'b', label: '财务', content: h('p', '营收 / 利润 / 现金流。') },
+                { key: 'c', label: '研报', content: h('p', '近期券商观点。') },
+              ],
+            }),
+            h('p', { class: 'demo-hint' }, '当前 tab：' + v.value),
+          ]);
+        },
+      }),
+    },
   ],
 
   Breadcrumb: [
@@ -501,6 +822,24 @@ export const vueDocs: Record<string, DemoCase[]> = {
           ],
         }),
       ),
+    },
+    {
+      code: `<Breadcrumb :items="items" separator="›" />\n<Breadcrumb :items="items" separator="→" />`,
+      Comp: defineComponent({
+        setup() {
+        const items = [
+          { label: '研究', href: '#' },
+          { label: '行业', href: '#' },
+          { label: '白酒' },
+        ];
+        return () =>
+          h('div', { style: { display: 'flex', flexDirection: 'column', gap: '10px' } }, [
+            h(Breadcrumb, { items, separator: '›' }),
+            h(Breadcrumb, { items, separator: '→' }),
+            h('p', { class: 'demo-hint' }, '默认分隔符为「/」。'),
+          ]);
+        },
+      }),
     },
   ],
 
@@ -518,12 +857,56 @@ export const vueDocs: Record<string, DemoCase[]> = {
         }),
       ),
     },
+    {
+      code: `<script setup>\nconst i = ref(1);\n</script>\n<Steps :steps="steps" :current="i" clickable @change="i = $event" />\n<p>当前第 {{ i + 1 }} 步</p>`,
+      Comp: defineComponent({
+        setup() {
+        const i = ref(1);
+        return () =>
+          h('div', null, [
+            h(Steps, {
+              steps: [
+                { title: '选股', desc: '筛选池' },
+                { title: '回测', desc: '历史验证' },
+                { title: '实盘', desc: '跟踪调仓' },
+              ],
+              current: i.value,
+              clickable: true,
+              onChange: (idx: number) => (i.value = idx),
+            }),
+            h('p', { class: 'demo-hint' }, '当前第 ' + (i.value + 1) + ' 步'),
+          ]);
+        },
+      }),
+    },
   ],
 
   Pagination: [
     {
       code: `<Pagination :total="240" :page-size="10" :default-page="3" />`,
       Comp: S(() => () => h(Pagination, { total: 240, pageSize: 10, defaultPage: 3 })),
+    },
+    {
+      code: `<Pagination :total="240" :page-size="10" :default-page="3" />\n<Pagination :total="240" :page-size="10" :default-page="3" :glass="false" />`,
+      Comp: S(() => () =>
+        h('div', { class: 'demo-row' }, [
+          h(Pagination, { total: 240, pageSize: 10, defaultPage: 3 }),
+          h(Pagination, { total: 240, pageSize: 10, defaultPage: 3, glass: false }),
+        ]),
+      ),
+    },
+    {
+      code: `<script setup>\nconst p = ref(1);\n</script>\n<Pagination :total="500" :page-size="10" :page="p" :sibling-count="2" @change="p = $event" />\n<p>当前第 {{ p }} 页</p>`,
+      Comp: defineComponent({
+        setup() {
+        const p = ref(1);
+        return () =>
+          h('div', null, [
+            h(Pagination, { total: 500, pageSize: 10, page: p.value, siblingCount: 2, onChange: (v: number) => (p.value = v) }),
+            h('p', { class: 'demo-hint' }, '当前第 ' + p.value + ' 页'),
+          ]);
+        },
+      }),
     },
   ],
 
@@ -536,6 +919,64 @@ export const vueDocs: Record<string, DemoCase[]> = {
           h(Tooltip, { content: '跟随主题表面', variant: 'surface' }, { default: () => h(Button, { variant: 'outline' }, 'surface') }),
         ]),
       ),
+    },
+    {
+      code: `<Tooltip content="默认：磨砂气泡" variant="surface"><Button>悬停：磨砂</Button></Tooltip>\n<Tooltip content="关闭：实心气泡" variant="surface" :glass="false"><Button variant="outline">悬停：实心</Button></Tooltip>`,
+      Comp: S(() => () =>
+        h('div', { class: 'demo-row' }, [
+          h(Tooltip, { content: '默认：磨砂气泡', variant: 'surface' }, {
+            default: () => h(Button, null, '悬停：磨砂'),
+          }),
+          h(Tooltip, { content: '关闭：实心气泡', variant: 'surface', glass: false }, {
+            default: () => h(Button, { variant: 'outline' }, '悬停：实心'),
+          }),
+        ]),
+      ),
+    },
+    {
+      code: `<Tooltip content="上方" placement="top"><Button>top</Button></Tooltip>\n<Tooltip content="延迟 600ms" :delay="600"><Button>delay</Button></Tooltip>\n<Tooltip content="不会出现" disabled><Button>disabled</Button></Tooltip>`,
+      Comp: defineComponent({
+        setup() {
+        return () =>
+          h('div', { class: 'demo-row' }, [
+            h(Tooltip, { content: '上方', placement: 'top' }, { default: () => h(Button, null, 'top') }),
+            h(Tooltip, { content: '右侧', placement: 'right' }, { default: () => h(Button, null, 'right') }),
+            h(Tooltip, { content: '下方', placement: 'bottom' }, { default: () => h(Button, null, 'bottom') }),
+            h(Tooltip, { content: '左侧', placement: 'left' }, { default: () => h(Button, null, 'left') }),
+            h(Tooltip, { content: '延迟 600ms 才出现', delay: 600 }, { default: () => h(Button, null, 'delay=600') }),
+            h(Tooltip, { content: '不会出现', disabled: true }, { default: () => h(Button, null, 'disabled') }),
+          ]);
+        },
+      }),
+    },
+    {
+      code: `<script setup>\nconst open = ref(false);\n</script>\n<Tooltip content="受控提示" :open="open" @open-change="open = $event">\n  <Button variant="outline">{{ open ? '已展开' : '已收起' }}</Button>\n</Tooltip>\n<p>当前状态：{{ open ? '显示' : '隐藏' }}</p>\n<Tooltip content="非受控：初始即显示" default-open>\n  <Button variant="outline">defaultOpen</Button>\n</Tooltip>`,
+      Comp: defineComponent({
+        setup() {
+        const open = ref(false);
+        return () =>
+          h('div', null, [
+            h(
+              Tooltip,
+              {
+                content: '受控提示',
+                open: open.value,
+                onOpenChange: (v: boolean) => (open.value = v),
+              },
+              {
+                default: () =>
+                  h(Button, { variant: 'outline' }, open.value ? '已展开' : '已收起'),
+              },
+            ),
+            h(
+              Tooltip,
+              { content: '非受控：初始即显示', defaultOpen: true },
+              { default: () => h(Button, { variant: 'outline' }, 'defaultOpen') },
+            ),
+            h('p', { class: 'demo-hint' }, '当前状态：' + (open.value ? '显示' : '隐藏')),
+          ]);
+        },
+      }),
     },
   ],
 
@@ -550,6 +991,35 @@ export const vueDocs: Record<string, DemoCase[]> = {
           }),
         ]),
       ),
+    },
+    {
+      code: `<script setup>\nconst open = ref(false);\n</script>\n<Popover :open="open" @open-change="open = $event">\n  <Button variant="outline">受控浮层：{{ open ? '已展开' : '已收起' }}</Button>\n  <template #content>受控浮层内容</template>\n</Popover>\n<p>当前状态：{{ open ? '展开' : '收起' }}</p>\n<Popover default-open>\n  <Button variant="outline">defaultOpen</Button>\n  <template #content>非受控：初始即展开</template>\n</Popover>`,
+      Comp: defineComponent({
+        setup() {
+        const open = ref(false);
+        return () =>
+          h('div', null, [
+            h(
+              Popover,
+              { open: open.value, onOpenChange: (v: boolean) => (open.value = v) },
+              {
+                default: () =>
+                  h(Button, { variant: 'outline' }, '受控浮层：' + (open.value ? '已展开' : '已收起')),
+                content: () => h('div', '受控浮层内容，外部点击由业务侧决定是否收起。'),
+              },
+            ),
+            h(
+              Popover,
+              { defaultOpen: true },
+              {
+                default: () => h(Button, { variant: 'outline' }, 'defaultOpen'),
+                content: () => h('div', '非受控：初始即展开'),
+              },
+            ),
+            h('p', { class: 'demo-hint' }, '当前状态：' + (open.value ? '展开' : '收起')),
+          ]);
+        },
+      }),
     },
   ],
 
@@ -573,6 +1043,48 @@ export const vueDocs: Record<string, DemoCase[]> = {
                 { default: () => h('p', 'Dialog 支持焦点陷阱、Esc / 点遮罩关闭，纯走 theme.css。') },
               ),
             ]);
+        },
+      }),
+    },
+    {
+      code: `<script setup>\nconst a = ref(false);\nconst b = ref(false);\n</script>\n<Button @click="a = true">默认：磨砂</Button>\n<Button variant="outline" @click="b = true">关闭：实心</Button>\n<Dialog :open="a" title="磨砂面板" @open-change="a = $event">面板走 backdrop-filter。</Dialog>\n<Dialog :open="b" title="实心面板" :glass="false" @open-change="b = $event">背景不透明，无模糊。</Dialog>`,
+      Comp: defineComponent({
+        setup() {
+        const a = ref(false);
+        const b = ref(false);
+        return () =>
+          h('div', { class: 'demo-row' }, [
+            h(Button, { onClick: () => (a.value = true) }, '默认：磨砂'),
+            h(Button, { variant: 'outline', onClick: () => (b.value = true) }, '关闭：实心'),
+            h(Dialog, { open: a.value, onOpenChange: (v: boolean) => (a.value = v), title: '磨砂面板' }, {
+              default: () => h('p', '面板背景走 backdrop-filter 毛玻璃。'),
+            }),
+            h(Dialog, { open: b.value, onOpenChange: (v: boolean) => (b.value = v), title: '实心面板', glass: false }, {
+              default: () => h('p', '背景为不透明实心面，无 backdrop-filter。'),
+            }),
+          ]);
+        },
+      }),
+    },
+    {
+      code: `<script setup>\nconst open = ref(false);\n</script>\n<Button @click="open = true">打开（点遮罩不关闭）</Button>\n<Dialog :open="open" title="填写中" :close-on-overlay="false" @open-change="open = $event">\n  点击背景不会关闭，需点按钮或按 Esc。\n</Dialog>`,
+      Comp: defineComponent({
+        setup() {
+        const open = ref(false);
+        return () =>
+          h('div', { class: 'demo-row' }, [
+            h(Button, { onClick: () => (open.value = true) }, '打开（点遮罩不关闭）'),
+            h(
+              Dialog,
+              {
+                open: open.value,
+                onOpenChange: (v: boolean) => (open.value = v),
+                title: '填写中',
+                closeOnOverlay: false,
+              },
+              { default: () => h('p', '点击背景不会关闭，需点按钮或按 Esc。') },
+            ),
+          ]);
         },
       }),
     },
@@ -601,6 +1113,62 @@ export const vueDocs: Record<string, DemoCase[]> = {
         },
       }),
     },
+    {
+      code: `<script setup>\nconst a = ref(false);\nconst b = ref(false);\n</script>\n<Button @click="a = true">默认：磨砂</Button>\n<Button variant="outline" @click="b = true">关闭：实心</Button>\n<Drawer :open="a" title="磨砂抽屉" @open-change="a = $event">面板走 backdrop-filter。</Drawer>\n<Drawer :open="b" title="实心抽屉" :glass="false" @open-change="b = $event">背景不透明。</Drawer>`,
+      Comp: defineComponent({
+        setup() {
+        const a = ref(false);
+        const b = ref(false);
+        return () =>
+          h('div', { class: 'demo-row' }, [
+            h(Button, { onClick: () => (a.value = true) }, '默认：磨砂'),
+            h(Button, { variant: 'outline', onClick: () => (b.value = true) }, '关闭：实心'),
+            h(Drawer, { open: a.value, onOpenChange: (v: boolean) => (a.value = v), title: '磨砂抽屉' }, {
+              default: () => h('p', '抽屉面板背景走 backdrop-filter 毛玻璃。'),
+            }),
+            h(Drawer, { open: b.value, onOpenChange: (v: boolean) => (b.value = v), title: '实心抽屉', glass: false }, {
+              default: () => h('p', '背景为不透明实心面，无 backdrop-filter。'),
+            }),
+          ]);
+        },
+      }),
+    },
+    {
+      code: `<script setup>\nconst a = ref(false);\nconst b = ref(false);\n</script>\n<Button @click="a = true">底部 + 无关闭按钮</Button>\n<Button variant="outline" @click="b = true">左侧 + 点遮罩不关闭</Button>\n<Drawer :open="a" title="底部抽屉" side="bottom" :show-close="false" @open-change="a = $event">\n  bottom 方向 + 隐藏关闭按钮。\n</Drawer>\n<Drawer :open="b" title="左侧抽屉" side="left" :close-on-overlay="false" @open-change="b = $event">\n  左侧滑出，点遮罩不关闭。\n</Drawer>`,
+      Comp: defineComponent({
+        setup() {
+        const a = ref(false);
+        const b = ref(false);
+        return () =>
+          h('div', { class: 'demo-row' }, [
+            h(Button, { onClick: () => (a.value = true) }, '底部 + 无关闭按钮'),
+            h(Button, { variant: 'outline', onClick: () => (b.value = true) }, '左侧 + 点遮罩不关闭'),
+            h(
+              Drawer,
+              {
+                open: a.value,
+                onOpenChange: (v: boolean) => (a.value = v),
+                title: '底部抽屉',
+                side: 'bottom',
+                showClose: false,
+              },
+              { default: () => h('p', 'side=bottom 从底部滑出，showClose=false 隐藏关闭按钮。') },
+            ),
+            h(
+              Drawer,
+              {
+                open: b.value,
+                onOpenChange: (v: boolean) => (b.value = v),
+                title: '左侧抽屉',
+                side: 'left',
+                closeOnOverlay: false,
+              },
+              { default: () => h('p', 'side=left 从左侧滑出，closeOnOverlay=false 点遮罩不关闭。') },
+            ),
+          ]);
+        },
+      }),
+    },
   ],
 
   ContextMenu: [
@@ -622,12 +1190,64 @@ export const vueDocs: Record<string, DemoCase[]> = {
         },
       }),
     },
+    {
+      code: `<script setup>\nconst target = ref(null);\nconst open = ref(false);\nconst last = ref('—');\n</script>\n<ContextMenu :target-ref="target" :items="items" :open="open"\n  @open-change="open = $event" @select="last = $event" />\n<div ref="target" class="demo-target">右键此区域</div>\n<p>菜单：{{ open ? '展开' : '收起' }} · 最近命令：{{ last }}</p>`,
+      Comp: defineComponent({
+        setup() {
+        const target = ref<HTMLDivElement | null>(null);
+        const open = ref(false);
+        const last = ref('—');
+        return () =>
+          h('div', null, [
+            h('div', { ref: target, class: 'demo-target' }, '右键此区域唤出受控菜单'),
+            h(ContextMenu, {
+              targetRef: target,
+              open: open.value,
+              onOpenChange: (v: boolean) => (open.value = v),
+              onSelect: (k: string) => (last.value = k),
+              items: [
+                { key: 'edit', label: '编辑' },
+                { key: 'copy', label: '复制', shortcut: '⌘C' },
+                { key: 'sep', label: '', separator: true },
+                { key: 'del', label: '删除', danger: true },
+              ],
+            }),
+            h('p', { class: 'demo-hint' }, '菜单：' + (open.value ? '展开' : '收起') + ' · 最近命令：' + last.value),
+          ]);
+        },
+      }),
+    },
   ],
 
   Tree: [
     {
       code: `<Tree :data="treeData" :default-expanded-keys="['1']" :default-checked-keys="['1-1']" />`,
       Comp: S(() => () => h(Tree, { data: treeData, defaultExpandedKeys: ['1'], defaultCheckedKeys: ['1-1'] })),
+    },
+    {
+      code: `<script setup>\nconst expanded = ref(['1']);\nconst checked = ref(['1-1']);\n</script>\n<Tree :data="treeData" checkable :expanded-keys="expanded" :checked-keys="checked"\n  @expand="expanded = $event" @check="checked = $event" />\n<p>展开 {{ expanded.length }} 组 / 勾选 {{ checked.length }} 项</p>`,
+      Comp: defineComponent({
+        setup() {
+        const expanded = ref<string[]>(['1']);
+        const checked = ref<string[]>(['1-1']);
+        return () =>
+          h('div', null, [
+            h(Tree, {
+              data: treeData,
+              checkable: true,
+              expandedKeys: expanded.value,
+              checkedKeys: checked.value,
+              onExpand: (keys: string[]) => (expanded.value = keys),
+              onCheck: (keys: string[]) => (checked.value = keys),
+            }),
+            h(
+              'p',
+              { class: 'demo-hint' },
+              '展开 ' + expanded.value.length + ' 组 / 勾选 ' + checked.value.length + ' 项',
+            ),
+          ]);
+        },
+      }),
     },
   ],
 
@@ -640,6 +1260,27 @@ export const vueDocs: Record<string, DemoCase[]> = {
         ]),
       ),
     },
+    {
+      code: `<script setup>\nconst v = ref([20, 60]);\n</script>\n<Slider :min="0" :max="100" :step="5" :value="v" min-label="保守" max-label="激进"\n  @change="v = $event" />\n<p>当前区间：{{ v[0] }} – {{ v[1] }}</p>`,
+      Comp: defineComponent({
+        setup() {
+        const v = ref<[number, number]>([20, 60]);
+        return () =>
+          h('div', { style: { width: '360px' } }, [
+            h(Slider, {
+              min: 0,
+              max: 100,
+              step: 5,
+              value: v.value,
+              onChange: (val: [number, number]) => (v.value = val),
+              minLabel: '保守',
+              maxLabel: '激进',
+            }),
+            h('p', { class: 'demo-hint' }, '当前区间：' + v.value[0] + ' – ' + v.value[1]),
+          ]);
+        },
+      }),
+    },
   ],
 
   DataTable: [
@@ -647,15 +1288,104 @@ export const vueDocs: Record<string, DemoCase[]> = {
       code: `<DataTable :columns="columns" :data="data" compact selectable row-key="code" />`,
       Comp: S(() => () => h(DataTable, { columns: tableColumns, data: tableData, compact: true, selectable: true, rowKey: 'code' })),
     },
+    {
+      code: `<DataTable :columns="columns" :data="data" compact />\n<DataTable :columns="columns" :data="data" compact :glass="false" />`,
+      Comp: S(() => () =>
+        h('div', { class: 'demo-row' }, [
+          h(DataTable, { columns: tableColumns, data: tableData, compact: true }),
+          h(DataTable, { columns: tableColumns, data: tableData, compact: true, glass: false }),
+        ]),
+      ),
+    },
+    {
+      code: `<script setup>\nconst sort = ref({ key: 'price', dir: 'desc' });\nconst sel = ref([]);\n</script>\n<DataTable :columns="columns" :data="sorted" compact selectable row-key="code"\n  :sort-key="sort.key" :sort-dir="sort.dir"\n  @sort="(key, dir) => (sort = { key, dir })"\n  :selected-keys="sel" @select="sel = $event" />\n<p>排序：{{ sort.key }} {{ sort.dir }} · 已选 {{ sel.length }} 行</p>`,
+      Comp: defineComponent({
+        setup() {
+        const sort = ref<{ key: string; dir: 'asc' | 'desc' }>({ key: 'price', dir: 'desc' });
+        const sel = ref<string[]>([]);
+        const sorted = computed(() =>
+          [...tableData].sort((a, b) =>
+            sort.value.dir === 'asc' ? a.price - b.price : b.price - a.price,
+          ),
+        );
+        return () =>
+          h('div', null, [
+            h(DataTable, {
+              columns: tableColumns,
+              data: sorted.value,
+              compact: true,
+              selectable: true,
+              rowKey: 'code',
+              sortKey: sort.value.key,
+              sortDir: sort.value.dir,
+              onSort: (key: string, dir: 'asc' | 'desc') => (sort.value = { key, dir }),
+              selectedKeys: sel.value,
+              onSelect: (keys: string[]) => (sel.value = keys),
+            }),
+            h(
+              'p',
+              { class: 'demo-hint' },
+              '排序：' +
+                sort.value.key +
+                ' ' +
+                (sort.value.dir === 'asc' ? '升序' : '降序') +
+                ' · 已选 ' +
+                sel.value.length +
+                ' 行',
+            ),
+          ]);
+        },
+      }),
+    },
+    {
+      code: `const columns = [\n  { key: 'name', title: '名称', sticky: true },\n  { key: 'price', title: '最新价', numeric: true, sortable: true },\n  { key: 'chg', title: '涨跌幅', numeric: true, render: (row) => h(Tag, ..., row.chg) },\n];\n<DataTable :columns="columns" :data="data" compact default-sort-key="price"\n  default-sort-dir="asc" />`,
+      Comp: defineComponent({
+        setup() {
+        const columns = [
+          { key: 'name', title: '名称', sticky: true },
+          { key: 'price', title: '最新价', numeric: true, sortable: true },
+          {
+            key: 'chg',
+            title: '涨跌幅',
+            numeric: true,
+            render: (row: Record<string, any>) =>
+              h(Tag, { type: String(row.chg).startsWith('+') ? 'up' : 'down' }, row.chg),
+          },
+        ];
+        return () =>
+          h(DataTable, {
+            columns,
+            data: tableData,
+            compact: true,
+            defaultSortKey: 'price',
+            defaultSortDir: 'asc',
+          });
+        },
+      }),
+    },
   ],
 
   Toast: [
     {
-      code: `toast('操作成功');\ntoast('正在保存…', { duration: 0 });`,
+      code: `toast('操作成功');\ntoast('正在保存…', { duration: 0 });\ntoast('已加入自选', { icon: StarIcon });`,
       Comp: S(() => () =>
         h('div', { class: 'demo-row' }, [
           h(Button, { onClick: () => toast('操作成功') }, '默认 Toast'),
           h(Button, { variant: 'outline', onClick: () => toast('正在保存…', { duration: 0 }) }, '常驻 Toast'),
+          h(
+            Button,
+            { variant: 'ghost', onClick: () => toast('已加入自选', { icon: h(StarIcon) }) },
+            '带图标 Toast',
+          ),
+        ]),
+      ),
+    },
+    {
+      code: `toast('默认：磨砂');\ntoast('关闭：实心', { glass: false });`,
+      Comp: S(() => () =>
+        h('div', { class: 'demo-row' }, [
+          h(Button, { onClick: () => toast('默认：磨砂') }, '默认 Toast'),
+          h(Button, { variant: 'outline', onClick: () => toast('关闭：实心', { glass: false }) }, '关闭玻璃 Toast'),
         ]),
       ),
     },
@@ -663,11 +1393,22 @@ export const vueDocs: Record<string, DemoCase[]> = {
 
   Message: [
     {
-      code: `showMessage('数据已更新', 'success');\nshowMessage('请求失败', 'danger');`,
+      code: `showMessage('数据已更新', 'success');\nshowMessage('请求失败', 'danger');\nshowMessage('部分字段已忽略', 'warning');\nshowMessage('已切换到研究视图', 'info');`,
       Comp: S(() => () =>
         h('div', { class: 'demo-row' }, [
           h(Button, { onClick: () => showMessage('数据已更新', 'success') }, 'success'),
           h(Button, { variant: 'outline', onClick: () => showMessage('请求失败', 'danger') }, 'danger'),
+          h(Button, { variant: 'outline', onClick: () => showMessage('部分字段已忽略', 'warning') }, 'warning'),
+          h(Button, { variant: 'ghost', onClick: () => showMessage('已切换到研究视图', 'info') }, 'info'),
+        ]),
+      ),
+    },
+    {
+      code: `showMessage('默认：磨砂', 'success');\nshowMessage('关闭：实心', 'success', 2600, false);`,
+      Comp: S(() => () =>
+        h('div', { class: 'demo-row' }, [
+          h(Button, { onClick: () => showMessage('默认：磨砂', 'success') }, '默认 Message'),
+          h(Button, { variant: 'outline', onClick: () => showMessage('关闭：实心', 'success', 2600, false) }, '关闭玻璃 Message'),
         ]),
       ),
     },
@@ -678,6 +1419,19 @@ export const vueDocs: Record<string, DemoCase[]> = {
     {
       code: `<Accordion :items="items" :default-active-keys="['1']" />`,
       Comp: S(() => () => h(Accordion, { items: accordionItems, defaultActiveKeys: ['1'] })),
+    },
+    {
+      code: `<script setup>\nconst keys = ref(['1']);\n</script>\n<Accordion :items="items" :active-keys="keys" @change="keys = $event" />\n<p>当前展开：{{ keys.join('、') || '无' }}</p>`,
+      Comp: defineComponent({
+        setup() {
+        const keys = ref<string[]>(['1']);
+        return () =>
+          h('div', null, [
+            h(Accordion, { items: accordionItems, activeKeys: keys.value, onChange: (k: string[]) => (keys.value = k) }),
+            h('p', { class: 'demo-hint' }, '当前展开：' + (keys.value.join('、') || '无')),
+          ]);
+        },
+      }),
     },
   ],
 
@@ -691,6 +1445,59 @@ export const vueDocs: Record<string, DemoCase[]> = {
         }),
       ),
     },
+    {
+      code: `<Form :fields="fields" id-prefix="glass-on" />\n<Form :fields="fields" id-prefix="glass-off" :glass="false" />`,
+      Comp: S(() => () =>
+        h('div', { class: 'demo-row' }, [
+          h(Form, { fields: formFields, idPrefix: 'glass-on' }),
+          h(Form, { fields: formFields, idPrefix: 'glass-off', glass: false }),
+        ]),
+      ),
+    },
+    {
+      code: `<script setup>\nconst fields = [\n  { name: 'name', label: '名称', defaultValue: '贵州茅台' },\n  { name: 'date', label: '调仓日', type: 'date' },\n];\n</script>\n<Form :fields="fields" submit-text="保存筛选条件" />\n<Form :fields="fields" :grid="false" submit-text="保存（纵向）" />`,
+      Comp: defineComponent({
+        setup() {
+        const fields = [
+          { name: 'name', label: '名称', defaultValue: '贵州茅台' },
+          { name: 'date', label: '调仓日', type: 'date' as const },
+        ];
+        return () =>
+          h('div', { class: 'demo-row' }, [
+            h(Form, { fields, submitText: '保存筛选条件' }),
+            h(Form, { fields, grid: false, submitText: '保存（纵向）' }),
+          ]);
+        },
+      }),
+    },
+    {
+      code: `<script setup>\nconst fields = [\n  { name: 'weight', label: '单票权重(%)', type: 'number', placeholder: '如 12.5', rules: [{ min: 0, message: '需大于 0' }] },\n  { name: 'price', label: '委托价', type: 'number', placeholder: '如 1685.2', rules: [{ min: 0, message: '不能为负' }] },\n];\n</script>\n<Form :fields="fields" submit-text="校验并提交" @submit="onSubmit" />`,
+      Comp: S(() => {
+        const fields = [
+          {
+            name: 'weight',
+            label: '单票权重(%)',
+            type: 'number' as const,
+            placeholder: '如 12.5',
+            rules: [{ min: 0, message: '需大于 0' }],
+          },
+          {
+            name: 'price',
+            label: '委托价',
+            type: 'number' as const,
+            placeholder: '如 1685.2',
+            rules: [{ min: 0, message: '不能为负' }],
+          },
+        ];
+        return () =>
+          h(Form, {
+            fields,
+            submitText: '校验并提交',
+            onSubmit: (v: Record<string, string>) =>
+              showMessage('通过：' + JSON.stringify(v), 'success'),
+          });
+      }),
+    },
   ],
 
   VirtualTable: [
@@ -699,6 +1506,40 @@ export const vueDocs: Record<string, DemoCase[]> = {
       Comp: S(() => () =>
         h(VirtualTable, { rows: vtableRows, columns: vtableColumns, rowHeight: 33 }),
       ),
+    },
+    {
+      code: `<VirtualTable :rows="rows" :columns="columns" />\n<VirtualTable :rows="rows" :columns="columns" :glass="false" />`,
+      Comp: S(() => () =>
+        h('div', { class: 'demo-row' }, [
+          h(VirtualTable, { rows: vtableRows, columns: vtableColumns }),
+          h(VirtualTable, { rows: vtableRows, columns: vtableColumns, glass: false }),
+        ]),
+      ),
+    },
+    {
+      code: `<VirtualTable :rows="rows" :columns="cols" :row-height="28" :buffer="20"\n  aria-label="标的行情虚拟表" />`,
+      Comp: defineComponent({
+        setup() {
+        const cols = [
+          { key: 'code', title: '代码', sticky: true, width: '96px' },
+          { key: 'name', title: '名称', width: '1fr' },
+        ];
+        const rows = Array.from({ length: 2000 }, (_, i) => ({
+          code: 'GN' + (1000 + i),
+          name: '标的 ' + i,
+        }));
+        return () =>
+          h('div', { style: { height: '200px' } }, [
+            h(VirtualTable, {
+              rows,
+              columns: cols,
+              rowHeight: 28,
+              buffer: 20,
+              ariaLabel: '标的行情虚拟表',
+            }),
+          ]);
+        },
+      }),
     },
   ],
 

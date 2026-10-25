@@ -1,5 +1,5 @@
 /**
- * 全局控件：主题明暗、涨跌色约定、信息密度、多品牌换肤。
+ * 全局控件：主题明暗、毛玻璃材质、涨跌色约定、信息密度、多品牌换肤。
  * 这些状态写入 documentElement，跨路由持久生效。
  */
 
@@ -13,6 +13,16 @@ export function initGlobalControls(): void {
     const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
     html.dataset.theme = next;
     html.style.colorScheme = next;
+  });
+
+  // 毛玻璃材质：data-glass="off" 时 theme.css 把全站半透明面回退为不透明实心面
+  // （同时真正移除 backdrop-filter，不是把 opacity 压到 100%）
+  const glassBtn = document.getElementById('glassBtn');
+  glassBtn?.addEventListener('click', () => {
+    const off = html.dataset.glass !== 'off';
+    if (off) html.dataset.glass = 'off';
+    else delete html.dataset.glass;
+    glassBtn.textContent = '玻璃：' + (off ? '关' : '开');
   });
 
   // 涨跌色约定：data-mkt=cn(红涨绿跌) / intl(绿涨红跌)

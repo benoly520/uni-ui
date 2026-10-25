@@ -1,0 +1,5 @@
+# 单包仓库（非 monorepo），此文件仅用于声明依赖构建脚本策略。
+# esbuild 的 postinstall 只做二进制自检，平台二进制已由可选依赖安装，无需执行脚本；
+# 显式拒绝可避免 pnpm 因「忽略构建脚本」而中断 install（与 plain-framework 保持一致）。
+allowBuilds:
+  esbuild: false

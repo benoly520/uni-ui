@@ -1,21 +1,20 @@
-import { resolve, signal } from 'plain';
+import { signal } from 'plain';
 import { cx } from './_shared';
-import type { MaybeGetter } from './_shared';
 
 export type SwitchSize = 'lg' | 'md' | 'sm' | 'xs';
 
 export interface SwitchProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  checked?: MaybeGetter<boolean>;
-  defaultChecked?: MaybeGetter<boolean>;
+  glass?: boolean;
+  checked?: boolean;
+  defaultChecked?: boolean;
   onChange?: (checked: boolean) => void;
-  size?: MaybeGetter<SwitchSize>;
-  disabled?: MaybeGetter<boolean>;
-  label?: MaybeGetter<string>;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  id?: MaybeGetter<string>;
+  size?: SwitchSize;
+  disabled?: boolean;
+  label?: string;
+  className?: string;
+  style?: string | Record<string, string>;
+  id?: string;
 }
 
 /**
@@ -23,22 +22,22 @@ export interface SwitchProps {
  * 受控/非受控双模式；aria-checked 为状态真理源（CSS 据此移动滑块）。
  */
 export function Switch(props: SwitchProps) {
-  const isControlled = () => resolve(props.checked) != null;
-  const size = () => resolve(props.size) ?? 'md';
-  const disabled = () => resolve(props.disabled) ?? false;
-  const inner = signal<boolean>(!!(resolve(props.defaultChecked) ?? false));
-  const on = () => (isControlled() ? !!resolve(props.checked) : inner());
+  const isControlled = () => props.checked != null;
+  const size = () => props.size ?? 'md';
+  const disabled = () => props.disabled ?? false;
+  const inner = signal<boolean>(!!(props.defaultChecked ?? false));
+  const on = () => (isControlled() ? !!props.checked : inner());
   return (
     <button
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
       type="button"
       role="switch"
-      class={cx('ui-switch', size() !== 'md' && 'ui-size-' + size(), resolve(props.className))}
+      class={cx('ui-switch', size() !== 'md' && 'ui-size-' + size(), props.className)}
       aria-checked={on() ? 'true' : 'false'}
-      aria-label={resolve(props.label)}
+      aria-label={props.label}
       disabled={disabled()}
-      style={resolve(props.style)}
+      style={props.style}
       onClick={() => {
         if (disabled()) return;
         const next = !on();

@@ -1,20 +1,19 @@
-import { resolve, signal } from 'plain';
+import { signal } from 'plain';
 import { cx } from './_shared';
-import type { MaybeGetter } from './_shared';
 
 export interface PaginationProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  total: MaybeGetter<number>;
-  pageSize?: MaybeGetter<number>;
-  page?: MaybeGetter<number>;
-  defaultPage?: MaybeGetter<number>;
+  glass?: boolean;
+  total: number;
+  pageSize?: number;
+  page?: number;
+  defaultPage?: number;
   onChange?: (page: number) => void;
-  siblingCount?: MaybeGetter<number>;
-  'aria-label'?: MaybeGetter<string>;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  id?: MaybeGetter<string>;
+  siblingCount?: number;
+  'aria-label'?: string;
+  className?: string;
+  style?: string | Record<string, string>;
+  id?: string;
 }
 
 function range(start: number, end: number): number[] {
@@ -44,16 +43,16 @@ function getPages(current: number, totalPages: number, sibling: number): (number
  * 受控 / 非受控；超出时显示省略号（1 … left..right … total）。
  */
 export function Pagination(props: PaginationProps) {
-  const isControlled = () => resolve(props.page) != null;
-  const inner = signal<number>(Number(resolve(props.defaultPage) ?? 1));
+  const isControlled = () => props.page != null;
+  const inner = signal<number>(Number(props.defaultPage ?? 1));
   // 当前页钳制到 [1, totalPages]：越界受控值时否则会出现无 is-active 页码、
   // 与 React 端（safeCurrent）高亮/禁用态不一致。
   const cur = () =>
-    Math.min(totalPages(), Math.max(1, isControlled() ? Number(resolve(props.page)) : inner()));
+    Math.min(totalPages(), Math.max(1, isControlled() ? Number(props.page) : inner()));
   const totalPages = () =>
-    Math.max(1, Math.ceil(Number(resolve(props.total)) / Number(resolve(props.pageSize) ?? 10)));
-  const sibling = () => Number(resolve(props.siblingCount) ?? 1);
-  const ariaLabel = () => resolve(props['aria-label']) ?? '分页';
+    Math.max(1, Math.ceil(Number(props.total) / Number(props.pageSize ?? 10)));
+  const sibling = () => Number(props.siblingCount ?? 1);
+  const ariaLabel = () => props['aria-label'] ?? '分页';
 
   const go = (p: number) => {
     const tp = totalPages();
@@ -64,12 +63,12 @@ export function Pagination(props: PaginationProps) {
   };
   return (
     <nav
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
-      class={cx('ui-pagination', resolve(props.className))}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
+      class={cx('ui-pagination', props.className)}
       role="navigation"
       aria-label={ariaLabel()}
-      style={resolve(props.style)}
+      style={props.style}
     >
       <button
         type="button"

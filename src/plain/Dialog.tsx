@@ -1,24 +1,25 @@
-import { resolve, signal, effect } from 'plain';
+import { signal, effect } from 'plain';
 import { cx } from './_shared';
-import type { MaybeGetter, Renderable } from './_shared';
+import type { Renderable } from './_shared';
 
 const FOCUSABLE = 'a[href],button:not([disabled]),textarea,input,select,[tabindex]:not([tabindex="-1"])';
 
 export interface DialogProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  open?: MaybeGetter<boolean>;
-  defaultOpen?: MaybeGetter<boolean>;
+  glass?: boolean;
+  open?: boolean;
+  defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  title?: MaybeGetter<Renderable>;
-  children?: MaybeGetter<Renderable>;
-  footer?: MaybeGetter<Renderable>;
-  closeOnOverlay?: MaybeGetter<boolean>;
-  closeOnEsc?: MaybeGetter<boolean>;
-  ariaLabel?: MaybeGetter<string>;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  id?: MaybeGetter<string>;
+  title?: Renderable;
+  /** lazy subtree：运行时是 thunk，显式调用 props.children() */
+  children?: any;
+  footer?: Renderable;
+  closeOnOverlay?: boolean;
+  closeOnEsc?: boolean;
+  ariaLabel?: string;
+  className?: string;
+  style?: string | Record<string, string>;
+  id?: string;
 }
 
 /**
@@ -27,11 +28,11 @@ export interface DialogProps {
  * 焦点逻辑改用 ref 抓取遮罩 + effect，消除旧实现在文档上长期挂监听的泄漏。
  */
 export function Dialog(props: DialogProps) {
-  const isControlled = () => resolve(props.open) != null;
-  const inner = signal<boolean>(!!(resolve(props.defaultOpen) ?? false));
-  const isOpen = () => (isControlled() ? !!resolve(props.open) : inner());
-  const closeOnOverlay = () => resolve(props.closeOnOverlay) ?? true;
-  const closeOnEsc = () => resolve(props.closeOnEsc) ?? true;
+  const isControlled = () => props.open != null;
+  const inner = signal<boolean>(!!(props.defaultOpen ?? false));
+  const isOpen = () => (isControlled() ? !!props.open : inner());
+  const closeOnOverlay = () => props.closeOnOverlay ?? true;
+  const closeOnEsc = () => props.closeOnEsc ?? true;
   const onOpenChange = props.onOpenChange;
 
   const setOpen = (v: boolean) => {
@@ -98,13 +99,13 @@ export function Dialog(props: DialogProps) {
   });
 
   const dialogLabel = () =>
-    resolve(props.ariaLabel) ||
-    (typeof resolve(props.title) === 'string' ? (resolve(props.title) as string) : '对话框');
+    props.ariaLabel ||
+    (typeof props.title === 'string' ? (props.title as string) : '对话框');
 
   return (
     <div
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
       ref={refCb}
       class={cx('ui-overlay', isOpen() && 'show')}
       role="presentation"
@@ -115,16 +116,16 @@ export function Dialog(props: DialogProps) {
     >
       <div
         // 契约 dialog.api.md：className / style 透传到 .ui-dialog 面板（而非遮罩）
-        class={cx('ui-dialog', 'ui-glass', resolve(props.className))}
-        style={resolve(props.style)}
+        class={cx('ui-dialog', 'ui-glass', props.className)}
+        style={props.style}
         role="dialog"
         aria-modal="true"
         aria-label={dialogLabel()}
       >
-        {resolve(props.title) != null && <h3>{resolve(props.title)}</h3>}
-        <div>{resolve(props.children)}</div>
-        {resolve(props.footer) != null && (
-          <div class="ui-dialog-actions">{resolve(props.footer)}</div>
+        {props.title != null && <h3>{props.title}</h3>}
+        <div>{props.children?.()}</div>
+        {props.footer != null && (
+          <div class="ui-dialog-actions">{props.footer}</div>
         )}
       </div>
     </div>

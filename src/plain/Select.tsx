@@ -1,7 +1,6 @@
-import { resolve, signal } from 'plain';
+import { signal } from 'plain';
 import { cx } from './_shared';
 import { IconCaret, IconCheck } from './icons';
-import type { MaybeGetter } from './_shared';
 
 export interface SelectOption {
   label: string;
@@ -11,18 +10,18 @@ export interface SelectOption {
 
 export interface SelectProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  options: MaybeGetter<SelectOption[]>;
-  value?: MaybeGetter<string | string[]>;
-  defaultValue?: MaybeGetter<string | string[]>;
-  multiple?: MaybeGetter<boolean>;
-  searchable?: MaybeGetter<boolean>;
-  placeholder?: MaybeGetter<string>;
+  glass?: boolean;
+  options: SelectOption[];
+  value?: string | string[];
+  defaultValue?: string | string[];
+  multiple?: boolean;
+  searchable?: boolean;
+  placeholder?: string;
   onChange?: (value: string | string[], option: SelectOption | SelectOption[]) => void;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  'aria-label'?: MaybeGetter<string>;
-  id?: MaybeGetter<string>;
+  className?: string;
+  style?: string | Record<string, string>;
+  'aria-label'?: string;
+  id?: string;
 }
 
 /**
@@ -31,23 +30,23 @@ export interface SelectProps {
  */
 export function Select(props: SelectProps) {
   const toArr = (v: any): string[] => (v == null ? [] : Array.isArray(v) ? [...v] : [v]);
-  const isControlled = () => resolve(props.value) != null;
+  const isControlled = () => props.value != null;
   const inner = signal<string[]>(
     isControlled()
-      ? toArr(resolve(props.value))
-      : resolve(props.defaultValue) != null
-        ? toArr(resolve(props.defaultValue))
+      ? toArr(props.value)
+      : props.defaultValue != null
+        ? toArr(props.defaultValue)
         : [],
   );
-  const selected = () => (isControlled() ? toArr(resolve(props.value)) : inner());
+  const selected = () => (isControlled() ? toArr(props.value) : inner());
   const open = signal(false);
   const query = signal('');
-  const isMulti = () => !!resolve(props.multiple);
-  const searchable = () => resolve(props.searchable) ?? false;
-  const placeholder = () => resolve(props.placeholder) ?? '请选择';
-  const ariaLabel = () => resolve(props['aria-label']);
+  const isMulti = () => !!props.multiple;
+  const searchable = () => props.searchable ?? false;
+  const placeholder = () => props.placeholder ?? '请选择';
+  const ariaLabel = () => props['aria-label'];
 
-  const opts = () => resolve(props.options) || [];
+  const opts = () => props.options || [];
   const labelText = () => {
     const sel = selected();
     const o = opts() || [];
@@ -106,13 +105,13 @@ export function Select(props: SelectProps) {
 
   return (
     <div
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
       ref={refRoot}
-      class={cx('ui-select', open() && 'open', resolve(props.className))}
+      class={cx('ui-select', open() && 'open', props.className)}
       data-multiple={isMulti() || undefined}
       aria-label={ariaLabel()}
-      style={resolve(props.style)}
+      style={props.style}
     >
       <button
         type="button"

@@ -1,6 +1,5 @@
-import { resolve, signal } from 'plain';
+import { signal } from 'plain';
 import { cx } from './_shared';
-import type { MaybeGetter } from './_shared';
 
 export interface DataTableColumn {
   /** 单元格取值键 row[key] */
@@ -19,28 +18,28 @@ export interface DataTableColumn {
 
 export interface DataTableProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  columns: MaybeGetter<DataTableColumn[]>;
-  data: MaybeGetter<Record<string, any>[]>;
+  glass?: boolean;
+  columns: DataTableColumn[];
+  data: Record<string, any>[];
   /** 紧凑密度（投研默认） */
-  compact?: MaybeGetter<boolean>;
+  compact?: boolean;
   /** 行多选 + 表头全选 */
-  selectable?: MaybeGetter<boolean>;
+  selectable?: boolean;
   /** 行标识键 */
-  rowKey?: MaybeGetter<string>;
+  rowKey?: string;
   /** 受控排序列 key */
-  sortKey?: MaybeGetter<string>;
+  sortKey?: string;
   /** 受控排序方向 */
-  sortDir?: MaybeGetter<'asc' | 'desc'>;
-  defaultSortKey?: MaybeGetter<string>;
-  defaultSortDir?: MaybeGetter<'asc' | 'desc'>;
+  sortDir?: 'asc' | 'desc';
+  defaultSortKey?: string;
+  defaultSortDir?: 'asc' | 'desc';
   /** 受控选中行 key */
-  selectedKeys?: MaybeGetter<string[]>;
+  selectedKeys?: string[];
   onSort?: (key: string, dir: 'asc' | 'desc') => void;
   onSelect?: (keys: string[]) => void;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  id?: MaybeGetter<string>;
+  className?: string;
+  style?: string | Record<string, string>;
+  id?: string;
 }
 
 function sortRows(
@@ -76,26 +75,26 @@ function sortRows(
  * 紧凑 / 列排序 / 可选行多选 / 冻结首列；受控 / 非受控排序与选择，不改原 data。
  */
 export function DataTable(props: DataTableProps) {
-  const compact = () => resolve(props.compact) ?? false;
-  const selectable = () => resolve(props.selectable) ?? false;
-  const rowKey = () => resolve(props.rowKey) ?? 'id';
-  const isSortControlled = () => resolve(props.sortKey) != null;
+  const compact = () => props.compact ?? false;
+  const selectable = () => props.selectable ?? false;
+  const rowKey = () => props.rowKey ?? 'id';
+  const isSortControlled = () => props.sortKey != null;
   const sortInner = signal<{ key?: string; dir: 'asc' | 'desc' }>({
-    key: resolve(props.defaultSortKey),
-    dir: (resolve(props.defaultSortDir) as 'asc' | 'desc') || 'asc',
+    key: props.defaultSortKey,
+    dir: (props.defaultSortDir as 'asc' | 'desc') || 'asc',
   });
   const curSort = (): { key?: string; dir: 'asc' | 'desc' } =>
     isSortControlled()
-      ? { key: resolve(props.sortKey), dir: (resolve(props.sortDir) as 'asc' | 'desc') || 'asc' }
+      ? { key: props.sortKey, dir: (props.sortDir as 'asc' | 'desc') || 'asc' }
       : sortInner();
-  const isSelControlled = () => resolve(props.selectedKeys) != null;
+  const isSelControlled = () => props.selectedKeys != null;
   const selInner = signal<string[]>([]);
   const selected = (): string[] =>
-    isSelControlled() ? (resolve(props.selectedKeys) as string[]) : selInner();
+    isSelControlled() ? (props.selectedKeys as string[]) : selInner();
   const selectedSet = () => new Set(selected());
 
-  const dataRows = () => resolve(props.data) as Record<string, any>[];
-  const columnsArr = () => resolve(props.columns) as DataTableColumn[];
+  const dataRows = () => props.data as Record<string, any>[];
+  const columnsArr = () => props.columns as DataTableColumn[];
   const displayed = () => {
     const s = curSort();
     if (!s.key) return dataRows();
@@ -138,15 +137,15 @@ export function DataTable(props: DataTableProps) {
 
   return (
     <div
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
       class={cx(
         'ui-table',
         compact() && 'ui-table--compact',
         selectable() && 'ui-table--selectable',
-        resolve(props.className),
+        props.className,
       )}
-      style={resolve(props.style)}
+      style={props.style}
     >
       <table>
         <thead>

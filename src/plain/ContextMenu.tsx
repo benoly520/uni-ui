@@ -1,12 +1,12 @@
-import { resolve, signal, effect } from 'plain';
+import { signal, effect } from 'plain';
 import { cx, mergeStyle } from './_shared';
-import type { MaybeGetter, Renderable } from './_shared';
+import type { Renderable } from './_shared';
 
 export interface ContextMenuItem {
   /** 唯一命令键（data-key） */
   key: string;
   /** 项文案 */
-  label: MaybeGetter<Renderable>;
+  label: Renderable;
   /** 右侧快捷键提示（可选） */
   shortcut?: string;
   /** 危险项（红 hover） */
@@ -17,23 +17,23 @@ export interface ContextMenuItem {
 
 export interface ContextMenuProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
+  glass?: boolean;
   /** 菜单项（命令式传入） */
-  items: MaybeGetter<ContextMenuItem[]>;
+  items: ContextMenuItem[];
   /** 右键触发目标（元素 / 返回元素的函数 / { current }） */
   target?: HTMLElement | (() => HTMLElement | null) | { current: HTMLElement | null } | null;
   /** 受控显隐（可选） */
-  open?: MaybeGetter<boolean>;
+  open?: boolean;
   /** 非受控初始 */
-  defaultOpen?: MaybeGetter<boolean>;
+  defaultOpen?: boolean;
   /** 显隐变化 */
   onOpenChange?: (open: boolean) => void;
   /** 点击项执行 */
   onSelect?: (key: string) => void;
-  'aria-label'?: MaybeGetter<string>;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  id?: MaybeGetter<string>;
+  'aria-label'?: string;
+  className?: string;
+  style?: string | Record<string, string>;
+  id?: string;
 }
 
 /**
@@ -42,12 +42,12 @@ export interface ContextMenuProps {
  * 受控 open + 命令式 items。文档级监听在 ref 清理里回收，消除旧实现的监听器泄漏。
  */
 export function ContextMenu(props: ContextMenuProps) {
-  const items = () => resolve(props.items) || [];
-  const isControlled = () => resolve(props.open) != null;
-  const inner = signal<boolean>(!!(resolve(props.defaultOpen) ?? false));
-  const shown = () => (isControlled() ? !!resolve(props.open) : inner());
+  const items = () => props.items || [];
+  const isControlled = () => props.open != null;
+  const inner = signal<boolean>(!!(props.defaultOpen ?? false));
+  const shown = () => (isControlled() ? !!props.open : inner());
   const pos = signal<{ x: number; y: number }>({ x: 0, y: 0 });
-  const ariaLabel = () => resolve(props['aria-label']) ?? '操作菜单';
+  const ariaLabel = () => props['aria-label'] ?? '操作菜单';
 
   const setOpen = (v: boolean) => {
     if (!isControlled()) inner.set(v);
@@ -56,7 +56,7 @@ export function ContextMenu(props: ContextMenuProps) {
   const close = () => setOpen(false);
 
   const getTarget = (): HTMLElement | null => {
-    const t = resolve(props.target) as any;
+    const t = props.target as any;
     if (!t) return null;
     if (t.current) return t.current as HTMLElement;
     if (typeof t === 'function') return t();
@@ -116,15 +116,15 @@ export function ContextMenu(props: ContextMenuProps) {
 
   return (
     <div
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
       ref={refCb}
-      class={cx('ui-contextmenu', shown() && 'is-open', resolve(props.className))}
+      class={cx('ui-contextmenu', shown() && 'is-open', props.className)}
       role="menu"
       aria-label={ariaLabel()}
       style={mergeStyle(
         { left: pos().x + 'px', top: pos().y + 'px' },
-        resolve(props.style),
+        props.style,
       )}
     >
       {items().map((it) =>
@@ -140,7 +140,7 @@ export function ContextMenu(props: ContextMenuProps) {
               close();
             }}
           >
-            <span>{resolve(it.label)}</span>
+            <span>{it.label}</span>
             {it.shortcut != null && <span class="ui-contextmenu-shortcut">{it.shortcut}</span>}
           </div>
         ),

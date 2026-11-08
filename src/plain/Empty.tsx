@@ -1,18 +1,18 @@
-import { resolve } from 'plain';
 import { cx } from './_shared';
 import { IconTable } from './icons';
-import type { MaybeGetter, Renderable } from './_shared';
+import type { Renderable } from './_shared';
 
 export interface EmptyProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  description?: Renderable | (() => Renderable);
+  glass?: boolean;
+  description?: Renderable;
   /** 图标插槽（24×24 + currentColor）；默认内置 table 图标，可覆盖 */
-  icon?: Renderable | (() => Renderable);
-  children?: Renderable | (() => Renderable);
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  id?: MaybeGetter<string>;
+  icon?: Renderable;
+  /** lazy subtree：运行时是 thunk，显式调用 props.children() */
+  children?: any;
+  className?: string;
+  style?: string | Record<string, string>;
+  id?: string;
 }
 
 /**
@@ -22,18 +22,18 @@ export interface EmptyProps {
 export function Empty(props: EmptyProps) {
   return (
     <div
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
-      class={cx('ui-empty', resolve(props.className))}
-      style={resolve(props.style)}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
+      class={cx('ui-empty', props.className)}
+      style={props.style}
     >
       <span class="ico ui-icon">
-        {resolve(props.icon) != null ? resolve(props.icon) : <IconTable />}
+        {props.icon != null ? props.icon : <IconTable />}
       </span>
-      {resolve(props.description) != null && (
-        <span class="ui-label">{resolve(props.description)}</span>
+      {props.description != null && (
+        <span class="ui-label">{props.description}</span>
       )}
-      {resolve(props.children)}
+      {props.children?.()}
     </div>
   );
 }

@@ -525,7 +525,10 @@ export const docs: ComponentDoc[] = [
     importHint: '无 Icon 组件导出 · 图标统一经 `icon` 插槽传入，契约见 contracts/icon.md',
     api: [
       { name: 'icon', type: 'ReactNode', default: '—', desc: '传节点：<Button icon={<Plus />}>（React）/ 传组件或 VNode，内部以 <component :is="icon" /> 渲染（Vue）' },
-      { name: 'icon（Plain）', type: 'Renderable | (() => Renderable)', default: '—', desc: '传「调用子组件」的结果或返回节点的函数，如 icon={PlusIcon()}' },
+      {
+        name: 'icon（Plain）', type: 'Renderable', default: '—',
+        desc: '传「调用子组件」的结果，如 icon={PlusIcon()}；props 直接读即可',
+      },
       { name: '插槽契约', type: '—', default: '—', desc: '24×24 viewBox + stroke/fill="currentColor"，零图标库运行时' },
       { name: '尺寸', type: '—', default: '--ui-icon-size', desc: '由 .ui-icon 容器决定并随 .ui-size-* 档位缩放，svg 自身不写 width/height' },
       { name: '颜色', type: '—', default: 'currentColor', desc: '继承文字色，无需额外传色值' },

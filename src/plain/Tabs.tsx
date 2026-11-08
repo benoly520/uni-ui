@@ -1,32 +1,32 @@
-import { resolve, signal, effect } from 'plain';
+import { signal, effect } from 'plain';
 import { cx, boolAttr } from './_shared';
-import type { MaybeGetter, Renderable } from './_shared';
+import type { Renderable } from './_shared';
 
 export interface TabItem {
   /** 唯一键，受控/非受控状态都以它为标识 */
   key: string;
   /** 标签文本/节点 */
-  label: MaybeGetter<Renderable>;
+  label: Renderable;
   /** 面板内容 */
-  content: MaybeGetter<Renderable>;
+  content: Renderable;
 }
 
 export interface TabsProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
+  glass?: boolean;
   /** 标签与面板数据 */
-  items: MaybeGetter<TabItem[]>;
+  items: TabItem[];
   /** 受控选中 key */
-  value?: MaybeGetter<string>;
+  value?: string;
   /** 非受控初始选中（缺省取首项） */
-  defaultValue?: MaybeGetter<string>;
+  defaultValue?: string;
   /** 选中变化回调 */
   onChange?: (key: string) => void;
   /** tablist 无障碍标签 */
-  ariaLabel?: MaybeGetter<string>;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  id?: MaybeGetter<string>;
+  ariaLabel?: string;
+  className?: string;
+  style?: string | Record<string, string>;
+  id?: string;
 }
 
 /**
@@ -36,13 +36,13 @@ export interface TabsProps {
  * 受控/非受控双模式。
  */
 export function Tabs(props: TabsProps) {
-  const itemsArr = () => resolve(props.items) || [];
-  const isControlled = () => resolve(props.value) != null;
+  const itemsArr = () => props.items || [];
+  const isControlled = () => props.value != null;
   const inner = signal<string>(
-    (resolve(props.defaultValue) as string) ?? itemsArr()[0]?.key ?? '',
+    (props.defaultValue as string) ?? itemsArr()[0]?.key ?? '',
   );
-  const selected = () => (isControlled() ? (resolve(props.value) as string) : inner());
-  const ariaLabel = () => resolve(props.ariaLabel) ?? '标签页';
+  const selected = () => (isControlled() ? (props.value as string) : inner());
+  const ariaLabel = () => props.ariaLabel ?? '标签页';
 
   const select = (key: string) => {
     if (!isControlled()) inner.set(key);
@@ -126,10 +126,10 @@ export function Tabs(props: TabsProps) {
   return (
     <>
       <div
-        data-glass={resolve(props.glass) === false ? 'off' : undefined}
-        id={resolve(props.id)}
-        class={cx('ui-tabs-wrap', resolve(props.className))}
-        style={resolve(props.style)}
+        data-glass={props.glass === false ? 'off' : undefined}
+        id={props.id}
+        class={cx('ui-tabs-wrap', props.className)}
+        style={props.style}
       >
         <button
           class="ui-tabs-arrow ui-tabs-arrow--left"
@@ -150,7 +150,7 @@ export function Tabs(props: TabsProps) {
                   tabIndex={active() ? 0 : -1}
                   onClick={() => select(it.key)}
                 >
-                  {resolve(it.label)}
+                  {it.label}
                 </button>
               );
             })}
@@ -173,7 +173,7 @@ export function Tabs(props: TabsProps) {
             aria-labelledby={`tab-${it.key}`}
             hidden={boolAttr(!active())}
           >
-            {resolve(it.content)}
+            {it.content}
           </div>
         );
       })}

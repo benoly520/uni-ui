@@ -1,21 +1,21 @@
-import { resolve } from 'plain';
 import { cx, mergeStyle } from './_shared';
-import type { MaybeGetter, Renderable } from './_shared';
+import type { Renderable } from './_shared';
 
 export type BadgeTone = 'brand' | 'danger' | 'success' | 'warning' | 'info';
 
 export interface BadgeProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  tone?: MaybeGetter<BadgeTone>;
-  dot?: MaybeGetter<boolean>;
-  count?: MaybeGetter<number>;
-  max?: MaybeGetter<number>;
-  showZero?: MaybeGetter<boolean>;
-  children?: Renderable | (() => Renderable);
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  id?: MaybeGetter<string>;
+  glass?: boolean;
+  tone?: BadgeTone;
+  dot?: boolean;
+  count?: number;
+  max?: number;
+  showZero?: boolean;
+  /** lazy subtree：运行时是 thunk，显式调用 props.children() */
+  children?: any;
+  className?: string;
+  style?: string | Record<string, string>;
+  id?: string;
 }
 
 /**
@@ -23,31 +23,31 @@ export interface BadgeProps {
  * count 超过 max 截断为 `max+`；dot 渲染状态圆点；count 为 0 且非 showZero 渲染空片段。
  */
 export function Badge(props: BadgeProps) {
-  const tone = () => resolve(props.tone) ?? 'brand';
-  const dot = () => resolve(props.dot) ?? false;
-  const maxVal = () => resolve(props.max) ?? 99;
-  const showZero = () => resolve(props.showZero) ?? false;
-  const countVal = () => resolve(props.count);
+  const tone = () => props.tone ?? 'brand';
+  const dot = () => props.dot ?? false;
+  const maxVal = () => props.max ?? 99;
+  const showZero = () => props.showZero ?? false;
+  const countVal = () => props.count;
   const hidden = () => {
     const c = countVal();
     return c != null && c === 0 && !showZero();
   };
   const content = () => {
     const c = countVal();
-    return c != null ? (c > maxVal() ? maxVal() + '+' : '' + c) : resolve(props.children);
+    return c != null ? (c > maxVal() ? maxVal() + '+' : '' + c) : props.children?.();
   };
   return (
     <span
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
-      class={cx('ui-badge', resolve(props.className))}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
+      class={cx('ui-badge', props.className)}
       style={mergeStyle(
         {
           background: 'var(--ui-color-' + tone() + '-soft, var(--ui-color-brand-soft))',
           color: 'var(--ui-color-' + tone() + ', var(--ui-color-brand))',
           display: hidden() ? 'none' : '',
         },
-        resolve(props.style),
+        props.style,
       )}
     >
       {dot() && (

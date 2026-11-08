@@ -1,26 +1,26 @@
-import { resolve, signal, effect } from 'plain';
+import { signal, effect } from 'plain';
 import { cx } from './_shared';
-import type { MaybeGetter, Renderable } from './_shared';
+import type { Renderable } from './_shared';
 
 export interface SegmentedOption {
-  label: Renderable | (() => Renderable);
+  label: Renderable;
   value: string | number;
   disabled?: boolean;
 }
 
 export interface SegmentedProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  options: MaybeGetter<SegmentedOption[]>;
-  value?: MaybeGetter<string | number>;
-  defaultValue?: MaybeGetter<string | number>;
+  glass?: boolean;
+  options: SegmentedOption[];
+  value?: string | number;
+  defaultValue?: string | number;
   onChange?: (value: string | number) => void;
-  size?: MaybeGetter<'lg' | 'md' | 'sm' | 'xs'>;
-  disabled?: MaybeGetter<boolean>;
-  'aria-label'?: MaybeGetter<string>;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  id?: MaybeGetter<string>;
+  size?: 'lg' | 'md' | 'sm' | 'xs';
+  disabled?: boolean;
+  'aria-label'?: string;
+  className?: string;
+  style?: string | Record<string, string>;
+  id?: string;
 }
 
 /**
@@ -29,19 +29,19 @@ export interface SegmentedProps {
  * 改用 ref 抓取根节点定位滑块，resize 监听在 ref 清理里回收，消除旧实现的监听器泄漏。
  */
 export function Segmented(props: SegmentedProps) {
-  const isControlled = () => resolve(props.value) != null;
-  const size = () => resolve(props.size) ?? 'md';
-  const disabled = () => resolve(props.disabled) ?? false;
-  const ariaLabel = () => resolve(props['aria-label']);
-  const opts = () => resolve(props.options) || [];
+  const isControlled = () => props.value != null;
+  const size = () => props.size ?? 'md';
+  const disabled = () => props.disabled ?? false;
+  const ariaLabel = () => props['aria-label'];
+  const opts = () => props.options || [];
   const inner = signal<string | number>(
     isControlled()
-      ? (resolve(props.value) as any)
-      : resolve(props.defaultValue) != null
-        ? (resolve(props.defaultValue) as any)
+      ? (props.value as any)
+      : props.defaultValue != null
+        ? (props.defaultValue as any)
         : (opts()[0]?.value as any),
   );
-  const selected = () => (isControlled() ? (resolve(props.value) as any) : inner());
+  const selected = () => (isControlled() ? (props.value as any) : inner());
 
   let rootEl: HTMLElement | null = null;
   const moveThumb = () => {
@@ -71,8 +71,8 @@ export function Segmented(props: SegmentedProps) {
 
   return (
     <div
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
       ref={(el) => {
         rootEl = el;
         moveThumb();
@@ -83,10 +83,10 @@ export function Segmented(props: SegmentedProps) {
           rootEl = null;
         };
       }}
-      class={cx('ui-segmented', size() !== 'md' && 'ui-size-' + size(), resolve(props.className))}
+      class={cx('ui-segmented', size() !== 'md' && 'ui-size-' + size(), props.className)}
       aria-label={ariaLabel()}
       aria-disabled={disabled() || undefined}
-      style={resolve(props.style)}
+      style={props.style}
     >
       <span class="thumb"></span>
       {opts().map((git, idx) => {
@@ -98,7 +98,7 @@ export function Segmented(props: SegmentedProps) {
             disabled={disabled() || !!o.disabled}
             onClick={() => select(o)}
           >
-            {resolve(o.label)}
+            {o.label}
           </button>
         );
       })}

@@ -1,35 +1,36 @@
-import { resolve, signal, effect } from 'plain';
+import { signal, effect } from 'plain';
 import { cx } from './_shared';
-import type { MaybeGetter, Renderable } from './_shared';
+import type { Renderable } from './_shared';
 
 export type TooltipVariant = 'invert' | 'surface';
 export type TooltipPlacement = 'top' | 'bottom' | 'left' | 'right';
 
 export interface TooltipProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
+  glass?: boolean;
   /** 气泡内容（文本或任意节点） */
-  content: MaybeGetter<Renderable>;
+  content: Renderable;
   /** surface=跟随主题表面 + 毛玻璃（默认）；invert=反转色（浅色黑泡 / 暗色白泡） */
-  variant?: MaybeGetter<TooltipVariant>;
+  variant?: TooltipVariant;
   /** 气泡方位 */
-  placement?: MaybeGetter<TooltipPlacement>;
+  placement?: TooltipPlacement;
   /** 受控显示 */
-  open?: MaybeGetter<boolean>;
+  open?: boolean;
   /** 非受控初始显示 */
-  defaultOpen?: MaybeGetter<boolean>;
+  defaultOpen?: boolean;
   /** 显隐变化回调 */
   onOpenChange?: (open: boolean) => void;
   /** 显示延迟（ms） */
-  delay?: MaybeGetter<number>;
+  delay?: number;
   /** 禁用提示 */
-  disabled?: MaybeGetter<boolean>;
+  disabled?: boolean;
   /** 气泡 id（默认自动生成，用于 aria-describedby） */
   id?: string;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
+  className?: string;
+  style?: string | Record<string, string>;
   /** 触发元素（建议可聚焦节点，如 button） */
-  children?: MaybeGetter<Renderable>;
+  /** lazy subtree：运行时是 thunk，显式调用 props.children() */
+  children?: any;
 }
 
 let tipSeq = 0;
@@ -42,13 +43,13 @@ let tipSeq = 0;
  * 焦点跟随改用 ref 注入 focusin/focusout（新框架无 onFocusIn/Out），并回收监听。
  */
 export function Tooltip(props: TooltipProps) {
-  const variant = () => resolve(props.variant) ?? 'surface';
-  const placement = () => resolve(props.placement) ?? 'top';
-  const isControlled = () => resolve(props.open) != null;
-  const inner = signal<boolean>(!!(resolve(props.defaultOpen) ?? false));
-  const shown = () => (isControlled() ? !!resolve(props.open) : inner());
-  const delay = () => resolve(props.delay) ?? 0;
-  const disabled = () => resolve(props.disabled) ?? false;
+  const variant = () => props.variant ?? 'surface';
+  const placement = () => props.placement ?? 'top';
+  const isControlled = () => props.open != null;
+  const inner = signal<boolean>(!!(props.defaultOpen ?? false));
+  const shown = () => (isControlled() ? !!props.open : inner());
+  const delay = () => props.delay ?? 0;
+  const disabled = () => props.disabled ?? false;
   const tipId = props.id || 'tip-' + ++tipSeq;
 
   const setOpen = (v: boolean) => {
@@ -112,16 +113,16 @@ export function Tooltip(props: TooltipProps) {
 
   return (
     <span
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
+      data-glass={props.glass === false ? 'off' : undefined}
       class={cx(
         'ui-tip',
         variant() === 'surface' && 'ui-tip--surface',
         placement() !== 'top' && 'ui-tip--' + placement(),
         shown() && 'is-open',
         // 契约 tooltip.api.md：className 透传到根 span（此前漏接，导致外部布局类失效）
-        resolve(props.className),
+        props.className,
       )}
-      style={resolve(props.style)}
+      style={props.style}
       onMouseEnter={show}
       onMouseLeave={hide}
       onKeyDown={(e: KeyboardEvent) => {
@@ -132,9 +133,9 @@ export function Tooltip(props: TooltipProps) {
       }}
       ref={refCb}
     >
-      {resolve(props.children)}
+      {props.children?.()}
       <span class="bubble" role="tooltip" id={tipId} aria-hidden={!shown()}>
-        {resolve(props.content)}
+        {props.content}
       </span>
     </span>
   );

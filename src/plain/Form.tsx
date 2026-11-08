@@ -1,6 +1,5 @@
-import { resolve, signal } from 'plain';
+import { signal } from 'plain';
 import { cx } from './_shared';
-import type { MaybeGetter } from './_shared';
 
 export interface FormRule {
   required?: boolean;
@@ -18,17 +17,17 @@ export interface FormField {
 }
 export interface FormProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  fields: MaybeGetter<FormField[]>;
+  glass?: boolean;
+  fields: FormField[];
   /** 字段栅格布局，默认 true */
-  grid?: MaybeGetter<boolean>;
-  submitText?: MaybeGetter<string>;
+  grid?: boolean;
+  submitText?: string;
   onSubmit?: (values: Record<string, string>) => void;
   /** id 命名空间前缀：同页多个 Form 必须传唯一值，否则同名字段会串 label */
-  idPrefix?: MaybeGetter<string>;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  id?: MaybeGetter<string>;
+  idPrefix?: string;
+  className?: string;
+  style?: string | Record<string, string>;
+  id?: string;
 }
 
 function validateField(field: FormField, value: string): string {
@@ -47,9 +46,9 @@ function validateField(field: FormField, value: string): string {
  * label/control 布局、错误态；提交时逐字段校验，通过则 onSubmit(values)。
  */
 export function Form(props: FormProps) {
-  const fieldsArr = () => resolve(props.fields) || [];
-  const grid = () => resolve(props.grid) ?? true;
-  const submitText = () => resolve(props.submitText) ?? '提交';
+  const fieldsArr = () => props.fields || [];
+  const grid = () => props.grid ?? true;
+  const submitText = () => props.submitText ?? '提交';
 
   const initValues = () =>
     Object.fromEntries(fieldsArr().map((f) => [f.name, f.defaultValue ?? '']));
@@ -58,7 +57,7 @@ export function Form(props: FormProps) {
 
   // 字段 id/htmlFor 的命名空间：不传前缀时保持 id === name（与既有契约快照一致）
   const fid = (name: string) => {
-    const p = resolve(props.idPrefix);
+    const p = props.idPrefix;
     return p ? p + '-' + name : name;
   };
 
@@ -104,10 +103,10 @@ export function Form(props: FormProps) {
 
   return (
     <form
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
-      class={cx('ui-form', resolve(props.className))}
-      style={resolve(props.style)}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
+      class={cx('ui-form', props.className)}
+      style={props.style}
       noValidate
       onSubmit={handleSubmit}
     >

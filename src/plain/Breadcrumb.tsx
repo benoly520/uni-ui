@@ -1,21 +1,20 @@
-import { resolve } from 'plain';
 import { cx } from './_shared';
-import type { MaybeGetter, Renderable } from './_shared';
+import type { Renderable } from './_shared';
 
 export interface BreadcrumbItem {
-  label: Renderable | (() => Renderable);
+  label: Renderable;
   href?: string;
 }
 
 export interface BreadcrumbProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  items: MaybeGetter<BreadcrumbItem[]>;
-  separator?: MaybeGetter<string>;
-  'aria-label'?: MaybeGetter<string>;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  id?: MaybeGetter<string>;
+  glass?: boolean;
+  items: BreadcrumbItem[];
+  separator?: string;
+  'aria-label'?: string;
+  className?: string;
+  style?: string | Record<string, string>;
+  id?: string;
 }
 
 /**
@@ -23,16 +22,16 @@ export interface BreadcrumbProps {
  * 末项标记为当前页（span.current + aria-current）；其余为链接 + 分隔符。
  */
 export function Breadcrumb(props: BreadcrumbProps) {
-  const separator = () => resolve(props.separator) ?? '/';
-  const ariaLabel = () => resolve(props['aria-label']) ?? '路径导航';
-  const itemsArr = () => resolve(props.items) || [];
+  const separator = () => props.separator ?? '/';
+  const ariaLabel = () => props['aria-label'] ?? '路径导航';
+  const itemsArr = () => props.items || [];
   return (
     <nav
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
-      class={cx('ui-breadcrumb', resolve(props.className))}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
+      class={cx('ui-breadcrumb', props.className)}
       aria-label={ariaLabel()}
-      style={resolve(props.style)}
+      style={props.style}
     >
       {itemsArr().map((git, i) => {
         const it = git;

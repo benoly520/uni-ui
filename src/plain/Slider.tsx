@@ -1,24 +1,23 @@
-import { resolve, signal } from 'plain';
+import { signal } from 'plain';
 import { cx } from './_shared';
-import type { MaybeGetter } from './_shared';
 
 export type SliderFormat = 'pct' | 'num' | ((v: number) => string);
 
 export interface SliderProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  min?: MaybeGetter<number>;
-  max?: MaybeGetter<number>;
-  step?: MaybeGetter<number>;
-  value?: MaybeGetter<[number, number]>;
-  defaultValue?: MaybeGetter<[number, number]>;
+  glass?: boolean;
+  min?: number;
+  max?: number;
+  step?: number;
+  value?: [number, number];
+  defaultValue?: [number, number];
   format?: SliderFormat;
   onChange?: (value: [number, number]) => void;
-  minLabel?: MaybeGetter<string>;
-  maxLabel?: MaybeGetter<string>;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  id?: MaybeGetter<string>;
+  minLabel?: string;
+  maxLabel?: string;
+  className?: string;
+  style?: string | Record<string, string>;
+  id?: string;
 }
 
 /**
@@ -26,39 +25,28 @@ export interface SliderProps {
  * 受控/非受控；lo≤hi 约束；支持拖拽（pointer 事件）与键盘微调 / Home / End。
  */
 export function Slider(props: SliderProps) {
-  const min = () => Number(resolve(props.min) ?? 0);
-  const max = () => Number(resolve(props.max) ?? 100);
-  const step = () => Number(resolve(props.step) ?? 1);
-  const isControlled = () => resolve(props.value) != null;
-  /**
-   * format 是「值本身可能是函数」的 prop，不能用 resolve 读取（resolve 会把用户传入的
-   * 格式化函数当成取值函数直接调用）。plain 编译器又会把普通 prop 包成 0 参取值函数，
-   * 因此用形参个数区分：0 参 = 编译器包装的取值函数，≥1 参 = 用户格式化函数。
-   */
-  const fmt = (): SliderFormat => {
-    const raw = props.format as any;
-    if (raw == null) return 'num';
-    if (typeof raw === 'function') {
-      return raw.length === 0 ? (raw() as SliderFormat) : (raw as SliderFormat);
-    }
-    return raw as SliderFormat;
-  };
-  const minLabel = () => resolve(props.minLabel) ?? '最小值';
-  const maxLabel = () => resolve(props.maxLabel) ?? '最大值';
+  const min = () => Number(props.min ?? 0);
+  const max = () => Number(props.max ?? 100);
+  const step = () => Number(props.step ?? 1);
+  const isControlled = () => props.value != null;
+  /** format 读出来就是用户传入的格式化函数（或字符串枚举），不再需要按形参个数区分 */
+  const fmt = (): SliderFormat => (props.format ?? 'num') as SliderFormat;
+  const minLabel = () => props.minLabel ?? '最小值';
+  const maxLabel = () => props.maxLabel ?? '最大值';
   const dv: [number, number] = isControlled()
-    ? (resolve(props.value) as [number, number])
-    : resolve(props.defaultValue) != null
-      ? (resolve(props.defaultValue) as [number, number])
+    ? (props.value as [number, number])
+    : props.defaultValue != null
+      ? (props.defaultValue as [number, number])
       : [min(), max()];
   const loInner = signal(Math.min(dv[0], dv[1]));
   const hiInner = signal(Math.max(dv[0], dv[1]));
   const lo = () =>
     isControlled()
-      ? Math.min((resolve(props.value) as any)[0], (resolve(props.value) as any)[1])
+      ? Math.min((props.value as any)[0], (props.value as any)[1])
       : loInner();
   const hi = () =>
     isControlled()
-      ? Math.max((resolve(props.value) as any)[0], (resolve(props.value) as any)[1])
+      ? Math.max((props.value as any)[0], (props.value as any)[1])
       : hiInner();
   // 分母兜底：min === max 时避免 0/0 得到 NaN%
   const pct = (v: number) => ((v - min()) / ((max() - min()) || 1)) * 100;
@@ -137,10 +125,10 @@ export function Slider(props: SliderProps) {
 
   return (
     <div
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
-      class={cx('ui-slider-wrap', resolve(props.className))}
-      style={resolve(props.style)}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
+      class={cx('ui-slider-wrap', props.className)}
+      style={props.style}
     >
       <div class="ui-slider">
         <div class="ui-slider-track">

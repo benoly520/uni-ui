@@ -23,10 +23,10 @@ function ensureMount(): void {
   document.body.appendChild(container);
   mount(container, () =>
     Toast({
-      show: () => showS(),
-      content: () => contentS(),
-      icon: () => iconS(),
-      glass: () => glassS(),
+      get show() { return showS(); },
+      get content() { return contentS(); },
+      get icon() { return iconS(); },
+      get glass() { return glassS(); },
     }),
   );
 }

@@ -1,21 +1,19 @@
-import { resolve } from 'plain';
 import { cx } from './_shared';
-import type { MaybeGetter } from './_shared';
 
 export type StatTrend = 'up' | 'down' | 'muted';
 
 export interface StatProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  label?: MaybeGetter<string>;
-  value?: MaybeGetter<string | number>;
-  prefix?: MaybeGetter<string>;
-  suffix?: MaybeGetter<string>;
-  delta?: MaybeGetter<string>;
-  trend?: MaybeGetter<StatTrend>;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  id?: MaybeGetter<string>;
+  glass?: boolean;
+  label?: string;
+  value?: string | number;
+  prefix?: string;
+  suffix?: string;
+  delta?: string;
+  trend?: StatTrend;
+  className?: string;
+  style?: string | Record<string, string>;
+  id?: string;
 }
 
 /**
@@ -23,18 +21,18 @@ export interface StatProps {
  * 主值等宽数字（ui-num）；涨跌着色跟随 trend（up/down/muted）。
  */
 export function Stat(props: StatProps) {
-  const label = () => resolve(props.label);
-  const value = () => resolve(props.value);
-  const prefix = () => resolve(props.prefix);
-  const suffix = () => resolve(props.suffix);
-  const delta = () => resolve(props.delta);
-  const trend = () => resolve(props.trend);
+  const label = () => props.label;
+  const value = () => props.value;
+  const prefix = () => props.prefix;
+  const suffix = () => props.suffix;
+  const delta = () => props.delta;
+  const trend = () => props.trend;
   return (
     <div
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
-      class={cx('ui-stat', resolve(props.className))}
-      style={resolve(props.style)}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
+      class={cx('ui-stat', props.className)}
+      style={props.style}
     >
       {label() != null && <span class="label">{String(label())}</span>}
       {value() != null && (

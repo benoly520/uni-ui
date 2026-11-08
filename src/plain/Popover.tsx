@@ -1,26 +1,27 @@
-import { resolve, signal, effect } from 'plain';
+import { signal, effect } from 'plain';
 import { cx, boolAttr } from './_shared';
-import type { MaybeGetter, Renderable } from './_shared';
+import type { Renderable } from './_shared';
 
 export interface PopoverProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
+  glass?: boolean;
   /** 面板内容（可含可交互元素，如按钮） */
-  content: MaybeGetter<Renderable>;
+  content: Renderable;
   /** 受控显示 */
-  open?: MaybeGetter<boolean>;
+  open?: boolean;
   /** 非受控初始显示 */
-  defaultOpen?: MaybeGetter<boolean>;
+  defaultOpen?: boolean;
   /** 显隐回调 */
   onOpenChange?: (open: boolean) => void;
   /** 面板无障碍标签 */
-  ariaLabel?: MaybeGetter<string>;
+  ariaLabel?: string;
   /** 面板 id（默认自动生成，用于 aria-controls） */
   id?: string;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
+  className?: string;
+  style?: string | Record<string, string>;
   /** 触发元素 */
-  children?: MaybeGetter<Renderable>;
+  /** lazy subtree：运行时是 thunk，显式调用 props.children() */
+  children?: any;
 }
 
 let popSeq = 0;
@@ -32,11 +33,11 @@ let popSeq = 0;
  * 焦点跟随改用 ref 注入 focusin/focusout（新框架无 onFocusIn/Out），并回收监听。
  */
 export function Popover(props: PopoverProps) {
-  const isControlled = () => resolve(props.open) != null;
-  const inner = signal<boolean>(!!(resolve(props.defaultOpen) ?? false));
-  const shown = () => (isControlled() ? !!resolve(props.open) : inner());
+  const isControlled = () => props.open != null;
+  const inner = signal<boolean>(!!(props.defaultOpen ?? false));
+  const shown = () => (isControlled() ? !!props.open : inner());
   const popId = props.id || 'pop-' + ++popSeq;
-  const ariaLabel = () => resolve(props.ariaLabel) ?? 'Popover';
+  const ariaLabel = () => props.ariaLabel ?? 'Popover';
 
   const setOpen = (v: boolean) => {
     if (!isControlled()) inner.set(v);
@@ -88,9 +89,9 @@ export function Popover(props: PopoverProps) {
 
   return (
     <div
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      class={cx('ui-popover', resolve(props.className))}
-      style={resolve(props.style)}
+      data-glass={props.glass === false ? 'off' : undefined}
+      class={cx('ui-popover', props.className)}
+      style={props.style}
       onMouseEnter={show}
       onMouseLeave={hide}
       onKeyDown={(e: KeyboardEvent) => {
@@ -101,7 +102,7 @@ export function Popover(props: PopoverProps) {
       }}
       ref={refCb}
     >
-      {resolve(props.children)}
+      {props.children?.()}
       <div
         class="ui-popover-panel"
         id={popId}
@@ -109,7 +110,7 @@ export function Popover(props: PopoverProps) {
         aria-label={ariaLabel()}
         hidden={boolAttr(!shown())}
       >
-        {resolve(props.content)}
+        {props.content}
       </div>
     </div>
   );

@@ -1,25 +1,25 @@
-import { resolve, signal, effect } from 'plain';
+import { signal, effect } from 'plain';
 import { cx } from './_shared';
 import { IconCaret } from './icons';
-import type { MaybeGetter, Renderable } from './_shared';
+import type { Renderable } from './_shared';
 
 export interface AccordionItemData {
   key: string;
-  title: Renderable | (() => Renderable);
-  badge?: Renderable | (() => Renderable);
-  content?: Renderable | (() => Renderable);
+  title: Renderable;
+  badge?: Renderable;
+  content?: Renderable;
 }
 
 export interface AccordionProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  items: MaybeGetter<AccordionItemData[]>;
-  activeKeys?: MaybeGetter<string[]>;
-  defaultActiveKeys?: MaybeGetter<string[]>;
+  glass?: boolean;
+  items: AccordionItemData[];
+  activeKeys?: string[];
+  defaultActiveKeys?: string[];
   onChange?: (keys: string[]) => void;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  id?: MaybeGetter<string>;
+  className?: string;
+  style?: string | Record<string, string>;
+  id?: string;
 }
 
 let accSeq = 0;
@@ -30,14 +30,14 @@ let accSeq = 0;
  * 用 ref 抓取根节点定位面板，消除旧实现在文档上按 id 查询的做法。
  */
 export function Accordion(props: AccordionProps) {
-  const itemsArr = () => resolve(props.items) || [];
-  const isControlled = () => resolve(props.activeKeys) != null;
+  const itemsArr = () => props.items || [];
+  const isControlled = () => props.activeKeys != null;
   const uid = 'acc-' + ++accSeq;
   const inner = signal<string[]>(
-    props.defaultActiveKeys != null ? [...(resolve(props.defaultActiveKeys) as string[])] : [],
+    props.defaultActiveKeys != null ? [...(props.defaultActiveKeys as string[])] : [],
   );
   const openSet = () =>
-    new Set(isControlled() ? (resolve(props.activeKeys) as string[]) || [] : inner());
+    new Set(isControlled() ? (props.activeKeys as string[]) || [] : inner());
 
   const toggle = (key: string) => {
     const set = new Set(openSet());
@@ -54,11 +54,11 @@ export function Accordion(props: AccordionProps) {
 
   return (
     <div
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id) || uid}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id || uid}
       ref={refRoot}
-      class={cx('ui-accordion', resolve(props.className))}
-      style={resolve(props.style)}
+      class={cx('ui-accordion', props.className)}
+      style={props.style}
     >
       {itemsArr().map((item) => {
         const isOpen = () => openSet().has(item.key);
@@ -86,7 +86,7 @@ export function Accordion(props: AccordionProps) {
               </span>
             </button>
             <div class="ui-accordion-panel">
-              <div class="ui-accordion-panel-inner">{resolve(item.content)}</div>
+              <div class="ui-accordion-panel-inner">{item.content}</div>
             </div>
           </div>
         );

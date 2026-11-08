@@ -503,7 +503,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '受控值（value）',
       desc: 'value + onChange 受控（多选时传数组），非受控用 defaultValue。',
-      code: `const v = signal<string>('600519');\n<Select options={options} value={() => v()} onChange={(val) => v.set(val as string)} />\n<p>当前值：{v()}</p>`,
+      code: `const v = signal<string>('600519');\n<Select options={options} value={v()} onChange={(val) => v.set(val as string)} />\n<p>当前值：{v()}</p>`,
       Comp: () => {
         const v = signal<string>('600519');
         return (
@@ -514,7 +514,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
                 { label: '宁德时代', value: '300750' },
                 { label: '招商银行', value: '600036' },
               ]}
-              value={() => v()}
+              value={v()}
               onChange={(val: string | string[]) => v.set(val as string)}
             />
             <p class="demo-hint">当前值：{v()}</p>
@@ -570,12 +570,12 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '受控值（value）',
       desc: 'value + onChange 受控（配合 precision 定点），非受控用 defaultValue。',
-      code: `const n = signal(1234.5);\n<NumberInput value={() => n()} onChange={(v) => n.set(v)} precision={2} prefix="¥" />\n<p>当前值：{n()}</p>`,
+      code: `const n = signal(1234.5);\n<NumberInput value={n()} onChange={(v) => n.set(v)} precision={2} prefix="¥" />\n<p>当前值：{n()}</p>`,
       Comp: () => {
         const n = signal(1234.5);
         return (
           <div>
-            <NumberInput value={() => n()} onChange={(v: number) => n.set(v)} precision={2} prefix="¥" />
+            <NumberInput value={n()} onChange={(v: number) => n.set(v)} precision={2} prefix="¥" />
             <p class="demo-hint">当前值：{n()}</p>
           </div>
         );
@@ -618,13 +618,13 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '受控值（value）',
       desc: 'value + onChange 受控，配合 placeholder 自定义占位；非受控用 defaultValue。',
-      code: `const v = signal<string | null>('2026-01-01');\n<DatePicker value={() => v()} onChange={(val) => v.set(val)} placeholder="选择报告日期" />\n<p>当前值：{v() || '未选择'}</p>`,
+      code: `const v = signal<string | null>('2026-01-01');\n<DatePicker value={v()} onChange={(val) => v.set(val)} placeholder="选择报告日期" />\n<p>当前值：{v() || '未选择'}</p>`,
       Comp: () => {
         const v = signal<DatePickerValue>('2026-01-01');
         return (
           <div>
             <DatePicker
-              value={() => v()}
+              value={v()}
               onChange={(val: DatePickerValue) => v.set(val)}
               placeholder="选择报告日期"
             />
@@ -681,7 +681,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '受控切换（value / onChange）',
       desc: 'value + onChange 受控当前段；onChange 回传选项 value（string | number），非受控用 defaultValue。',
-      code: `const v = signal<string | number>('d');\n<Segmented options={options} value={() => v()} onChange={(val) => v.set(val)} />\n<p>当前：{v()}</p>`,
+      code: `const v = signal<string | number>('d');\n<Segmented options={options} value={v()} onChange={(val) => v.set(val)} />\n<p>当前：{v()}</p>`,
       Comp: () => {
         const v = signal<string | number>('d');
         return (
@@ -692,7 +692,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
                 { label: '周K', value: 'w' },
                 { label: '月K', value: 'm' },
               ]}
-              value={() => v()}
+              value={v()}
               onChange={(val: string | number) => v.set(val)}
             />
             <p class="demo-hint">当前：{String(v())}</p>
@@ -746,7 +746,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '受控输入 / 初始值 / 选中回调',
       desc: 'value + onChange 受控关键词（非受控用 defaultValue）；onSelect 回传被选中的 option 对象（value / code / tag 全量）。',
-      code: `const q = signal('茅台');\nconst picked = signal('未选择');\n<Search value={() => q()} onChange={(v) => q.set(v)} options={options}\n  onSelect={(o) => picked.set(o.label)} />\n<Search defaultValue="茅台" options={options} />\n<p>当前输入：{q()} · 已选：{picked()}</p>`,
+      code: `const q = signal('茅台');\nconst picked = signal('未选择');\n<Search value={q()} onChange={(v) => q.set(v)} options={options}\n  onSelect={(o) => picked.set(o.label)} />\n<Search defaultValue="茅台" options={options} />\n<p>当前输入：{q()} · 已选：{picked()}</p>`,
       Comp: () => {
         const q = signal('茅台');
         const picked = signal('未选择');
@@ -757,7 +757,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
         return (
           <div>
             <Search
-              value={() => q()}
+              value={q()}
               onChange={(v: string) => q.set(v)}
               options={options}
               onSelect={(o: { label: string; code?: string }) =>
@@ -917,13 +917,13 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '受控选中（value）',
       desc: 'value + onChange 受控选中 key，非受控用 defaultValue。',
-      code: `const v = signal('a');\n<Tabs items={items} value={() => v()} onChange={(k) => v.set(k)} />\n<p>当前 tab：{v()}</p>`,
+      code: `const v = signal('a');\n<Tabs items={items} value={v()} onChange={(k) => v.set(k)} />\n<p>当前 tab：{v()}</p>`,
       Comp: () => {
         const v = signal('a');
         return (
           <div>
             <Tabs
-              value={() => v()}
+              value={v()}
               onChange={(k: string) => v.set(k)}
               items={[
                 { key: 'a', label: '概况', content: '公司基本面与行业地位。' },
@@ -997,7 +997,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '受控步骤与可点击',
       desc: 'current + onChange 受控当前步；clickable 允许点击步骤跳转（默认 true），关闭后仅作展示。',
-      code: `const i = signal(1);\n<Steps steps={steps} current={() => i()} clickable onChange={(idx) => i.set(idx)} />\n<p>当前第 {i() + 1} 步</p>`,
+      code: `const i = signal(1);\n<Steps steps={steps} current={i()} clickable onChange={(idx) => i.set(idx)} />\n<p>当前第 {i() + 1} 步</p>`,
       Comp: () => {
         const i = signal(1);
         return (
@@ -1008,7 +1008,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
                 { title: '回测', desc: '历史验证' },
                 { title: '实盘', desc: '跟踪调仓' },
               ]}
-              current={() => i()}
+              current={i()}
               clickable
               onChange={(idx: number) => i.set(idx)}
             />
@@ -1044,7 +1044,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '受控翻页与 siblingCount',
       desc: 'page + onChange 受控当前页；siblingCount 控制当前页两侧保留的页码数。',
-      code: `const p = signal(1);\n<Pagination total={500} pageSize={10} page={() => p()} onChange={(v) => p.set(v)} siblingCount={2} />\n<p>当前第 {p()} 页</p>`,
+      code: `const p = signal(1);\n<Pagination total={500} pageSize={10} page={p()} onChange={(v) => p.set(v)} siblingCount={2} />\n<p>当前第 {p()} 页</p>`,
       Comp: () => {
         const p = signal(1);
         return (
@@ -1052,7 +1052,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
             <Pagination
               total={500}
               pageSize={10}
-              page={() => p()}
+              page={p()}
               onChange={(v: number) => p.set(v)}
               siblingCount={2}
             />
@@ -1114,12 +1114,12 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '受控显隐（open）',
       desc: 'open + onOpenChange 受控显隐（非受控用 defaultOpen）；与校验/引导联动时可强制展示提示。',
-      code: `const open = signal(false);\n<Tooltip content="受控提示" open={() => open()} onOpenChange={(v) => open.set(v)}>\n  <Button variant="outline">{open() ? '已展开' : '已收起'}</Button>\n</Tooltip>\n<p>当前状态：{open() ? '显示' : '隐藏'}</p>\n<Tooltip content="非受控：初始即显示" defaultOpen>\n  <Button variant="outline">defaultOpen</Button>\n</Tooltip>`,
+      code: `const open = signal(false);\n<Tooltip content="受控提示" open={open()} onOpenChange={(v) => open.set(v)}>\n  <Button variant="outline">{open() ? '已展开' : '已收起'}</Button>\n</Tooltip>\n<p>当前状态：{open() ? '显示' : '隐藏'}</p>\n<Tooltip content="非受控：初始即显示" defaultOpen>\n  <Button variant="outline">defaultOpen</Button>\n</Tooltip>`,
       Comp: () => {
         const open = signal(false);
         return (
           <div>
-            <Tooltip content="受控提示" open={() => open()} onOpenChange={(v: boolean) => open.set(v)}>
+            <Tooltip content="受控提示" open={open()} onOpenChange={(v: boolean) => open.set(v)}>
               <Button variant="outline">{open() ? '已展开' : '已收起'}</Button>
             </Tooltip>
             <Tooltip content="非受控：初始即显示" defaultOpen>
@@ -1148,13 +1148,13 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '受控显隐（open）',
       desc: 'open + onOpenChange 受控显隐；非受控用 defaultOpen；content 面板可放可交互内容。',
-      code: `const open = signal(false);\n<Popover open={() => open()} onOpenChange={(v) => open.set(v)} content={panel}>\n  <Button variant="outline">受控浮层：{open() ? '已展开' : '已收起'}</Button>\n</Popover>\n<p>当前状态：{open() ? '展开' : '收起'}</p>\n<Popover defaultOpen content={panel}>\n  <Button variant="outline">defaultOpen</Button>\n</Popover>`,
+      code: `const open = signal(false);\n<Popover open={open()} onOpenChange={(v) => open.set(v)} content={panel}>\n  <Button variant="outline">受控浮层：{open() ? '已展开' : '已收起'}</Button>\n</Popover>\n<p>当前状态：{open() ? '展开' : '收起'}</p>\n<Popover defaultOpen content={panel}>\n  <Button variant="outline">defaultOpen</Button>\n</Popover>`,
       Comp: () => {
         const open = signal(false);
         return (
           <div>
             <Popover
-              open={() => open()}
+              open={open()}
               onOpenChange={(v: boolean) => open.set(v)}
               content={PopoverPanel()}
             >
@@ -1174,14 +1174,14 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '模态对话框',
       desc: 'open 为必填受控；内置焦点陷阱、Esc / 点遮罩关闭；title / footer 配置头部与底部。',
-      code: `const open = signal(false);\n<Button onClick={() => open.set(true)}>打开 Dialog</Button>\n<Dialog open={() => open()} onOpenChange={(v) => open.set(v)} title="新建策略"\n  footer={Footer({ onClose: () => open.set(false) })}>\n  <p>支持焦点陷阱与 Esc 关闭。</p>\n</Dialog>`,
+      code: `const open = signal(false);\n<Button onClick={() => open.set(true)}>打开 Dialog</Button>\n<Dialog open={open()} onOpenChange={(v) => open.set(v)} title="新建策略"\n  footer={Footer({ onClose: () => open.set(false) })}>\n  <p>支持焦点陷阱与 Esc 关闭。</p>\n</Dialog>`,
       Comp: () => {
         const open = signal(false);
         return (
           <>
             <Button onClick={() => open.set(true)}>打开 Dialog</Button>
             <Dialog
-              open={() => open()}
+              open={open()}
               onOpenChange={(v: boolean) => open.set(v)}
               title="新建策略"
               footer={DialogFooter({ onClose: () => open.set(false) })}
@@ -1195,7 +1195,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '玻璃开关（glass）',
       desc: 'glass 默认 true 保持磨砂观感；传 false 时组件根节点输出 data-glass="off"，theme.css 把半透明面回退为不透明实心面并真移除 backdrop-filter（不是把透明度压到 100%）。',
-      code: `const a = signal(false);\nconst b = signal(false);\n<Button onClick={() => a.set(true)}>默认：磨砂</Button>\n<Button variant="outline" onClick={() => b.set(true)}>关闭：实心</Button>\n<Dialog open={() => a()} onOpenChange={(v) => a.set(v)} title="磨砂面板">面板走 backdrop-filter。</Dialog>\n<Dialog open={() => b()} onOpenChange={(v) => b.set(v)} title="实心面板" glass={false}>背景不透明。</Dialog>`,
+      code: `const a = signal(false);\nconst b = signal(false);\n<Button onClick={() => a.set(true)}>默认：磨砂</Button>\n<Button variant="outline" onClick={() => b.set(true)}>关闭：实心</Button>\n<Dialog open={a()} onOpenChange={(v) => a.set(v)} title="磨砂面板">面板走 backdrop-filter。</Dialog>\n<Dialog open={b()} onOpenChange={(v) => b.set(v)} title="实心面板" glass={false}>背景不透明。</Dialog>`,
       Comp: () => {
         const a = signal(false);
         const b = signal(false);
@@ -1203,10 +1203,10 @@ export const plainDocs: Record<string, PlainCase[]> = {
           <div class="demo-row">
             <Button onClick={() => a.set(true)}>默认：磨砂</Button>
             <Button variant="outline" onClick={() => b.set(true)}>关闭：实心</Button>
-            <Dialog open={() => a()} onOpenChange={(v: boolean) => a.set(v)} title="磨砂面板">
+            <Dialog open={a()} onOpenChange={(v: boolean) => a.set(v)} title="磨砂面板">
               面板背景走 backdrop-filter 毛玻璃。
             </Dialog>
-            <Dialog open={() => b()} onOpenChange={(v: boolean) => b.set(v)} title="实心面板" glass={false}>
+            <Dialog open={b()} onOpenChange={(v: boolean) => b.set(v)} title="实心面板" glass={false}>
               背景为不透明实心面，无 backdrop-filter。
             </Dialog>
           </div>
@@ -1216,14 +1216,14 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '点遮罩不关闭（closeOnOverlay）',
       desc: 'closeOnOverlay=false 时点击遮罩不关闭，只保留 Esc 与显式按钮，避免误触丢失填写内容。',
-      code: `const open = signal(false);\n<Button onClick={() => open.set(true)}>打开（点遮罩不关闭）</Button>\n<Dialog open={() => open()} onOpenChange={(v) => open.set(v)} title="填写中"\n  closeOnOverlay={false}>\n  点击背景不会关闭，需点按钮或按 Esc。\n</Dialog>`,
+      code: `const open = signal(false);\n<Button onClick={() => open.set(true)}>打开（点遮罩不关闭）</Button>\n<Dialog open={open()} onOpenChange={(v) => open.set(v)} title="填写中"\n  closeOnOverlay={false}>\n  点击背景不会关闭，需点按钮或按 Esc。\n</Dialog>`,
       Comp: () => {
         const open = signal(false);
         return (
           <div class="demo-row">
             <Button onClick={() => open.set(true)}>打开（点遮罩不关闭）</Button>
             <Dialog
-              open={() => open()}
+              open={open()}
               onOpenChange={(v: boolean) => open.set(v)}
               title="填写中"
               closeOnOverlay={false}
@@ -1240,14 +1240,14 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '侧滑抽屉',
       desc: 'side 控制滑出方向（right/left/bottom）；showClose 控制关闭按钮；同样具备焦点陷阱。',
-      code: `const open = signal(false);\n<Drawer open={() => open()} onOpenChange={(v) => open.set(v)} title="筛选条件" subtitle="右侧滑出">\n  承载较复杂的筛选 / 表单。\n</Drawer>`,
+      code: `const open = signal(false);\n<Drawer open={open()} onOpenChange={(v) => open.set(v)} title="筛选条件" subtitle="右侧滑出">\n  承载较复杂的筛选 / 表单。\n</Drawer>`,
       Comp: () => {
         const open = signal(false);
         return (
           <>
             <Button onClick={() => open.set(true)}>打开 Drawer</Button>
             <Drawer
-              open={() => open()}
+              open={open()}
               onOpenChange={(v: boolean) => open.set(v)}
               title="筛选条件"
               subtitle="右侧滑出"
@@ -1261,7 +1261,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '玻璃开关（glass）',
       desc: 'glass 默认 true 保持磨砂观感；传 false 时组件根节点输出 data-glass="off"，theme.css 把半透明面回退为不透明实心面并真移除 backdrop-filter（不是把透明度压到 100%）。',
-      code: `const a = signal(false);\nconst b = signal(false);\n<Button onClick={() => a.set(true)}>默认：磨砂</Button>\n<Button variant="outline" onClick={() => b.set(true)}>关闭：实心</Button>\n<Drawer open={() => a()} onOpenChange={(v) => a.set(v)} title="磨砂抽屉">面板走 backdrop-filter。</Drawer>\n<Drawer open={() => b()} onOpenChange={(v) => b.set(v)} title="实心抽屉" glass={false}>背景不透明。</Drawer>`,
+      code: `const a = signal(false);\nconst b = signal(false);\n<Button onClick={() => a.set(true)}>默认：磨砂</Button>\n<Button variant="outline" onClick={() => b.set(true)}>关闭：实心</Button>\n<Drawer open={a()} onOpenChange={(v) => a.set(v)} title="磨砂抽屉">面板走 backdrop-filter。</Drawer>\n<Drawer open={b()} onOpenChange={(v) => b.set(v)} title="实心抽屉" glass={false}>背景不透明。</Drawer>`,
       Comp: () => {
         const a = signal(false);
         const b = signal(false);
@@ -1269,10 +1269,10 @@ export const plainDocs: Record<string, PlainCase[]> = {
           <div class="demo-row">
             <Button onClick={() => a.set(true)}>默认：磨砂</Button>
             <Button variant="outline" onClick={() => b.set(true)}>关闭：实心</Button>
-            <Drawer open={() => a()} onOpenChange={(v: boolean) => a.set(v)} title="磨砂抽屉">
+            <Drawer open={a()} onOpenChange={(v: boolean) => a.set(v)} title="磨砂抽屉">
               抽屉面板背景走 backdrop-filter 毛玻璃。
             </Drawer>
-            <Drawer open={() => b()} onOpenChange={(v: boolean) => b.set(v)} title="实心抽屉" glass={false}>
+            <Drawer open={b()} onOpenChange={(v: boolean) => b.set(v)} title="实心抽屉" glass={false}>
               背景为不透明实心面，无 backdrop-filter。
             </Drawer>
           </div>
@@ -1282,7 +1282,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '方向 / 关闭按钮 / 遮罩行为',
       desc: 'side 支持 right / left / bottom；showClose=false 隐藏右上角关闭；closeOnOverlay=false 需显式关闭。',
-      code: `const a = signal(false);\nconst b = signal(false);\n<Button onClick={() => a.set(true)}>底部 + 无关闭按钮</Button>\n<Button variant="outline" onClick={() => b.set(true)}>左侧 + 点遮罩不关闭</Button>\n<Drawer open={() => a()} onOpenChange={(v) => a.set(v)} title="底部抽屉"\n  side="bottom" showClose={false}>bottom 方向 + 隐藏关闭按钮。</Drawer>\n<Drawer open={() => b()} onOpenChange={(v) => b.set(v)} title="左侧抽屉"\n  side="left" closeOnOverlay={false}>左侧滑出，点遮罩不关闭。</Drawer>`,
+      code: `const a = signal(false);\nconst b = signal(false);\n<Button onClick={() => a.set(true)}>底部 + 无关闭按钮</Button>\n<Button variant="outline" onClick={() => b.set(true)}>左侧 + 点遮罩不关闭</Button>\n<Drawer open={a()} onOpenChange={(v) => a.set(v)} title="底部抽屉"\n  side="bottom" showClose={false}>bottom 方向 + 隐藏关闭按钮。</Drawer>\n<Drawer open={b()} onOpenChange={(v) => b.set(v)} title="左侧抽屉"\n  side="left" closeOnOverlay={false}>左侧滑出，点遮罩不关闭。</Drawer>`,
       Comp: () => {
         const a = signal(false);
         const b = signal(false);
@@ -1291,7 +1291,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
             <Button onClick={() => a.set(true)}>底部 + 无关闭按钮</Button>
             <Button variant="outline" onClick={() => b.set(true)}>左侧 + 点遮罩不关闭</Button>
             <Drawer
-              open={() => a()}
+              open={a()}
               onOpenChange={(v: boolean) => a.set(v)}
               title="底部抽屉"
               side="bottom"
@@ -1300,7 +1300,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
               side=bottom 从底部滑出，showClose=false 隐藏关闭按钮。
             </Drawer>
             <Drawer
-              open={() => b()}
+              open={b()}
               onOpenChange={(v: boolean) => b.set(v)}
               title="左侧抽屉"
               side="left"
@@ -1318,7 +1318,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '右键菜单',
       desc: 'target 指定右键目标；items 定义菜单项（支持 shortcut / danger / separator）；onSelect 回调 key。',
-      code: `<div id="pg-cm" class="demo-target">右键此区域唤出菜单</div>\n<ContextMenu target={() => document.getElementById('pg-cm')} items={items} onSelect={(k) => toast('执行：' + k)} />`,
+      code: `<div id="pg-cm" class="demo-target">右键此区域唤出菜单</div>\n<ContextMenu target={document.getElementById('pg-cm')} items={items} onSelect={(k) => toast('执行：' + k)} />`,
       Comp: () => {
         const items = [
           { key: 'edit', label: '编辑' },
@@ -1332,7 +1332,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
             </div>
             <ContextMenu
               items={items}
-              target={() => document.getElementById('pg-cm')}
+              target={document.getElementById('pg-cm')}
               onSelect={(k: string) => toast('执行：' + k)}
             />
           </>
@@ -1342,7 +1342,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '受控显隐与命令回调',
       desc: 'open + onOpenChange 受控显隐；onSelect 回传被点击的命令 key；items 支持 shortcut / danger / separator。',
-      code: `const open = signal(false);\nconst last = signal('—');\n<ContextMenu target={() => document.getElementById('ctx-adv')} items={items}\n  open={() => open()} onOpenChange={(v) => open.set(v)}\n  onSelect={(k) => last.set(k)} />\n<div id="ctx-adv" class="demo-target">右键此区域</div>\n<p>菜单：{open() ? '展开' : '收起'} · 最近命令：{last()}</p>`,
+      code: `const open = signal(false);\nconst last = signal('—');\n<ContextMenu target={document.getElementById('ctx-adv')} items={items}\n  open={open()} onOpenChange={(v) => open.set(v)}\n  onSelect={(k) => last.set(k)} />\n<div id="ctx-adv" class="demo-target">右键此区域</div>\n<p>菜单：{open() ? '展开' : '收起'} · 最近命令：{last()}</p>`,
       Comp: () => {
         const open = signal(false);
         const last = signal('—');
@@ -1352,8 +1352,8 @@ export const plainDocs: Record<string, PlainCase[]> = {
               右键此区域唤出受控菜单
             </div>
             <ContextMenu
-              target={() => document.getElementById('ctx-adv')}
-              open={() => open()}
+              target={document.getElementById('ctx-adv')}
+              open={open()}
               onOpenChange={(v: boolean) => open.set(v)}
               onSelect={(k: string) => last.set(k)}
               items={[
@@ -1386,7 +1386,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '受控展开与勾选',
       desc: 'expandedKeys / checkedKeys 受控；onExpand / onCheck 回传新集合与变更详情；checkable=false 时退化为纯展开树。',
-      code: `const expanded = signal<string[]>(['1']);\nconst checked = signal<string[]>(['1-1']);\n<Tree data={treeData} checkable expandedKeys={() => expanded()}\n  checkedKeys={() => checked()} onExpand={(keys) => expanded.set(keys)}\n  onCheck={(keys) => checked.set(keys)} />\n<p>展开 {expanded().length} 组 / 勾选 {checked().length} 项</p>`,
+      code: `const expanded = signal<string[]>(['1']);\nconst checked = signal<string[]>(['1-1']);\n<Tree data={treeData} checkable expandedKeys={expanded()}\n  checkedKeys={checked()} onExpand={(keys) => expanded.set(keys)}\n  onCheck={(keys) => checked.set(keys)} />\n<p>展开 {expanded().length} 组 / 勾选 {checked().length} 项</p>`,
       Comp: () => {
         const expanded = signal<string[]>(['1']);
         const checked = signal<string[]>(['1-1']);
@@ -1395,8 +1395,8 @@ export const plainDocs: Record<string, PlainCase[]> = {
             <Tree
               data={treeData}
               checkable
-              expandedKeys={() => expanded()}
-              checkedKeys={() => checked()}
+              expandedKeys={expanded()}
+              checkedKeys={checked()}
               onExpand={(keys: string[]) => expanded.set(keys)}
               onCheck={(keys: string[]) => checked.set(keys)}
             />
@@ -1423,7 +1423,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '受控区间与步长',
       desc: 'value + onChange 受控区间值；step 控制微调粒度；minLabel / maxLabel 自定义两端标签。',
-      code: `const v = signal<[number, number]>([20, 60]);\n<Slider min={0} max={100} step={5} value={() => v()}\n  onChange={(val) => v.set(val)} minLabel="保守" maxLabel="激进" />\n<p>当前区间：{v()[0]} – {v()[1]}</p>`,
+      code: `const v = signal<[number, number]>([20, 60]);\n<Slider min={0} max={100} step={5} value={v()}\n  onChange={(val) => v.set(val)} minLabel="保守" maxLabel="激进" />\n<p>当前区间：{v()[0]} – {v()[1]}</p>`,
       Comp: () => {
         const v = signal<[number, number]>([20, 60]);
         return (
@@ -1432,7 +1432,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
               min={0}
               max={100}
               step={5}
-              value={() => v()}
+              value={v()}
               onChange={(val: [number, number]) => v.set(val)}
               minLabel="保守"
               maxLabel="激进"
@@ -1467,7 +1467,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '受控排序与选中',
       desc: 'sortKey + sortDir 受控排序列（组件只维护表头指示与回调，数据排序由业务侧执行）；selectedKeys + onSelect 受控选中行。',
-      code: `const sort = signal<{ key: string; dir: 'asc' | 'desc' }>({ key: 'price', dir: 'desc' });\nconst sel = signal<string[]>([]);\nconst rows = () => [...tableData].sort((a, b) => sort().dir === 'asc' ? a.price - b.price : b.price - a.price);\n<DataTable columns={columns} data={() => rows()} compact selectable rowKey="code"\n  sortKey={() => sort().key} sortDir={() => sort().dir}\n  onSort={(key, dir) => sort.set({ key, dir })}\n  selectedKeys={() => sel()} onSelect={(keys) => sel.set(keys)} />\n<p>排序：{sort().key} {sort().dir} · 已选 {sel().length} 行</p>`,
+      code: `const sort = signal<{ key: string; dir: 'asc' | 'desc' }>({ key: 'price', dir: 'desc' });\nconst sel = signal<string[]>([]);\nconst rows = () => [...tableData].sort((a, b) => sort().dir === 'asc' ? a.price - b.price : b.price - a.price);\n<DataTable columns={columns} data={rows()} compact selectable rowKey="code"\n  sortKey={sort().key} sortDir={sort().dir}\n  onSort={(key, dir) => sort.set({ key, dir })}\n  selectedKeys={sel()} onSelect={(keys) => sel.set(keys)} />\n<p>排序：{sort().key} {sort().dir} · 已选 {sel().length} 行</p>`,
       Comp: () => {
         const sort = signal<{ key: string; dir: 'asc' | 'desc' }>({ key: 'price', dir: 'desc' });
         const sel = signal<string[]>([]);
@@ -1479,14 +1479,14 @@ export const plainDocs: Record<string, PlainCase[]> = {
           <div>
             <DataTable
               columns={tableColumns}
-              data={() => rows()}
+              data={rows()}
               compact
               selectable
               rowKey="code"
-              sortKey={() => sort().key}
-              sortDir={() => sort().dir}
+              sortKey={sort().key}
+              sortDir={sort().dir}
               onSort={(key: string, dir: 'asc' | 'desc') => sort.set({ key, dir })}
-              selectedKeys={() => sel()}
+              selectedKeys={sel()}
               onSelect={(keys: string[]) => sel.set(keys)}
             />
             <p class="demo-hint">
@@ -1610,7 +1610,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
     {
       title: '受控展开（activeKeys）',
       desc: 'activeKeys 传入受控展开的 key 列表，onChange 回传新列表；非受控用 defaultActiveKeys。',
-      code: `const keys = signal<string[]>(['1']);\n<Accordion items={items} activeKeys={() => keys()} onChange={(k) => keys.set(k)} />\n<p>当前展开：{keys().join('、') || '无'}</p>`,
+      code: `const keys = signal<string[]>(['1']);\n<Accordion items={items} activeKeys={keys()} onChange={(k) => keys.set(k)} />\n<p>当前展开：{keys().join('、') || '无'}</p>`,
       Comp: () => {
         const keys = signal<string[]>(['1']);
         const items = [
@@ -1621,7 +1621,7 @@ export const plainDocs: Record<string, PlainCase[]> = {
           <div>
             <Accordion
               items={items}
-              activeKeys={() => keys()}
+              activeKeys={keys()}
               onChange={(k: string[]) => keys.set(k)}
             />
             <p class="demo-hint">当前展开：{keys().join('、') || '无'}</p>

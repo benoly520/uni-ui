@@ -1,22 +1,21 @@
-import { resolve, signal } from 'plain';
+import { signal } from 'plain';
 import { cx, boolAttr } from './_shared';
 import { IconCalendar, IconChevronLeft, IconChevronRight } from './icons';
-import type { MaybeGetter } from './_shared';
 
 export type DatePickerValue = string | [string, string] | null;
 
 export interface DatePickerProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  range?: MaybeGetter<boolean>;
-  value?: MaybeGetter<DatePickerValue>;
-  defaultValue?: MaybeGetter<DatePickerValue>;
+  glass?: boolean;
+  range?: boolean;
+  value?: DatePickerValue;
+  defaultValue?: DatePickerValue;
   onChange?: (value: DatePickerValue) => void;
-  placeholder?: MaybeGetter<string>;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  'aria-label'?: MaybeGetter<string>;
-  id?: MaybeGetter<string>;
+  placeholder?: string;
+  className?: string;
+  style?: string | Record<string, string>;
+  'aria-label'?: string;
+  id?: string;
 }
 
 const WEEK = ['一', '二', '三', '四', '五', '六', '日'];
@@ -36,17 +35,17 @@ const startOfMonth = (d: Date | null) =>
  * 单日 / 区间两种模式；周一起始；区间仅选满两日才回调；点击外部 / 清除关闭。
  */
 export function DatePicker(props: DatePickerProps) {
-  const range = () => resolve(props.range) ?? false;
-  const isControlled = () => resolve(props.value) != null;
-  const placeholder = () => resolve(props.placeholder);
-  const ariaLabel = () => resolve(props['aria-label']);
+  const range = () => props.range ?? false;
+  const isControlled = () => props.value != null;
+  const placeholder = () => props.placeholder;
+  const ariaLabel = () => props['aria-label'];
   const def: DatePickerValue = isControlled()
-    ? (resolve(props.value) as DatePickerValue)
-    : resolve(props.defaultValue) != null
-      ? (resolve(props.defaultValue) as DatePickerValue)
+    ? (props.value as DatePickerValue)
+    : props.defaultValue != null
+      ? (props.defaultValue as DatePickerValue)
       : null;
   const inner = signal<DatePickerValue>(def);
-  const get = () => (isControlled() ? (resolve(props.value) as DatePickerValue) : inner());
+  const get = () => (isControlled() ? (props.value as DatePickerValue) : inner());
 
   const open = signal(false);
   const view = signal<Date>(
@@ -117,11 +116,11 @@ export function DatePicker(props: DatePickerProps) {
     return arr;
   };
 
-  // 说明：renderCell 被当作「子组件」，入参 c 视为 props，属性读取用 resolve(c.x)。
+  // 说明：renderCell 接的是普通数据对象，属性直接读 c.x。
   const renderCell = (c: { d: Date; out: boolean; label: number }) => {
-    const d = () => resolve(c.d);
-    const out = () => resolve(c.out);
-    const label = () => resolve(c.label);
+    const d = () => c.d;
+    const out = () => c.out;
+    const label = () => c.label;
     const v = () => fmt(d());
     const today = () => fmt(new Date());
     const isToday = () => v() === today();
@@ -164,11 +163,11 @@ export function DatePicker(props: DatePickerProps) {
 
   return (
     <div
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
-      class={cx('ui-datepicker', resolve(props.className))}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
+      class={cx('ui-datepicker', props.className)}
       data-range={dataRange()}
-      style={resolve(props.style)}
+      style={props.style}
     >
       <button
         type="button"

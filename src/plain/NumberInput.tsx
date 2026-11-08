@@ -1,23 +1,22 @@
-import { resolve, signal } from 'plain';
+import { signal } from 'plain';
 import { cx } from './_shared';
-import type { MaybeGetter } from './_shared';
 
 export interface NumberInputProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  min?: MaybeGetter<number>;
-  max?: MaybeGetter<number>;
-  step?: MaybeGetter<number>;
-  precision?: MaybeGetter<number>;
-  prefix?: MaybeGetter<string>;
-  suffix?: MaybeGetter<string>;
-  value?: MaybeGetter<number | null>;
-  defaultValue?: MaybeGetter<number>;
+  glass?: boolean;
+  min?: number;
+  max?: number;
+  step?: number;
+  precision?: number;
+  prefix?: string;
+  suffix?: string;
+  value?: number | null;
+  defaultValue?: number;
   onChange?: (value: number) => void;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  'aria-label'?: MaybeGetter<string>;
-  id?: MaybeGetter<string>;
+  className?: string;
+  style?: string | Record<string, string>;
+  'aria-label'?: string;
+  id?: string;
 }
 
 function escapeRe(s: string): string {
@@ -29,22 +28,22 @@ function escapeRe(s: string): string {
  * 千分位 + 定点格式化；支持前缀/后缀符号；步进、失焦、回车提交均做 [min,max] 钳制。
  */
 export function NumberInput(props: NumberInputProps) {
-  const min = () => resolve(props.min) ?? -Infinity;
-  const max = () => resolve(props.max) ?? Infinity;
-  const step = () => resolve(props.step) ?? 1;
-  const precision = () => resolve(props.precision) ?? 0;
-  const prefix = () => resolve(props.prefix);
-  const suffix = () => resolve(props.suffix);
-  const isControlled = () => resolve(props.value) != null;
+  const min = () => props.min ?? -Infinity;
+  const max = () => props.max ?? Infinity;
+  const step = () => props.step ?? 1;
+  const precision = () => props.precision ?? 0;
+  const prefix = () => props.prefix;
+  const suffix = () => props.suffix;
+  const isControlled = () => props.value != null;
   const inner = signal<number>(
-    resolve(props.value) != null
-      ? Number(resolve(props.value))
-      : Number(resolve(props.defaultValue) ?? 0),
+    props.value != null
+      ? Number(props.value)
+      : Number(props.defaultValue ?? 0),
   );
   const draft = signal<string | null>(null);
   // 受控时一切读数以 props.value 为准：受控分支 commit() 不写 inner，
   // 若 display()/stepBy() 仍读 inner() 会永远停在挂载时的初值（受控形同虚设）。
-  const current = () => (isControlled() ? Number(resolve(props.value)) : inner());
+  const current = () => (isControlled() ? Number(props.value) : inner());
 
   const clamp = (n: number) => Math.min(Number(max()), Math.max(Number(min()), n));
   const parse = (s: string): number | null => {
@@ -79,17 +78,17 @@ export function NumberInput(props: NumberInputProps) {
 
   return (
     <div
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
-      class={cx('ui-number', resolve(props.className))}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
+      class={cx('ui-number', props.className)}
       data-min={min() !== -Infinity ? dataNum(min()) : undefined}
       data-max={max() !== Infinity ? dataNum(max()) : undefined}
       data-step={dataNum(step())}
       data-precision={dataNum(precision())}
       data-prefix={prefix()}
       data-suffix={suffix()}
-      aria-label={resolve(props['aria-label'])}
-      style={resolve(props.style)}
+      aria-label={props['aria-label']}
+      style={props.style}
     >
       {prefix() != null && <span class="ui-number-prefix">{prefix()}</span>}
       <button
@@ -104,7 +103,7 @@ export function NumberInput(props: NumberInputProps) {
       <input
         class="ui-number-input"
         inputMode="decimal"
-        aria-label={resolve(props['aria-label'])}
+        aria-label={props['aria-label']}
         value={display()}
         onInput={(e: Event) => draft.set((e.target as HTMLInputElement).value)}
         onBlur={(e: Event) => {

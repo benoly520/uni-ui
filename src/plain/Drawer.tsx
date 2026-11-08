@@ -1,6 +1,6 @@
-import { resolve, signal, effect } from 'plain';
+import { signal, effect } from 'plain';
 import { cx } from './_shared';
-import type { MaybeGetter, Renderable } from './_shared';
+import type { Renderable } from './_shared';
 
 /** 焦点陷阱可聚焦选择器：与 React / Vue 端保持一致 */
 const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
@@ -12,26 +12,27 @@ export type DrawerPlacement = DrawerSide;
 
 export interface DrawerProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  open?: MaybeGetter<boolean>;
-  defaultOpen?: MaybeGetter<boolean>;
+  glass?: boolean;
+  open?: boolean;
+  defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   /** 滑出方向：right（默认）/ left / bottom */
-  side?: MaybeGetter<DrawerSide>;
+  side?: DrawerSide;
   /** @deprecated 旧命名，等价于 side */
-  placement?: MaybeGetter<DrawerSide>;
-  title?: MaybeGetter<Renderable>;
+  placement?: DrawerSide;
+  title?: Renderable;
   /** 副标题（位于标题下方 .ui-label） */
-  subtitle?: MaybeGetter<Renderable>;
+  subtitle?: Renderable;
   /** 是否显示右上角关闭按钮 */
-  showClose?: MaybeGetter<boolean>;
-  children?: MaybeGetter<Renderable>;
-  closeOnOverlay?: MaybeGetter<boolean>;
-  closeOnEsc?: MaybeGetter<boolean>;
-  ariaLabel?: MaybeGetter<string>;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  id?: MaybeGetter<string>;
+  showClose?: boolean;
+  /** lazy subtree：运行时是 thunk，显式调用 props.children() */
+  children?: any;
+  closeOnOverlay?: boolean;
+  closeOnEsc?: boolean;
+  ariaLabel?: string;
+  className?: string;
+  style?: string | Record<string, string>;
+  id?: string;
 }
 
 /**
@@ -40,13 +41,13 @@ export interface DrawerProps {
  * DOM 结构与 React / Vue 端逐字对齐（.ui-drawer-overlay > aside.ui-drawer > header/.body）。
  */
 export function Drawer(props: DrawerProps) {
-  const isControlled = () => resolve(props.open) != null;
-  const inner = signal<boolean>(!!(resolve(props.defaultOpen) ?? false));
-  const isOpen = () => (isControlled() ? !!resolve(props.open) : inner());
-  const closeOnOverlay = () => resolve(props.closeOnOverlay) ?? true;
-  const closeOnEsc = () => resolve(props.closeOnEsc) ?? true;
-  const side = () => resolve(props.side) ?? resolve(props.placement) ?? 'right';
-  const showClose = () => resolve(props.showClose) ?? true;
+  const isControlled = () => props.open != null;
+  const inner = signal<boolean>(!!(props.defaultOpen ?? false));
+  const isOpen = () => (isControlled() ? !!props.open : inner());
+  const closeOnOverlay = () => props.closeOnOverlay ?? true;
+  const closeOnEsc = () => props.closeOnEsc ?? true;
+  const side = () => props.side ?? props.placement ?? 'right';
+  const showClose = () => props.showClose ?? true;
   const onOpenChange = props.onOpenChange;
 
   const setOpen = (v: boolean) => {
@@ -122,13 +123,13 @@ export function Drawer(props: DrawerProps) {
   });
 
   const dialogLabel = () =>
-    resolve(props.ariaLabel) ||
-    (typeof resolve(props.title) === 'string' ? (resolve(props.title) as string) : '抽屉');
+    props.ariaLabel ||
+    (typeof props.title === 'string' ? (props.title as string) : '抽屉');
 
   return (
     <div
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
       ref={refCb}
       class={cx('ui-drawer-overlay', isOpen() && 'show')}
       role="presentation"
@@ -143,21 +144,21 @@ export function Drawer(props: DrawerProps) {
           'ui-drawer',
           'ui-glass',
           side() !== 'right' && 'ui-drawer--' + side(),
-          resolve(props.className),
+          props.className,
         )}
-        style={resolve(props.style)}
+        style={props.style}
         role="dialog"
         aria-modal="true"
         aria-label={dialogLabel()}
       >
-        {(resolve(props.title) != null || showClose()) && (
+        {(props.title != null || showClose()) && (
           <header>
             <div>
-              {resolve(props.title) != null && (
-                <div class="ui-drawer-title">{resolve(props.title)}</div>
+              {props.title != null && (
+                <div class="ui-drawer-title">{props.title}</div>
               )}
-              {resolve(props.subtitle) != null && (
-                <div class="ui-label">{resolve(props.subtitle)}</div>
+              {props.subtitle != null && (
+                <div class="ui-label">{props.subtitle}</div>
               )}
             </div>
             {showClose() && (
@@ -172,7 +173,7 @@ export function Drawer(props: DrawerProps) {
             )}
           </header>
         )}
-        <div class="body">{resolve(props.children)}</div>
+        <div class="body">{props.children?.()}</div>
       </aside>
     </div>
   );

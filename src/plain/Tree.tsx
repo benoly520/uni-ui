@@ -1,7 +1,6 @@
-import { resolve, signal } from 'plain';
+import { signal } from 'plain';
 import { cx } from './_shared';
 import { IconCaret } from './icons';
-import type { MaybeGetter } from './_shared';
 
 export interface TreeData {
   key: string;
@@ -12,19 +11,19 @@ export interface TreeData {
 
 export interface TreeProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  data: MaybeGetter<TreeData[]>;
-  checkable?: MaybeGetter<boolean>;
-  defaultExpandedKeys?: MaybeGetter<string[]>;
-  defaultCheckedKeys?: MaybeGetter<string[]>;
-  expandedKeys?: MaybeGetter<string[]>;
-  checkedKeys?: MaybeGetter<string[]>;
+  glass?: boolean;
+  data: TreeData[];
+  checkable?: boolean;
+  defaultExpandedKeys?: string[];
+  defaultCheckedKeys?: string[];
+  expandedKeys?: string[];
+  checkedKeys?: string[];
   onExpand?: (keys: string[], info: { key: string; expanded: boolean }) => void;
   onCheck?: (keys: string[], info: { key: string; checked: boolean }) => void;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  'aria-label'?: MaybeGetter<string>;
-  id?: MaybeGetter<string>;
+  className?: string;
+  style?: string | Record<string, string>;
+  'aria-label'?: string;
+  id?: string;
 }
 
 function allParentKeys(nodes: any[], acc: string[] = []): string[] {
@@ -42,30 +41,30 @@ function allParentKeys(nodes: any[], acc: string[] = []): string[] {
  * 层级展示 / 勾选；展开、勾选均支持受控与默认态；勾选不触发折叠。
  */
 export function Tree(props: TreeProps) {
-  const checkable = () => resolve(props.checkable) ?? true;
+  const checkable = () => props.checkable ?? true;
   // 受控 / 非受控模式在挂载时确定（与 React 一致：prop != null 即为受控）
-  const expControlled = resolve(props.expandedKeys) != null;
-  const chkControlled = resolve(props.checkedKeys) != null;
+  const expControlled = props.expandedKeys != null;
+  const chkControlled = props.checkedKeys != null;
 
   const expInner = signal<string[]>(
     expControlled
-      ? [...(resolve(props.expandedKeys) as string[])]
+      ? [...(props.expandedKeys as string[])]
       : props.defaultExpandedKeys != null
-        ? [...(resolve(props.defaultExpandedKeys) as string[])]
-        : allParentKeys(resolve(props.data) as TreeData[]),
+        ? [...(props.defaultExpandedKeys as string[])]
+        : allParentKeys(props.data as TreeData[]),
   );
   const expSet = () =>
-    new Set(expControlled ? (resolve(props.expandedKeys) as string[]) || [] : expInner());
+    new Set(expControlled ? (props.expandedKeys as string[]) || [] : expInner());
 
   const chkInner = signal<string[]>(
     chkControlled
-      ? [...(resolve(props.checkedKeys) as string[])]
+      ? [...(props.checkedKeys as string[])]
       : props.defaultCheckedKeys != null
-        ? [...(resolve(props.defaultCheckedKeys) as string[])]
+        ? [...(props.defaultCheckedKeys as string[])]
         : [],
   );
   const chkSet = () =>
-    new Set(chkControlled ? (resolve(props.checkedKeys) as string[]) || [] : chkInner());
+    new Set(chkControlled ? (props.checkedKeys as string[]) || [] : chkInner());
 
   const toggleExpand = (node: TreeData) => {
     const set = new Set(expSet());
@@ -85,12 +84,12 @@ export function Tree(props: TreeProps) {
   };
 
   // 说明：renderNode 是被当作「子组件」对待的（命名函数返回 JSX），其入参 node
-  // 被视为 props，故所有属性读取都用 resolve(node.x)（同组件 props 的读法）。
+  // 是普通数据对象，属性直接读 node.x。
   const renderNode = (node: TreeData) => {
-    const label = () => resolve(node.label);
-    const key = () => resolve(node.key);
-    const count = () => resolve(node.count);
-    const children = () => resolve(node.children);
+    const label = () => node.label;
+    const key = () => node.key;
+    const count = () => node.count;
+    const children = () => node.children;
     const hasChildren = () => !!(children() && children()!.length);
     const isOpen = () => expSet().has(key());
     const isOn = () => chkSet().has(key());
@@ -139,19 +138,19 @@ export function Tree(props: TreeProps) {
     );
   };
 
-  const ariaLabel = () => resolve(props['aria-label']) ?? '树';
+  const ariaLabel = () => props['aria-label'] ?? '树';
 
   return (
     <div
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
-      class={cx('ui-tree', resolve(props.className))}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
+      class={cx('ui-tree', props.className)}
       role="tree"
       aria-label={ariaLabel()}
-      style={resolve(props.style)}
+      style={props.style}
     >
       <ul class="ui-tree-children">
-        {(resolve(props.data) as TreeData[]).map((gn) => renderNode(gn))}
+        {(props.data as TreeData[]).map((gn) => renderNode(gn))}
       </ul>
     </div>
   );

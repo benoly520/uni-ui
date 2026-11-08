@@ -14,10 +14,10 @@ function ensureMount(): void {
   document.body.appendChild(container);
   mount(container, () =>
     Message({
-      show: () => showS(),
-      type: () => typeS(),
-      content: () => contentS(),
-      glass: () => glassS(),
+      get show() { return showS(); },
+      get type() { return typeS(); },
+      get content() { return contentS(); },
+      get glass() { return glassS(); },
     }),
   );
 }

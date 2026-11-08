@@ -3,23 +3,18 @@
  * 仅保留类型别名与 cx 透传；视图一律用 plain 的 JSX 编写，由 plain 编译器编译为直接 DOM。
  *
  * 规则（对照 plain 契约 lint）：
- * - 不解构 props（PLAIN_E1105）；一律用 resolve(props.x) 读取，默认值的写法包成 thunk：
- *   `const variant = () => resolve(props.variant) ?? 'default'`。
- * - 不快照 props（PLAIN_E1112）；不要把 props 取值存进变量，在会重跑的上下文里 resolve。
- * - 不 resolve on* 事件 prop（PLAIN_E1108）；事件 prop 编译器不包 getter，直接 props.onXxx(...)。
+ * - 不解构 props（PLAIN_E1105）；动态 props 是真 getter，直接读 props.x，
+ *   带默认值时包成 thunk：`const variant = () => props.variant ?? 'default'`。
+ * - 不快照 props（PLAIN_E1107 / E1112）；别把 props 取值存进组件体变量，
+ *   在 JSX / effect / 事件回调里直接读；children 是 lazy thunk，要显式调用 props.children()。
+ * - on* 事件 prop 与函数型 prop 读出来就是函数，直接调用 props.onXxx(...)；
+ *   内建元素属性只接受普通值，不传 getter / 函数。
  * - 不用 JSX 属性展开（PLAIN_E1008 编译期硬错）；透传属性显式列出。
  */
 import { cx as cxFn } from '../utils/cx';
 import type { Renderable } from 'plain';
 
 export const cx = cxFn;
-
-/**
- * 可传「值」或「取值函数」的响应式入参。
- * plain 的 JSX 内建属性用的是同语义的 JSX.MayGetter<T>，这里作为组件 props 的模块级别名，
- * 方便在组件 Props 接口里书写。
- */
-export type MaybeGetter<T> = T | (() => T);
 
 export type { Renderable };
 
@@ -38,9 +33,9 @@ export function boolAttr(b: boolean): any {
 
 /**
  * 合并内联样式：base 为组件计算值，extra 为外部传入的 style。
- * 注意：plain 编译器的 style 属性只接受「对象或字符串」的求值结果，
- * **不接受取值函数**（`style={() => ({...})}` 会被静默丢弃），
- * 而属性表达式本身就在 effect 内求值，因此这里直接用对象即可保持响应式。
+ * 注意：plain 的 style 属性只接受「对象或字符串」的求值结果，**不接受函数**
+ * （传函数会把函数本身写进 DOM）；属性表达式本身就在 effect 内求值，
+ * 因此这里直接用对象即可保持响应式。
  * extra 为字符串时无法与组件计算值合并，按对象语义忽略（与 React 端 CSSProperties 一致）。
  */
 export function mergeStyle(

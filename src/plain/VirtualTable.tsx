@@ -1,6 +1,5 @@
-import { resolve, signal } from 'plain';
+import { signal } from 'plain';
 import { cx } from './_shared';
-import type { MaybeGetter } from './_shared';
 
 export interface VTableColumn {
   key: string;
@@ -15,17 +14,17 @@ export interface VTableColumn {
 
 export interface VirtualTableProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  rows: MaybeGetter<Record<string, any>[]>;
-  columns: MaybeGetter<VTableColumn[]>;
+  glass?: boolean;
+  rows: Record<string, any>[];
+  columns: VTableColumn[];
   /** 固定行高（px），默认 33 对齐 theme.css */
-  rowHeight?: MaybeGetter<number>;
+  rowHeight?: number;
   /** 上下缓冲行，默认 6 */
-  buffer?: MaybeGetter<number>;
-  ariaLabel?: MaybeGetter<string>;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  id?: MaybeGetter<string>;
+  buffer?: number;
+  ariaLabel?: string;
+  className?: string;
+  style?: string | Record<string, string>;
+  id?: string;
 }
 
 /**
@@ -35,19 +34,19 @@ export interface VirtualTableProps {
  * resize 监听在 ref 清理里回收，消除旧实现长期挂监听的泄漏。
  */
 export function VirtualTable(props: VirtualTableProps) {
-  const total = () => (resolve(props.rows) as Record<string, any>[]).length;
+  const total = () => (props.rows as Record<string, any>[]).length;
   const range = signal<[number, number]>([0, 0]);
 
   const gridStyle = () => {
-    const cols = resolve(props.columns) as VTableColumn[];
+    const cols = props.columns as VTableColumn[];
     return { gridTemplateColumns: cols.map((c) => c.width || '1fr').join(' ') };
   };
 
   const recompute = (scrollTop: number, clientHeight: number) => {
     const ch = clientHeight || 320;
     const t = total();
-    const rh = Number(resolve(props.rowHeight) ?? 33);
-    const buf = Number(resolve(props.buffer) ?? 6);
+    const rh = Number(props.rowHeight ?? 33);
+    const buf = Number(props.buffer ?? 6);
     const start = Math.floor(scrollTop / rh);
     const vis = Math.ceil(ch / rh) + buf * 2;
     const s = Math.max(0, start - buf);
@@ -77,16 +76,16 @@ export function VirtualTable(props: VirtualTableProps) {
     if (vtEl) recompute(vtEl.scrollTop, vtEl.clientHeight);
   });
 
-  const ariaLabel = () => resolve(props.ariaLabel);
+  const ariaLabel = () => props.ariaLabel;
 
   return (
     <>
       <div
-        data-glass={resolve(props.glass) === false ? 'off' : undefined}
-        id={resolve(props.id)}
+        data-glass={props.glass === false ? 'off' : undefined}
+        id={props.id}
         ref={refVt}
-        class={cx('ui-vtable', resolve(props.className))}
-        style={resolve(props.style)}
+        class={cx('ui-vtable', props.className)}
+        style={props.style}
         aria-label={ariaLabel()}
         onScroll={(e: Event) => {
           const el = e.currentTarget as HTMLElement;
@@ -94,7 +93,7 @@ export function VirtualTable(props: VirtualTableProps) {
         }}
       >
         <div class="ui-vtable-head" style={gridStyle()}>
-          {(resolve(props.columns) as VTableColumn[]).map((col) => (
+          {(props.columns as VTableColumn[]).map((col) => (
             <span class={cx(col.sticky && 'sticky-col')} data-num={col.numeric || undefined}>
               {col.title}
             </span>
@@ -102,18 +101,18 @@ export function VirtualTable(props: VirtualTableProps) {
         </div>
         <div
           class="ui-vtable-viewport"
-          style={{ height: `${total() * Number(resolve(props.rowHeight) ?? 33)}px` }}
+          style={{ height: `${total() * Number(props.rowHeight ?? 33)}px` }}
         >
           {(windowIndices()).map((i) => {
-            const row = (resolve(props.rows) as Record<string, any>[])[i];
-            const rh = Number(resolve(props.rowHeight) ?? 33);
+            const row = (props.rows as Record<string, any>[])[i];
+            const rh = Number(props.rowHeight ?? 33);
             return (
               <div
                 class="ui-vtable-row"
                 // plain 的 style 只接受「对象或字符串」求值结果，传取值函数会被静默丢弃
                 style={{ ...gridStyle(), transform: `translateY(${i * rh}px)` }}
               >
-                {(resolve(props.columns) as VTableColumn[]).map((col) => {
+                {(props.columns as VTableColumn[]).map((col) => {
                   const t = () => (col.trend ? col.trend(row) : undefined);
                   return (
                     <span

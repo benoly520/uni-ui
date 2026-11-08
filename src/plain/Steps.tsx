@@ -1,24 +1,24 @@
-import { resolve, signal } from 'plain';
+import { signal } from 'plain';
 import { cx } from './_shared';
 import { IconCheck } from './icons';
-import type { MaybeGetter, Renderable } from './_shared';
+import type { Renderable } from './_shared';
 
 export interface StepItem {
-  title: Renderable | (() => Renderable);
-  desc?: Renderable | (() => Renderable);
+  title: Renderable;
+  desc?: Renderable;
 }
 
 export interface StepsProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  steps: MaybeGetter<StepItem[]>;
-  current?: MaybeGetter<number>;
-  defaultCurrent?: MaybeGetter<number>;
-  clickable?: MaybeGetter<boolean>;
+  glass?: boolean;
+  steps: StepItem[];
+  current?: number;
+  defaultCurrent?: number;
+  clickable?: boolean;
   onChange?: (index: number) => void;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  id?: MaybeGetter<string>;
+  className?: string;
+  style?: string | Record<string, string>;
+  id?: string;
 }
 
 /**
@@ -26,11 +26,11 @@ export interface StepsProps {
  * 已完成步实心品牌色 + check，当前步高亮；可点击跳转（受 clickable 控制）。
  */
 export function Steps(props: StepsProps) {
-  const isControlled = () => resolve(props.current) != null;
-  const clickable = () => resolve(props.clickable) ?? true;
-  const inner = signal<number>(Number(resolve(props.defaultCurrent) ?? 0));
-  const cur = () => (isControlled() ? Number(resolve(props.current)) : inner());
-  const stepsArr = () => resolve(props.steps) || [];
+  const isControlled = () => props.current != null;
+  const clickable = () => props.clickable ?? true;
+  const inner = signal<number>(Number(props.defaultCurrent ?? 0));
+  const cur = () => (isControlled() ? Number(props.current) : inner());
+  const stepsArr = () => props.steps || [];
   /**
    * 步骤与连接线的扁平序列：连接线是 .ui-step 的兄弟节点（与 React / Vue 端及设计稿一致）。
    * 用「序列 + map + 三元」而不是 Fragment：plain 编译器的列表项必须是单个顶层元素。
@@ -52,10 +52,10 @@ export function Steps(props: StepsProps) {
   };
   return (
     <div
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
-      class={cx('ui-steps', resolve(props.className))}
-      style={resolve(props.style)}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
+      class={cx('ui-steps', props.className)}
+      style={props.style}
     >
       {seq().map((git) =>
         git.line ? (

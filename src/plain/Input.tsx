@@ -1,28 +1,28 @@
-import { resolve, signal } from 'plain';
+import { signal } from 'plain';
 import { cx } from './_shared';
-import type { MaybeGetter, Renderable } from './_shared';
+import type { Renderable } from './_shared';
 
 export type InputSize = 'lg' | 'md' | 'sm' | 'xs';
 
 export interface InputProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  value?: MaybeGetter<string>;
-  defaultValue?: MaybeGetter<string>;
+  glass?: boolean;
+  value?: string;
+  defaultValue?: string;
   onChange?: (value: string, e: Event) => void;
-  size?: MaybeGetter<InputSize>;
-  disabled?: MaybeGetter<boolean>;
-  error?: MaybeGetter<boolean>;
-  placeholder?: MaybeGetter<string>;
-  type?: MaybeGetter<string>;
-  name?: MaybeGetter<string>;
-  id?: MaybeGetter<string>;
-  maxLength?: MaybeGetter<number>;
-  prefix?: Renderable | (() => Renderable);
-  suffix?: Renderable | (() => Renderable);
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  'aria-label'?: MaybeGetter<string>;
+  size?: InputSize;
+  disabled?: boolean;
+  error?: boolean;
+  placeholder?: string;
+  type?: string;
+  name?: string;
+  id?: string;
+  maxLength?: number;
+  prefix?: Renderable;
+  suffix?: Renderable;
+  className?: string;
+  style?: string | Record<string, string>;
+  'aria-label'?: string;
 }
 
 /**
@@ -30,21 +30,21 @@ export interface InputProps {
  * 受控/非受控；error 加 --error 类与 aria-invalid；前后缀包入 .ui-input-wrap。
  */
 export function Input(props: InputProps) {
-  const isControlled = () => resolve(props.value) != null;
-  const size = () => resolve(props.size) ?? 'md';
-  const disabled = () => resolve(props.disabled) ?? false;
-  const error = () => resolve(props.error) ?? false;
+  const isControlled = () => props.value != null;
+  const size = () => props.size ?? 'md';
+  const disabled = () => props.disabled ?? false;
+  const error = () => props.error ?? false;
   const inner = signal<string>(
-    resolve(props.value) != null
-      ? String(resolve(props.value))
-      : resolve(props.defaultValue) != null
-        ? String(resolve(props.defaultValue))
+    props.value != null
+      ? String(props.value)
+      : props.defaultValue != null
+        ? String(props.defaultValue)
         : '',
   );
-  const cur = () => (isControlled() ? String(resolve(props.value)) : inner());
+  const cur = () => (isControlled() ? String(props.value) : inner());
 
-  const prefix = () => resolve(props.prefix);
-  const suffix = () => resolve(props.suffix);
+  const prefix = () => props.prefix;
+  const suffix = () => props.suffix;
   const showWrap = () => prefix() != null || suffix() != null;
   const onInput = (e: Event) => {
     const v = (e.target as HTMLInputElement).value;
@@ -55,44 +55,44 @@ export function Input(props: InputProps) {
     <>
       {showWrap() ? (
         <span
-          data-glass={resolve(props.glass) === false ? 'off' : undefined}
+          data-glass={props.glass === false ? 'off' : undefined}
           class="ui-input-wrap"
-          style={resolve(props.style)}
+          style={props.style}
         >
           {prefix() != null && <span class="ui-icon" aria-hidden="true">{prefix()}</span>}
           <input
             class={cx('ui-input', size() !== 'md' && 'ui-size-' + size(), error() && 'ui-input--error')}
-            type={resolve(props.type) ?? 'text'}
+            type={props.type ?? 'text'}
             value={cur()}
-            placeholder={resolve(props.placeholder)}
-            name={resolve(props.name)}
-            id={resolve(props.id)}
+            placeholder={props.placeholder}
+            name={props.name}
+            id={props.id}
             disabled={disabled()}
             aria-invalid={error() || undefined}
-            aria-label={resolve(props['aria-label'])}
+            aria-label={props['aria-label']}
             onInput={onInput}
           />
           {suffix() != null && <span class="ui-icon" aria-hidden="true">{suffix()}</span>}
         </span>
       ) : (
         <input
-          data-glass={resolve(props.glass) === false ? 'off' : undefined}
+          data-glass={props.glass === false ? 'off' : undefined}
           class={cx(
             'ui-input',
             size() !== 'md' && 'ui-size-' + size(),
             error() && 'ui-input--error',
-            resolve(props.className),
+            props.className,
           )}
-          style={resolve(props.style)}
-          type={resolve(props.type) ?? 'text'}
+          style={props.style}
+          type={props.type ?? 'text'}
           value={cur()}
-          placeholder={resolve(props.placeholder)}
-          name={resolve(props.name)}
-          id={resolve(props.id)}
-          maxLength={resolve(props.maxLength)}
+          placeholder={props.placeholder}
+          name={props.name}
+          id={props.id}
+          maxLength={props.maxLength}
           disabled={disabled()}
           aria-invalid={error() || undefined}
-          aria-label={resolve(props['aria-label'])}
+          aria-label={props['aria-label']}
           onInput={onInput}
         />
       )}

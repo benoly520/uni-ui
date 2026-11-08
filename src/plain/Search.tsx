@@ -1,7 +1,6 @@
-import { resolve, signal } from 'plain';
+import { signal } from 'plain';
 import { cx } from './_shared';
 import { IconSearch } from './icons';
-import type { MaybeGetter } from './_shared';
 
 export interface SearchTag {
   text: string;
@@ -16,16 +15,16 @@ export interface SearchOption {
 
 export interface SearchProps {
   /** 玻璃材质开关：false 时根节点输出 data-glass="off"，由 theme.css 回退为不透明实心面；默认 true 保持既有磨砂观感 */
-  glass?: MaybeGetter<boolean>;
-  options?: MaybeGetter<SearchOption[]>;
-  value?: MaybeGetter<string>;
-  defaultValue?: MaybeGetter<string>;
-  placeholder?: MaybeGetter<string>;
+  glass?: boolean;
+  options?: SearchOption[];
+  value?: string;
+  defaultValue?: string;
+  placeholder?: string;
   onChange?: (value: string) => void;
   onSelect?: (option: SearchOption) => void;
-  className?: MaybeGetter<string>;
-  style?: MaybeGetter<string | Record<string, string>>;
-  id?: MaybeGetter<string>;
+  className?: string;
+  style?: string | Record<string, string>;
+  id?: string;
 }
 
 /**
@@ -33,22 +32,22 @@ export interface SearchProps {
  * 带联想列表；支持键盘上下导航、回车确认；点击外部 / Esc 关闭建议。
  */
 export function Search(props: SearchProps) {
-  const isControlled = () => resolve(props.value) != null;
+  const isControlled = () => props.value != null;
   const inner = signal<string>(
-    resolve(props.value) != null
-      ? String(resolve(props.value))
-      : resolve(props.defaultValue) != null
-        ? String(resolve(props.defaultValue))
+    props.value != null
+      ? String(props.value)
+      : props.defaultValue != null
+        ? String(props.defaultValue)
         : '',
   );
-  const cur = () => (isControlled() ? String(resolve(props.value)) : inner());
+  const cur = () => (isControlled() ? String(props.value) : inner());
   const open = signal(false);
   // 初值 -1（与 React 一致）：否则聚焦后首次按 ↓ 会直接落到第 2 项
   const active = signal(-1);
 
   const visible = () => {
     const q = cur().trim().toLowerCase();
-    const opts = (resolve(props.options) as SearchOption[]) || [];
+    const opts = (props.options as SearchOption[]) || [];
     if (!q) return opts;
     return opts.filter(
       (o) => o.label.toLowerCase().includes(q) || (o.code || '').toLowerCase().includes(q),
@@ -81,17 +80,17 @@ export function Search(props: SearchProps) {
 
   return (
     <div
-      data-glass={resolve(props.glass) === false ? 'off' : undefined}
-      id={resolve(props.id)}
-      class={cx('ui-search', open() && 'open', resolve(props.className))}
-      style={resolve(props.style)}
+      data-glass={props.glass === false ? 'off' : undefined}
+      id={props.id}
+      class={cx('ui-search', open() && 'open', props.className)}
+      style={props.style}
     >
       <span class="ico ui-icon">
         <IconSearch />
       </span>
       <input
         class="ui-search-input"
-        placeholder={resolve(props.placeholder) ?? '搜索…'}
+        placeholder={props.placeholder ?? '搜索…'}
         aria-label="全局搜索"
         value={cur()}
         onFocus={() => {

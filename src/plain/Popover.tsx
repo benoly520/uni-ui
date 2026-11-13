@@ -36,7 +36,9 @@ export function Popover(props: PopoverProps) {
   const isControlled = () => props.open != null;
   const inner = signal<boolean>(!!(props.defaultOpen ?? false));
   const shown = () => (isControlled() ? !!props.open : inner());
-  const popId = props.id || 'pop-' + ++popSeq;
+  const defaultPopId = 'pop-' + ++popSeq;
+  /** 优先读取传入 ID，缺省时使用实例级稳定 ID。 */
+  const popId = () => props.id || defaultPopId;
   const ariaLabel = () => props.ariaLabel ?? 'Popover';
 
   const setOpen = (v: boolean) => {
@@ -58,7 +60,7 @@ export function Popover(props: PopoverProps) {
     rootEl = el;
     const trigger = el.firstElementChild as HTMLElement | null;
     if (trigger) {
-      trigger.setAttribute('aria-controls', popId);
+      trigger.setAttribute('aria-controls', popId());
       // 初始态也要写 aria-expanded：下面的 effect 首次运行时 ref 可能还没绑定
       trigger.setAttribute('aria-expanded', shown() ? 'true' : 'false');
       const onClick = () => setOpen(!shown());
@@ -81,10 +83,15 @@ export function Popover(props: PopoverProps) {
       rootEl = null;
     };
   };
-  // open 变化后响应式同步触发元素的 aria-expanded
+  // 显隐或 ID 变化后同步触发元素的无障碍属性
   effect(() => {
+    const id = popId();
+    const expanded = shown() ? 'true' : 'false';
     const trigger = rootEl?.firstElementChild as HTMLElement | null;
-    if (trigger) trigger.setAttribute('aria-expanded', shown() ? 'true' : 'false');
+    if (trigger) {
+      trigger.setAttribute('aria-controls', id);
+      trigger.setAttribute('aria-expanded', expanded);
+    }
   });
 
   return (
@@ -105,7 +112,7 @@ export function Popover(props: PopoverProps) {
       {props.children?.()}
       <div
         class="ui-popover-panel"
-        id={popId}
+        id={popId()}
         role="dialog"
         aria-label={ariaLabel()}
         hidden={boolAttr(!shown())}

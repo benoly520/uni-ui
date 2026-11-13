@@ -39,12 +39,13 @@ export function DatePicker(props: DatePickerProps) {
   const isControlled = () => props.value != null;
   const placeholder = () => props.placeholder;
   const ariaLabel = () => props['aria-label'];
-  const def: DatePickerValue = isControlled()
-    ? (props.value as DatePickerValue)
-    : props.defaultValue != null
-      ? (props.defaultValue as DatePickerValue)
-      : null;
-  const inner = signal<DatePickerValue>(def);
+  const inner = signal<DatePickerValue>(
+    isControlled()
+      ? (props.value as DatePickerValue)
+      : props.defaultValue != null
+        ? (props.defaultValue as DatePickerValue)
+        : null,
+  );
   const get = () => (isControlled() ? (props.value as DatePickerValue) : inner());
 
   const open = signal(false);

@@ -42,36 +42,37 @@ function allParentKeys(nodes: any[], acc: string[] = []): string[] {
  */
 export function Tree(props: TreeProps) {
   const checkable = () => props.checkable ?? true;
-  // 受控 / 非受控模式在挂载时确定（与 React 一致：prop != null 即为受控）
-  const expControlled = props.expandedKeys != null;
-  const chkControlled = props.checkedKeys != null;
+  /** 根据当前展开属性判断受控模式。 */
+  const expControlled = () => props.expandedKeys != null;
+  /** 根据当前勾选属性判断受控模式。 */
+  const chkControlled = () => props.checkedKeys != null;
 
   const expInner = signal<string[]>(
-    expControlled
+    expControlled()
       ? [...(props.expandedKeys as string[])]
       : props.defaultExpandedKeys != null
         ? [...(props.defaultExpandedKeys as string[])]
         : allParentKeys(props.data as TreeData[]),
   );
   const expSet = () =>
-    new Set(expControlled ? (props.expandedKeys as string[]) || [] : expInner());
+    new Set(expControlled() ? (props.expandedKeys as string[]) || [] : expInner());
 
   const chkInner = signal<string[]>(
-    chkControlled
+    chkControlled()
       ? [...(props.checkedKeys as string[])]
       : props.defaultCheckedKeys != null
         ? [...(props.defaultCheckedKeys as string[])]
         : [],
   );
   const chkSet = () =>
-    new Set(chkControlled ? (props.checkedKeys as string[]) || [] : chkInner());
+    new Set(chkControlled() ? (props.checkedKeys as string[]) || [] : chkInner());
 
   const toggleExpand = (node: TreeData) => {
     const set = new Set(expSet());
     const wasOpen = set.has(node.key);
     if (wasOpen) set.delete(node.key);
     else set.add(node.key);
-    if (!expControlled) expInner.set([...set]);
+    if (!expControlled()) expInner.set([...set]);
     props.onExpand?.([...set], { key: node.key, expanded: !wasOpen });
   };
   const toggleCheck = (node: TreeData) => {
@@ -79,7 +80,7 @@ export function Tree(props: TreeProps) {
     const wasOn = set.has(node.key);
     if (wasOn) set.delete(node.key);
     else set.add(node.key);
-    if (!chkControlled) chkInner.set([...set]);
+    if (!chkControlled()) chkInner.set([...set]);
     props.onCheck?.([...set], { key: node.key, checked: !wasOn });
   };
 

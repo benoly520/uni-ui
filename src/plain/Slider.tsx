@@ -33,13 +33,14 @@ export function Slider(props: SliderProps) {
   const fmt = (): SliderFormat => (props.format ?? 'num') as SliderFormat;
   const minLabel = () => props.minLabel ?? '最小值';
   const maxLabel = () => props.maxLabel ?? '最大值';
-  const dv: [number, number] = isControlled()
+  /** 读取内部状态的初始区间，不缓存 props 的复合读取。 */
+  const dv = (): [number, number] => isControlled()
     ? (props.value as [number, number])
     : props.defaultValue != null
       ? (props.defaultValue as [number, number])
       : [min(), max()];
-  const loInner = signal(Math.min(dv[0], dv[1]));
-  const hiInner = signal(Math.max(dv[0], dv[1]));
+  const loInner = signal(Math.min(dv()[0], dv()[1]));
+  const hiInner = signal(Math.max(dv()[0], dv()[1]));
   const lo = () =>
     isControlled()
       ? Math.min((props.value as any)[0], (props.value as any)[1])

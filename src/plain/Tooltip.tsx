@@ -50,7 +50,9 @@ export function Tooltip(props: TooltipProps) {
   const shown = () => (isControlled() ? !!props.open : inner());
   const delay = () => props.delay ?? 0;
   const disabled = () => props.disabled ?? false;
-  const tipId = props.id || 'tip-' + ++tipSeq;
+  const defaultTipId = 'tip-' + ++tipSeq;
+  /** 优先读取传入 ID，缺省时使用实例级稳定 ID。 */
+  const tipId = () => props.id || defaultTipId;
 
   const setOpen = (v: boolean) => {
     if (disabled()) return;
@@ -87,7 +89,7 @@ export function Tooltip(props: TooltipProps) {
         detach = null;
       }
       if (off || !trigger) return;
-      trigger.setAttribute('aria-describedby', tipId);
+      trigger.setAttribute('aria-describedby', tipId());
       const onFocusIn = () => show();
       const onFocusOut = (e: FocusEvent) => {
         if (el.contains(e.relatedTarget as Node)) return;
@@ -134,7 +136,7 @@ export function Tooltip(props: TooltipProps) {
       ref={refCb}
     >
       {props.children?.()}
-      <span class="bubble" role="tooltip" id={tipId} aria-hidden={!shown()}>
+      <span class="bubble" role="tooltip" id={tipId()} aria-hidden={!shown()}>
         {props.content}
       </span>
     </span>

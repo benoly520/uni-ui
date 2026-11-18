@@ -19,8 +19,8 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "plain": ["../plain-framework/dist/index.d.ts"],
-      "plain/*": ["../plain-framework/dist/*.d.ts"]
+      "plain": ["../../plain-framework/dist/index.d.ts"],
+      "plain/*": ["../../plain-framework/dist/*.d.ts"]
     }
   },
   "include": ["src/plain", "src/utils"]

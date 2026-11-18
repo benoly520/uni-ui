@@ -60,7 +60,7 @@
     "vue": "^3.4.0"
   },
   "devDependencies": {
-    "plain": "link:../plain-framework",
+    "plain": "link:../../plain-framework",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-vue": "^5.1.0",

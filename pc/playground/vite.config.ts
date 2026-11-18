@@ -5,10 +5,10 @@ import { resolve } from 'node:path';
 // Plain 框架编译器（本地通过 link: 依赖解析，免去先发版）。
 import plain from 'plain/vite';
 
-// 单包根目录（uni-ui 仓库根）：playground 通过 alias 直接消费「源码」，
+// PC 包根目录：playground 通过 alias 直接消费「源码」，
 // 免去先 build 库即可热更调试；同时演示真实消费路径 uni-ui/react、uni-ui/vue、uni-ui/plain、uni-ui/theme.css。
 const root = resolve(__dirname, '..');
-const plainRoot = resolve(__dirname, '../../plain-framework');
+const plainRoot = resolve(__dirname, '../../../plain-framework');
 
 export default defineConfig({
   plugins: [
@@ -39,7 +39,7 @@ export default defineConfig({
     },
     dedupe: ['react', 'react-dom', 'vue', 'plain'],
   },
-  // 库源码位于仓库根（playground 的父目录），放开 fs 访问以便 dev server 直接服务
+  // 库源码位于 PC 包根目录（playground 的父目录），放开 fs 访问以便 dev server 直接服务
   server: { fs: { allow: [root, plainRoot] }, port: 5180, open: false },
   preview: { port: 5180 },
 });

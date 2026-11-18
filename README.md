@@ -1,66 +1,71 @@
 # uni-ui
 
-同时支持 **React 18** / **Vue 3** / **Plain** 三端的 PC 端 Web 组件库，首应用为金融投研工具。
+面向不同运行环境的独立组件库集合。各端仅保持设计理念一致，不共享代码或设计文件。
 
-设计语言：macOS 毛玻璃质感、紧凑密度、默认暗色、七色品牌色、rem 单位。视觉全部来自共享设计系统 `theme.css`，组件文件零样式，保证三端 DOM 与类名完全一致。
+## 目录
 
-## 特性
+| 目录 | 场景 | 状态 |
+| --- | --- | --- |
+| [`pc/`](./pc/README.md) | 桌面 Web，支持 React / Vue / Plain | 已有组件库 |
+| `h5/` | 移动 Web，计划支持 React / Vue / Plain | 目录预留，尚未实现 |
+| `weapp/` | 微信小程序 | 目录预留，尚未实现 |
+| `tui/` | 终端交互界面（TUI），不是脚手架 CLI | 目录预留，尚未实现 |
 
-- **单包三端**：`uni-ui/react`、`uni-ui/vue`、`uni-ui/plain` 三个子路径；React / Vue / Plain 均外置为 peer 依赖。
-- **32 个组件**：基础输入、展示、导航、浮层、数据、反馈全品类，含金融增强（NumberInput / DatePicker / Stat / Tree / Slider / DataTable / Search）。
-- **契约四件套**：每个组件配套 `contracts/<name>.{api,behavior,dom}.md`，作为三端实现的唯一事实来源。
-- **图标**：不内置图标库。组件只内置少量「状态驱动」的内联 SVG（caret / check / search / calendar / table），其余图标由使用方经 `icon` 插槽传入；设计预览用本地 `vendor/lucide.min.js`（2126 图标，不随包发布），边界与快照记法见 `contracts/icon.md`。
+## 独立原则
 
-## 快速开始
+- 各端独立管理源码、工具函数、样式、主题变量、组件契约、依赖、构建、测试和发布。
+- 不创建跨端的 `shared`、`core`、公共 token 包，也不通过相对路径引用其他端的文件。
+- 只在品牌色、视觉气质、状态色语义等设计理念上保持一致，各端分别实现。
+- 允许重复代码，不为去重引入跨端耦合；各端不要求相同 DOM、API 或组件清单。
+- 同一端内部可以共享主题、工具和契约；PC 与 H5 的 React / Vue / Plain 应在各自端内对齐。
+- 微信小程序和 TUI 的技术选型独立决定，不预设沿用 Web 的三个框架。
+- 每个实际实现的端应能脱离本仓库的其他端独立开发、构建和发布。
 
-```ts
-// React
-import 'uni-ui/theme.css'; // 必选：一次性引入设计系统
-import { Button, Tree } from 'uni-ui/react';
+根目录只维护仓库说明、协作约定、Git 配置和许可证，不建立统一依赖或跨端构建工程。
 
-// Vue
-import 'uni-ui/theme.css';
-import { Tree } from 'uni-ui/vue';
+## PC 开发
+
+现有工程已整体迁入 `pc/`，包名 `uni-ui` 和 `uni-ui/react`、`uni-ui/vue`、
+`uni-ui/plain`、`uni-ui/theme.css` 等导入路径不变。
+
+本地开发需要相邻的 `plain-framework` 仓库，布局为：
+
+```text
+父目录/
+├── plain-framework/
+└── uni-ui/
+    ├── pc/
+    ├── h5/
+    ├── weapp/
+    └── tui/
 ```
 
-命令式反馈：
-
-```ts
-import { toast, showMessage } from 'uni-ui/react';
-toast('已保存');                        // 默认 2400ms 后自动关闭
-toast('已提交', { duration: 3000 });    // 可指定时长（0 = 常驻）
-showMessage('已保存', 'success');       // success | warning | info | danger
-showMessage('保存失败', 'danger', 4000);
-```
-
-## 文档
-
-- 使用说明：[`docs/USAGE.md`](./docs/USAGE.md)
-- 架构与设计方案讨论：[`跨框架组件库架构方案讨论.md`](./跨框架组件库架构方案讨论.md)
-- 组件契约规范：`contracts/`
-
-## 本地预览（Playground）
-
-三端并排演示，从库源码真实消费路径运行：
+在本仓库根目录执行：
 
 ```bash
-cd playground
+cd pc
 pnpm install
-pnpm dev        # http://localhost:5180
+pnpm run typecheck
+pnpm run typecheck:plain
+pnpm run build
 ```
 
-## 构建
+启动预览（从本仓库根目录执行）：
 
 ```bash
+cd pc/playground
 pnpm install
-pnpm run build              # 默认：单文件 bundle dist/react.js + dist/vue.js
-pnpm run build:modules      # 可选：按组件拆分（支持 uni-ui/react/Button 子路径直引）
-pnpm run typecheck          # vue-tsc 全量类型检查（0 error）
+pnpm dev
 ```
 
-## 约定
+更多说明见 [`pc/README.md`](./pc/README.md)。
 
-- 组件文件不写任何 scoped / 运行时 CSS；视觉复用 `theme.css` 已有 class。
-- **字体需自行加载（库零字体依赖）**：`theme.css` 不含 `@font-face`，`--ui-font-display` / `--ui-font-body` / `--ui-font-mono` 缺省回落系统字体；要拿到设计调性需应用侧加载 Cabinet Grotesk / Satoshi / JetBrains Mono，或直接覆盖这三个 token（见 [`docs/USAGE.md`](./docs/USAGE.md) §3.1）。
-- React / Vue / Plain 产出完全一致的标签、class、层级（DOM 一致是三端铁律）。
-- 构建工具：Vite 5 + Rollup（详见架构文档 §17.36 对比分析）。
+## 本地消费路径迁移
+
+通过包名消费已发布组件的导入语句无需更改。
+若其他项目通过 `link:` 或源码 alias 指向旧仓库根目录，需要改为指向 `uni-ui/pc`，
+源码与主题路径也相应改为 `uni-ui/pc/src/...` 和 `uni-ui/pc/theme.css`。
+
+## 许可证
+
+[MIT](./LICENSE)。PC 目录保留独立许可证副本，便于独立分发。

@@ -1,31 +1,43 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { resolve } from 'node:path';
+// plain 框架编译器 / vite 插件（本地通过 link: 依赖解析）。
+import plain from 'plain/vite';
 
-// H5 独立组件库：react / vue 两个入口共享同一份移动端设计令牌，组件本身零样式。
+// H5 独立组件库：react / vue / plain 三个入口共享同一份移动端设计令牌，组件本身零样式。
 // 样式由应用侧一次性 import 'uni-ui-h5/theme.css'；源码写 px，PostCSS 在构建时统一转 rem。
 //
 // 打包形态（二选一）：
-//   默认  pnpm build          → 单文件：dist/react.js、dist/vue.js、dist/flexible.js
+//   默认  pnpm build          → 单文件：dist/react.js、dist/vue.js、dist/plain.js、dist/flexible.js
 //   可选  pnpm build:modules  → 按组件拆分：dist/react/Button.js、dist/vue/Button.vue.js …
 const modules = process.env.H5_MODULES === '1';
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    // plain 必须在最前：先把 plain 的 .tsx 编译为「直接构建 DOM」的代码，
+    // 避免被 vue 插件再次按 JSX 处理。仅匹配 plain 源码。
+    plain({
+      include: /src\/plain\/.*\.(tsx|ts)$/,
+      rpc: false,
+    }),
+    vue(),
+  ],
   build: {
     lib: {
       entry: {
         react: resolve(__dirname, 'src/react/index.ts'),
         vue: resolve(__dirname, 'src/vue/index.ts'),
+        plain: resolve(__dirname, 'src/plain/index.ts'),
         flexible: resolve(__dirname, 'src/flexible.ts'),
       },
       formats: ['es'],
     },
     rollupOptions: {
-      // react / vue 均为 peer，不进 bundle；jsx-runtime 也外置。
+      // react / vue / plain 均为 peer，不进 bundle；jsx-runtime 也外置。
       external: (id) =>
-        ['react', 'react-dom', 'react/jsx-runtime', 'vue'].includes(id) ||
-        id.startsWith('react/'),
+        ['react', 'react-dom', 'react/jsx-runtime', 'vue', 'plain'].includes(id) ||
+        id.startsWith('react/') ||
+        id.startsWith('plain/'),
       output: modules
         ? {
             // 源码 src/react/Button.tsx → dist/react/Button.js

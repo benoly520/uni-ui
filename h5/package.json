@@ -1,7 +1,7 @@
 {
   "name": "uni-ui-h5",
   "version": "0.1.0",
-  "description": "面向移动 Web 的独立组件库（React 18 + Vue 3），源码使用 px，构建时自动转换为 rem 以适配不同屏幕。",
+  "description": "面向移动 Web 的独立组件库（React 18 + Vue 3 + Plain），源码使用 px，构建时自动转换为 rem 以适配不同屏幕。",
   "type": "module",
   "license": "MIT",
   "author": "benoly520",
@@ -20,6 +20,10 @@
       "types": "./dist/vue/index.d.ts",
       "import": "./dist/vue.js"
     },
+    "./plain": {
+      "types": "./dist/plain/index.d.ts",
+      "import": "./dist/plain.js"
+    },
     "./react/*": {
       "types": "./dist/react/*.d.ts",
       "import": "./dist/react/*.js"
@@ -27,6 +31,10 @@
     "./vue/*": {
       "types": "./dist/vue/*.d.ts",
       "import": "./dist/vue/*.js"
+    },
+    "./plain/*": {
+      "types": "./dist/plain/*.d.ts",
+      "import": "./dist/plain/*.js"
     },
     "./flexible": {
       "types": "./dist/flexible.d.ts",
@@ -39,12 +47,15 @@
   "types": "./dist/react/index.d.ts",
   "scripts": {
     "dev": "vite",
-    "build": "rm -rf dist && vite build && node scripts/build-theme.mjs && pnpm run types",
-    "build:modules": "rm -rf dist && H5_MODULES=1 vite build && node scripts/build-theme.mjs && pnpm run types",
+    "build": "rm -rf dist && vite build && node scripts/build-theme.mjs && pnpm run types && pnpm run types:plain",
+    "build:modules": "rm -rf dist && H5_MODULES=1 vite build && node scripts/build-theme.mjs && pnpm run types && pnpm run types:plain",
     "types": "vue-tsc -p tsconfig.json --emitDeclarationOnly --outDir dist",
-    "typecheck": "vue-tsc -p tsconfig.json --noEmit"
+    "types:plain": "tsc -p tsconfig.plain.json",
+    "typecheck": "vue-tsc -p tsconfig.json --noEmit",
+    "typecheck:plain": "tsc --noEmit -p tsconfig.plain.json"
   },
   "peerDependencies": {
+    "plain": "^0.7.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "vue": "^3.4.0"
@@ -53,6 +64,7 @@
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-vue": "^5.1.0",
+    "plain": "link:../../plain-framework",
     "postcss": "^8.4.0",
     "postcss-pxtorem": "^6.1.0",
     "react": "^18.3.1",

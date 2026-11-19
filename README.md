@@ -7,7 +7,7 @@
 | 目录 | 场景 | 状态 |
 | --- | --- | --- |
 | [`pc/`](./pc/README.md) | 桌面 Web，支持 React / Vue / Plain | 已有组件库 |
-| `h5/` | 移动 Web，支持 React / Vue | 已有组件库（Button） |
+| `h5/` | 移动 Web，支持 React / Vue / Plain | 已有组件库（Button） |
 | `weapp/` | 微信小程序 | 目录预留，尚未实现 |
 | `tui/` | 终端交互界面（TUI），不是脚手架 CLI | 目录预留，尚未实现 |
 

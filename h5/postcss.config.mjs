@@ -12,7 +12,8 @@ export const pxtoremOptions = {
   selectorBlackList: ['h5-no-rem'],
   minPixelValue: 2,
   mediaQuery: false,
-  exclude: /node_modules/i,
+  // playground 自身布局样式保持 px，只转换库的 theme.css 与 node_modules 外的组件样式。
+  exclude: /(node_modules|\/playground\/)/i,
 };
 
 export default {

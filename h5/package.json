@@ -52,7 +52,8 @@
     "types": "vue-tsc -p tsconfig.json --emitDeclarationOnly --outDir dist",
     "types:plain": "tsc -p tsconfig.plain.json",
     "typecheck": "vue-tsc -p tsconfig.json --noEmit",
-    "typecheck:plain": "tsc --noEmit -p tsconfig.plain.json"
+    "typecheck:plain": "tsc --noEmit -p tsconfig.plain.json",
+    "test": "node --test test/plain/*.test.mjs"
   },
   "peerDependencies": {
     "plain": "^0.7.0",
@@ -64,6 +65,7 @@
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-vue": "^5.1.0",
+    "jsdom": "^25.0.0",
     "plain": "link:../../plain-framework",
     "postcss": "^8.4.0",
     "postcss-pxtorem": "^6.1.0",

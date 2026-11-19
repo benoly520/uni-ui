@@ -1,0 +1,173 @@
+/* Playground 自身布局：使用 px，不参与库的 px → rem 转换（见 postcss.config.mjs exclude）。 */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  color: #1d1d1f;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue",
+    "Microsoft YaHei", sans-serif;
+  background: #eef1f5;
+}
+
+[data-theme="dark"] body {
+  color: #f5f5f7;
+  background: #0b0b0d;
+}
+
+.pg-head {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.72);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(16px);
+}
+
+[data-theme="dark"] .pg-head {
+  background: rgba(20, 20, 22, 0.72);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.pg-brand {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.pg-brand span {
+  color: #0a84ff;
+}
+
+.pg-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pg-root {
+  color: #6e6e73;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-theme="dark"] .pg-root {
+  color: #98989d;
+}
+
+.pg-hint {
+  max-width: 1280px;
+  margin: 16px auto 0;
+  padding: 0 16px;
+  color: #6e6e73;
+  font-size: 13px;
+}
+
+[data-theme="dark"] .pg-hint {
+  color: #98989d;
+}
+
+.pg-main {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+@media (min-width: 1000px) {
+  .pg-main {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.pg-panel {
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+}
+
+[data-theme="dark"] .pg-panel {
+  background: #1c1c1e;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.pg-panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .pg-panel-head {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.pg-fw {
+  color: #0a84ff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.pg-sub {
+  color: #6e6e73;
+  font-size: 12px;
+}
+
+[data-theme="dark"] .pg-sub {
+  color: #98989d;
+}
+
+.pg-card {
+  padding-top: 14px;
+}
+
+.pg-card h2 {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pg-card p {
+  margin: 0 0 12px;
+  color: #6e6e73;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+[data-theme="dark"] .pg-card p {
+  color: #98989d;
+}
+
+.pg-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.pg-stack {
+  display: grid;
+  gap: 8px;
+}
+
+.pg-stage {
+  min-height: 44px;
+}
+
+.pg-error {
+  margin: 0;
+  color: #e5484d;
+  font-size: 12px;
+}

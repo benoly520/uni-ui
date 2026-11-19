@@ -7,7 +7,7 @@
 | 目录 | 场景 | 状态 |
 | --- | --- | --- |
 | [`pc/`](./pc/README.md) | 桌面 Web，支持 React / Vue / Plain | 已有组件库 |
-| `h5/` | 移动 Web，支持 React / Vue / Plain | 已有组件库（Button） |
+| [`h5/`](./h5/README.md) | 移动 Web，支持 React / Vue / Plain | 已有组件库（Button） |
 | `weapp/` | 微信小程序 | 目录预留，尚未实现 |
 | `tui/` | 终端交互界面（TUI），不是脚手架 CLI | 目录预留，尚未实现 |
 
@@ -60,6 +60,34 @@ pnpm dev
 
 更多说明见 [`pc/README.md`](./pc/README.md)。
 
+## H5 开发
+
+`h5/` 是独立的移动 Web 组件库，包名 `uni-ui-h5`，导入路径为
+`uni-ui-h5/react`、`uni-ui-h5/vue`、`uni-ui-h5/plain`、`uni-ui-h5/theme.css`。
+源码使用 px，构建时自动转换为 rem；组件契约与 PC 完全分离。
+
+在本仓库根目录执行：
+
+```bash
+cd h5
+pnpm install
+pnpm run typecheck
+pnpm run typecheck:plain
+pnpm run build
+pnpm test
+```
+
+启动预览：
+
+```bash
+cd h5/playground
+pnpm install
+pnpm dev
+```
+
+更多说明见 [`h5/README.md`](./h5/README.md)、[`h5/docs/USAGE.md`](./h5/docs/USAGE.md)
+与 [`h5/contracts/`](./h5/contracts/README.md)。
+
 ## 本地消费路径迁移
 
 通过包名消费已发布组件的导入语句无需更改。
@@ -68,4 +96,4 @@ pnpm dev
 
 ## 许可证
 
-[MIT](./LICENSE)。PC 目录保留独立许可证副本，便于独立分发。
+[MIT](./LICENSE)。PC 与 H5 目录各自保留独立许可证副本，便于独立分发。

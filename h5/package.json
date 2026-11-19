@@ -1,0 +1,65 @@
+{
+  "name": "uni-ui-h5",
+  "version": "0.1.0",
+  "description": "面向移动 Web 的独立组件库（React 18 + Vue 3），源码使用 px，构建时自动转换为 rem 以适配不同屏幕。",
+  "type": "module",
+  "license": "MIT",
+  "author": "benoly520",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react.js"
+    },
+    "./vue": {
+      "types": "./dist/vue/index.d.ts",
+      "import": "./dist/vue.js"
+    },
+    "./react/*": {
+      "types": "./dist/react/*.d.ts",
+      "import": "./dist/react/*.js"
+    },
+    "./vue/*": {
+      "types": "./dist/vue/*.d.ts",
+      "import": "./dist/vue/*.js"
+    },
+    "./flexible": {
+      "types": "./dist/flexible.d.ts",
+      "import": "./dist/flexible.js"
+    },
+    "./theme.css": "./dist/theme.css"
+  },
+  "main": "./dist/react.js",
+  "module": "./dist/react.js",
+  "types": "./dist/react/index.d.ts",
+  "scripts": {
+    "dev": "vite",
+    "build": "rm -rf dist && vite build && node scripts/build-theme.mjs && pnpm run types",
+    "build:modules": "rm -rf dist && H5_MODULES=1 vite build && node scripts/build-theme.mjs && pnpm run types",
+    "types": "vue-tsc -p tsconfig.json --emitDeclarationOnly --outDir dist",
+    "typecheck": "vue-tsc -p tsconfig.json --noEmit"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "vue": "^3.4.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-vue": "^5.1.0",
+    "postcss": "^8.4.0",
+    "postcss-pxtorem": "^6.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.5.0",
+    "vite": "^5.4.0",
+    "vue": "^3.4.0",
+    "vue-tsc": "^2.1.0"
+  }
+}

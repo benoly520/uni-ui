@@ -1,0 +1,235 @@
+/* ============================================================
+   uni-ui-h5 · 移动端设计令牌
+   源码统一使用 px（设计稿 375 宽），构建时由 postcss-pxtorem
+   自动转换为 rem；运行时由 src/flexible.ts 设置 html font-size。
+   1px 发丝线保留 px（minPixelValue: 2），不做转换。
+   ============================================================ */
+
+:root {
+  /* — 品牌与语义色 — */
+  --h5-color-brand: #0a84ff;
+  --h5-color-brand-active: #0060df;
+  --h5-color-brand-soft: rgba(10, 132, 255, 0.12);
+  --h5-color-danger: #e5484d;
+  --h5-color-danger-active: #c93a3f;
+  --h5-color-success: #2fa66b;
+  --h5-color-on-brand: #ffffff;
+
+  /* — 文本与背景 — */
+  --h5-color-text: #1d1d1f;
+  --h5-color-text-soft: #6e6e73;
+  --h5-color-surface: #ffffff;
+  --h5-color-fill: rgba(120, 120, 128, 0.12);
+  --h5-color-fill-active: rgba(120, 120, 128, 0.2);
+  --h5-color-border: rgba(0, 0, 0, 0.12);
+  --h5-color-border-active: rgba(0, 0, 0, 0.2);
+
+  /* — 圆角 — */
+  --h5-radius-sm: 6px;
+  --h5-radius-md: 10px;
+  --h5-radius-pill: 999px;
+
+  /* — 字体 — */
+  --h5-font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue",
+    "Microsoft YaHei", sans-serif;
+  --h5-font-size-sm: 14px;
+  --h5-font-size-md: 16px;
+  --h5-font-size-lg: 17px;
+
+  /* — 按钮尺寸（移动端触控高度不低于 44px）— */
+  --h5-btn-height-sm: 36px;
+  --h5-btn-height-md: 44px;
+  --h5-btn-height-lg: 50px;
+  --h5-btn-pad-sm: 12px;
+  --h5-btn-pad-md: 20px;
+  --h5-btn-pad-lg: 24px;
+
+  /* — 动效 — */
+  --h5-ease: cubic-bezier(0.2, 0.8, 0.3, 1);
+  --h5-dur-fast: 160ms;
+}
+
+/* 暗色主题：仅覆盖语义令牌，组件结构不变 */
+[data-theme="dark"] {
+  --h5-color-brand: #0a84ff;
+  --h5-color-brand-active: #409cff;
+  --h5-color-brand-soft: rgba(10, 132, 255, 0.24);
+  --h5-color-danger: #ff6961;
+  --h5-color-danger-active: #ff8a84;
+  --h5-color-on-brand: #ffffff;
+  --h5-color-text: #f5f5f7;
+  --h5-color-text-soft: #98989d;
+  --h5-color-surface: #1c1c1e;
+  --h5-color-fill: rgba(120, 120, 128, 0.24);
+  --h5-color-fill-active: rgba(120, 120, 128, 0.36);
+  --h5-color-border: rgba(255, 255, 255, 0.16);
+  --h5-color-border-active: rgba(255, 255, 255, 0.28);
+}
+
+/* ============================================================
+   Button
+   尺寸：h5-btn--small / 默认 medium / h5-btn--large
+   变体：h5-btn--primary / secondary / outline / ghost / danger
+   修饰：h5-btn--block（通栏）、h5-btn--round（胶囊）、h5-btn--loading
+   ============================================================ */
+.h5-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-sizing: border-box;
+  height: var(--h5-btn-height-md);
+  margin: 0;
+  padding: 0 var(--h5-btn-pad-md);
+  font-family: var(--h5-font-family);
+  font-size: var(--h5-font-size-md);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--h5-color-text);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  vertical-align: middle;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--h5-radius-md);
+  outline: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--h5-dur-fast) var(--h5-ease),
+    border-color var(--h5-dur-fast) var(--h5-ease),
+    color var(--h5-dur-fast) var(--h5-ease),
+    opacity var(--h5-dur-fast) var(--h5-ease);
+}
+
+.h5-btn:focus-visible {
+  box-shadow: 0 0 0 3px var(--h5-color-brand-soft);
+}
+
+/* — 尺寸 — */
+.h5-btn--small {
+  height: var(--h5-btn-height-sm);
+  padding: 0 var(--h5-btn-pad-sm);
+  font-size: var(--h5-font-size-sm);
+  border-radius: var(--h5-radius-sm);
+}
+
+.h5-btn--large {
+  height: var(--h5-btn-height-lg);
+  padding: 0 var(--h5-btn-pad-lg);
+  font-size: var(--h5-font-size-lg);
+}
+
+/* — 修饰 — */
+.h5-btn--block {
+  display: flex;
+  width: 100%;
+}
+
+.h5-btn--round {
+  border-radius: var(--h5-radius-pill);
+}
+
+/* — 变体 — */
+.h5-btn--primary {
+  color: var(--h5-color-on-brand);
+  background: var(--h5-color-brand);
+}
+
+.h5-btn--primary:active:not(:disabled) {
+  background: var(--h5-color-brand-active);
+}
+
+.h5-btn--secondary {
+  color: var(--h5-color-text);
+  background: var(--h5-color-fill);
+}
+
+.h5-btn--secondary:active:not(:disabled) {
+  background: var(--h5-color-fill-active);
+}
+
+.h5-btn--outline {
+  color: var(--h5-color-text);
+  border-color: var(--h5-color-border);
+  background: transparent;
+}
+
+.h5-btn--outline:active:not(:disabled) {
+  border-color: var(--h5-color-border-active);
+  background: var(--h5-color-fill);
+}
+
+.h5-btn--ghost {
+  color: var(--h5-color-brand);
+  background: transparent;
+}
+
+.h5-btn--ghost:active:not(:disabled) {
+  background: var(--h5-color-brand-soft);
+}
+
+.h5-btn--danger {
+  color: var(--h5-color-on-brand);
+  background: var(--h5-color-danger);
+}
+
+.h5-btn--danger:active:not(:disabled) {
+  background: var(--h5-color-danger-active);
+}
+
+/* — 状态 — */
+.h5-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.h5-btn--loading {
+  pointer-events: none;
+}
+
+/* — 图标与加载 — */
+.h5-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+}
+
+.h5-btn__icon > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+.h5-btn__spinner {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: h5-btn-spin 700ms linear infinite;
+}
+
+@keyframes h5-btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .h5-btn {
+    transition: none;
+  }
+
+  .h5-btn__spinner {
+    animation-duration: 1.4s;
+  }
+}

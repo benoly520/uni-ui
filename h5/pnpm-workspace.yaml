@@ -1,0 +1,4 @@
+# 独立单包工程（非 monorepo），此文件仅用于声明依赖构建脚本策略。
+# esbuild 平台二进制由可选依赖提供，postinstall 只做自检；显式拒绝避免 pnpm 交互中断。
+allowBuilds:
+  esbuild: false
